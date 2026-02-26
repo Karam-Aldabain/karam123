@@ -1916,6 +1916,7 @@ export default function StudentsGraduatesLanding() {
   const animateImpactNumbers = true;
 
   const [openProgram, setOpenProgram] = useState(null);
+  const [applyProgram, setApplyProgram] = useState(null);
 
   const sliderRef = useRef(null);
   const scrollSlider = (dir) => {
@@ -2307,10 +2308,10 @@ Turn theory into market-ready skills through hands-on projects.             </mo
         onClose={() => setOpenProgram(null)}
         onApply={(p) => {
           setOpenProgram(null);
-          scrollToApply(p?.name || "");
+          setApplyProgram(p || null);
         }}
       />
-      <ApplyFlowModal open={false} program={null} onClose={() => {}} />
+      <ApplyFlowModal open={!!applyProgram} program={applyProgram} onClose={() => setApplyProgram(null)} />
 
       <style>{css}</style>
     </div>
