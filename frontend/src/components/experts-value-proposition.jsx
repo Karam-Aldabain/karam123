@@ -402,7 +402,7 @@ export default function ExpertsValuePropositionPage() {
                 >
                   <Calculator className="h-4 w-4" style={{ color: THEME.accent2 }} />
                 </span>
-                Example earnings calculator
+                ex earnings calculator
               </div>
 
               <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
