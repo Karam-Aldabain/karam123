@@ -801,51 +801,47 @@
 }
 
 .px-header.dark .px-mega {
-  background: linear-gradient(
-    180deg,
-    rgba(20, 29, 38, 0.97) 0%,
-    rgba(20, 29, 38, 0.93) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+  background: color-mix(in srgb, var(--px-sand) 92%, white 8%);
+  border-color: color-mix(in srgb, var(--px-deep) 14%, transparent);
+  box-shadow: 0 22px 60px color-mix(in srgb, black 18%, transparent);
 }
 
 .px-header.dark .px-megaTop {
-  border-bottom-color: rgba(255, 255, 255, 0.10);
+  border-bottom-color: color-mix(in srgb, var(--px-deep) 10%, transparent);
 }
 
 .px-header.dark .px-megaTitle {
-  color: rgba(226, 226, 210, 0.95);
+  color: var(--px-primary);
 }
 
 .px-header.dark .px-linkCard {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: color-mix(in srgb, white 60%, var(--px-sand));
+  border-color: color-mix(in srgb, var(--px-deep) 10%, transparent);
 }
 
 .px-header.dark .px-linkCard:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(197, 31, 93, 0.42);
+  background: color-mix(in srgb, white 70%, var(--px-sand));
+  border-color: color-mix(in srgb, var(--px-accent) 28%, transparent);
 }
 
 .px-header.dark .px-linkCard.active {
-  border-color: rgba(197, 31, 93, 0.58);
-  box-shadow: 0 0 0 2px rgba(197, 31, 93, 0.24);
+  border-color: color-mix(in srgb, var(--px-accent) 42%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--px-accent) 18%, transparent);
 }
 
 .px-header.dark .px-linkLabel {
-  color: rgba(226, 226, 210, 0.94);
+  color: var(--px-primary);
 }
 
 .px-header.dark .px-linkArrow {
-  color: rgba(226, 226, 210, 0.70);
+  color: color-mix(in srgb, var(--px-deep) 35%, transparent);
 }
 
 .px-header.dark .px-itemIcon {
-  color: rgba(226, 226, 210, 0.85);
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: none;
+  color: color-mix(in srgb, var(--px-deep) 78%, transparent);
+  border-color: color-mix(in srgb, var(--px-deep) 14%, transparent);
+  background: color-mix(in srgb, var(--px-primary) 7%, white);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
 }
 
 .px-header.dark .px-mobilePanel {
