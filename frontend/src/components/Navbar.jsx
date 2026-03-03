@@ -280,14 +280,12 @@ function ItemIcon({ title, active = false, className = "" }) {
 
 export default function Navbar({ dir = "ltr" }) {
   const [openId, setOpenId] = useState(null);
-  const [previewByGroup, setPreviewByGroup] = useState({});
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { theme } = useLocalTheme();
   const brandLogoSrc = "/navbar-logo-dark.png";
   const navRef = useRef(null);
   const closeTimer = useRef(null);
-  const previewTimer = useRef(null);
   const navItems = useMemo(() => NAV, []);
 
   useEffect(() => {
@@ -331,13 +329,6 @@ export default function Navbar({ dir = "ltr" }) {
     closeTimer.current = window.setTimeout(() => setOpenId(null), 140);
   }
 
-  function clearPreviewTimer() {
-    if (previewTimer.current) {
-      window.clearTimeout(previewTimer.current);
-      previewTimer.current = null;
-    }
-  }
-
   function toggleMobile() {
     setMobileOpen((v) => !v);
     setOpenId(null);
@@ -346,40 +337,6 @@ export default function Navbar({ dir = "ltr" }) {
   function onNavLink() {
     setOpenId(null);
     setMobileOpen(false);
-  }
-
-  function setPreview(groupId, item, category) {
-    setPreviewByGroup((prev) => ({
-      ...prev,
-      [groupId]: {
-        title: item.label,
-        text: item.desc,
-        category,
-        href: item.href,
-        iconTitle: item.label,
-        children: item.children || [],
-      },
-    }));
-  }
-
-  function setPreviewWithIntent(groupId, item, category) {
-    clearPreviewTimer();
-    previewTimer.current = window.setTimeout(() => {
-      setPreview(groupId, item, category);
-      previewTimer.current = null;
-    }, 120);
-  }
-
-  function toPreview(item, category) {
-    if (!item) return null;
-    return {
-      title: item.label,
-      text: item.desc,
-      category,
-      href: item.href,
-      iconTitle: item.label,
-      children: item.children || [],
-    };
   }
 
   return (
@@ -404,9 +361,6 @@ export default function Navbar({ dir = "ltr" }) {
           <div className="px-center" onPointerLeave={() => !isMobile && scheduleClose()}>
             {navItems.map((group) => {
               const open = openId === group.id;
-              const defaultItem = group.columns?.[0]?.items?.[0];
-              const defaultCategory = group.columns?.[0]?.title || group.label;
-              const activePreview = previewByGroup[group.id] || toPreview(defaultItem, defaultCategory);
 
               return (
                 <div
@@ -434,7 +388,6 @@ export default function Navbar({ dir = "ltr" }) {
                       onPointerEnter={() => !isMobile && openMenu(group.id)}
                       onPointerLeave={() => {
                         if (!isMobile) scheduleClose();
-                        clearPreviewTimer();
                       }}
                     >
                       <div className="px-megaGrid">
@@ -446,15 +399,12 @@ export default function Navbar({ dir = "ltr" }) {
                                 {col.items.map((it) => (
                                   <li key={it.href}>
                                     <a
-                                      className={`px-linkCard ${activePreview?.href === it.href ? "active" : ""}`}
+                                      className="px-linkCard"
                                       href={it.href}
                                       onClick={onNavLink}
-                                      onMouseEnter={() => setPreviewWithIntent(group.id, it, col.title)}
-                                      onMouseLeave={clearPreviewTimer}
-                                      onFocus={() => setPreview(group.id, it, col.title)}
                                     >
                                       <div className="px-linkHead">
-                                        <ItemIcon title={it.label} active={activePreview?.href === it.href} />
+                                        <ItemIcon title={it.label} />
                                         <div className="px-linkLabel">{it.label}</div>
                                         <ChevronRightIcon className="px-linkArrow" size={18} strokeWidth={2} />
                                       </div>
@@ -465,57 +415,6 @@ export default function Navbar({ dir = "ltr" }) {
                             </div>
                           ))}
                         </div>
-
-                                                <a
-                          className="px-promo"
-                          href={activePreview?.href || "#"}
-                          onClick={(e) => {
-                            if (!activePreview?.href) {
-                              e.preventDefault();
-                              return;
-                            }
-                            onNavLink();
-                          }}
-                        >
-                          <div
-                            className="px-promoBody"
-                            key={`${group.id}-${activePreview?.href || "empty"}`}
-                          >
-                            {activePreview ? (
-                              <>
-                                <ItemIcon title={activePreview.iconTitle} active className="promo" />
-                                <div className="px-promoTitle">{activePreview.title}</div>
-                                <div className="px-promoText">{activePreview.text}</div>
-                                {activePreview.children?.length ? (
-                                  <div className="px-promoSubList">
-                                    {activePreview.children.map((sub, subIdx) => (
-                                      <a
-                                        key={sub.href}
-                                        className="px-promoSubLink"
-                                        href={sub.href}
-                                        onClick={onNavLink}
-                                        style={{ animationDelay: `${subIdx * 0.04}s` }}
-                                      >
-                                        <ItemIcon title={sub.label} className="sub" />
-                                        <span>{sub.label}</span>
-                                        <span className="px-promoSubArrow">-&gt;</span>
-                                      </a>
-                                    ))}
-                                  </div>
-                                ) : null}
-                                <div className="px-promoCta">Learn more</div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="px-promoTitle">Hover an item</div>
-                                <div className="px-promoText">
-                                  Select a menu item to preview details and navigate.
-                                </div>
-                                <div className="px-promoCta">Preview panel</div>
-                              </>
-                            )}
-                          </div>
-                        </a>
                       </div>
                     </div>
                   )}
