@@ -1764,6 +1764,7 @@ export default function LandingPage() {
   const [pulseKey, setPulseKey] = useState(0);
   const [expertIndex, setExpertIndex] = useState(0);
   const [expertVisible, setExpertVisible] = useState(4);
+  const [journeyIndex, setJourneyIndex] = useState(0);
 
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
@@ -1817,6 +1818,14 @@ export default function LandingPage() {
   };
   const goExpertRight = () => {
     setExpertIndex((prev) => (prev >= expertMaxStart ? 0 : prev + 1));
+  };
+  const journeyImages = ["/apply.webp", "/projects.png", "/kkk.png", "/lunch.png"];
+  const journeyCount = HOW_IT_WORKS.length;
+  const goJourneyPrev = () => {
+    setJourneyIndex((prev) => (prev <= 0 ? journeyCount - 1 : prev - 1));
+  };
+  const goJourneyNext = () => {
+    setJourneyIndex((prev) => (prev >= journeyCount - 1 ? 0 : prev + 1));
   };
 
   const SUCCESS_STORIES = useMemo(
@@ -2374,7 +2383,105 @@ export default function LandingPage() {
           </MotionItem>
 
           <MotionItem>
-          <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-2 sm:hidden">
+            {(() => {
+              const s = HOW_IT_WORKS[journeyIndex];
+              return (
+                <motion.div
+                  key={s.title}
+                  initial={reduce ? false : { opacity: 0, y: 10 }}
+                  animate={reduce ? {} : { opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="relative h-full overflow-hidden rounded-[26px] border border-[color:var(--journeyBorder)] bg-[color:var(--journeyBg)]"
+                  style={{ boxShadow: "var(--journeyShadow)" }}
+                >
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    style={{ background: "var(--journeyGlow)" }}
+                  />
+                  <div className="relative grid items-center gap-6 p-6">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold"
+                          style={{
+                            background: "var(--journeyBadgeBg)",
+                            color: "var(--journeyBadgeText)",
+                            border: "1px solid var(--journeyBadgeBorder)",
+                          }}
+                        >
+                          {String(journeyIndex + 1).padStart(2, "0")}
+                        </span>
+                        <div className="text-base font-semibold text-[color:var(--text)]">
+                          {s.title}
+                        </div>
+                      </div>
+
+                      <p className="mt-3 max-w-[55ch] text-sm font-medium leading-relaxed text-[color:var(--muted)]">
+                        {s.desc}
+                      </p>
+                    </div>
+
+                    <div
+                      className="overflow-hidden rounded-[18px]"
+                      style={{
+                        border: "1px solid var(--journeyImgBorder)",
+                        boxShadow: "var(--journeyImgShadow)",
+                      }}
+                    >
+                      <img
+                        src={journeyImages[journeyIndex]}
+                        alt={s.title}
+                        className={[
+                          "h-[170px] w-full",
+                          journeyIndex === 2 ? "object-contain bg-white" : "object-cover",
+                        ].join(" ")}
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="relative z-10 flex items-center justify-between px-6 pb-6">
+                    <button
+                      type="button"
+                      onClick={goJourneyPrev}
+                      className="inline-flex items-center gap-1 rounded-full border border-[color:var(--journeyBorder)] bg-white/65 px-3 py-1.5 text-xs font-semibold text-[color:var(--text)]"
+                      aria-label="Previous step"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Prev
+                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {HOW_IT_WORKS.map((_, dotIdx) => (
+                        <button
+                          key={dotIdx}
+                          type="button"
+                          onClick={() => setJourneyIndex(dotIdx)}
+                          aria-label={`Go to step ${dotIdx + 1}`}
+                          className="h-2.5 w-2.5 rounded-full transition"
+                          style={{
+                            background:
+                              dotIdx === journeyIndex ? "var(--accent)" : "rgba(36,52,71,0.25)",
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={goJourneyNext}
+                      className="inline-flex items-center gap-1 rounded-full border border-[color:var(--journeyBorder)] bg-white/65 px-3 py-1.5 text-xs font-semibold text-[color:var(--text)]"
+                      aria-label="Next step"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })()}
+          </div>
+
+          <div className="mt-10 hidden grid-cols-1 gap-6 sm:grid xl:grid-cols-2">
             {HOW_IT_WORKS.map((s, idx) => (
               <div
                 key={s.title}
@@ -2419,12 +2526,7 @@ export default function LandingPage() {
                     }}
                   >
                     <img
-                      src={[
-                        "/apply.webp",
-                        "/projects.png",
-                        "/kkk.png",
-                        "/lunch.png",
-                      ][idx]}
+                      src={journeyImages[idx]}
                       alt={s.title}
                       className={[
                         "h-[170px] w-full md:h-[180px]",
