@@ -53,8 +53,7 @@ const IMAGES = {
   solution4: "/life.jpg",
   solution5:
     "/landing-universities-companies.png",
-  about:
-    "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+  about: "/about-praktix-karam.jpg",
 };
 
 const SOLUTIONS = [
@@ -1891,8 +1890,32 @@ export default function LandingPage() {
           "The mentorship quality and weekly feedback loops were the strongest part for our teams.",
         name: "Khaled Rahman",
         role: "Program Supervisor",
-        avatar: "https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=900&q=85",
-        photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=900&q=85",
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85",
+        photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85",
+      },
+      {
+        quote:
+          "The program gave us a clear structure to coach interns and measure performance every week.",
+        name: "Rania Haddad",
+        role: "Learning Operations Lead",
+        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=85",
+        photo: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1400&q=85",
+      },
+      {
+        quote:
+          "We saw faster onboarding because participants already understood team workflows and delivery standards.",
+        name: "David Klein",
+        role: "Technical Program Manager",
+        avatar: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=900&q=85",
+        photo: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=1400&q=85",
+      },
+      {
+        quote:
+          "Portfolio reviews became much stronger once students started shipping project work with mentor feedback.",
+        name: "Yasmine Noor",
+        role: "Career Services Specialist",
+        avatar: "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?auto=format&fit=crop&w=900&q=85",
+        photo: "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?auto=format&fit=crop&w=900&q=85",
       },
       {
         quote:
