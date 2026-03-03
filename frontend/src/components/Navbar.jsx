@@ -551,9 +551,6 @@ export default function Navbar({ dir = "ltr" }) {
               <div className="px-accordion">
                 {navItems.map((group) => {
                   const open = openId === group.id;
-                  const defaultItem = group.columns?.[0]?.items?.[0];
-                  const defaultCategory = group.columns?.[0]?.title || group.label;
-                  const activePreview = previewByGroup[group.id] || toPreview(defaultItem, defaultCategory);
                   return (
                     <div key={group.id} className="px-accItem">
                       <button
@@ -573,42 +570,20 @@ export default function Navbar({ dir = "ltr" }) {
                               <ul className="px-accList">
                                 {col.items.map((it) => (
                                   <li key={it.href}>
-                                    <button
-                                      type="button"
-                                      className={`px-accLinkBtn ${activePreview?.href === it.href ? "active" : ""}`}
-                                      onClick={() => setPreview(group.id, it, col.title)}
+                                    <a
+                                      className="px-accLink"
+                                      href={it.href}
+                                      onClick={onNavLink}
                                     >
                                       <ItemIcon title={it.label} className="mobile" />
                                       <span>{it.label}</span>
                                       <ChevronRightIcon className="px-linkArrow" size={16} strokeWidth={2} />
-                                    </button>
+                                    </a>
                                   </li>
                                 ))}
                               </ul>
                             </div>
                           ))}
-
-                          {activePreview ? (
-                            <div className="px-accPreview">
-                              <ItemIcon title={activePreview.iconTitle} active className="promo" />
-                              <div className="px-promoTitle">{activePreview.title}</div>
-                              <div className="px-promoText">{activePreview.text}</div>
-                              {activePreview.children?.length ? (
-                                <div className="px-promoSubList">
-                                  {activePreview.children.map((sub) => (
-                                    <a key={sub.href} className="px-promoSubLink" href={sub.href} onClick={onNavLink}>
-                                      <ItemIcon title={sub.label} className="sub" />
-                                      <span>{sub.label}</span>
-                                      <span className="px-promoSubArrow">-&gt;</span>
-                                    </a>
-                                  ))}
-                                </div>
-                              ) : null}
-                              <a className="px-promoCta" href={activePreview.href || group.promo.href} onClick={onNavLink}>
-                                Learn more
-                              </a>
-                            </div>
-                          ) : null}
                         </div>
                       )}
                     </div>
