@@ -727,7 +727,7 @@ function Input({ icon: Icon, iconColor = THEME.accent, className, ...props }) {
   );
 }
 
-function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent }) {
+function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent, name }) {
   const hasIcon = !!Icon;
   return (
     <div className="relative">
@@ -737,6 +737,7 @@ function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent
         </div>
       ) : null}
       <select
+        name={name}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cx(
@@ -1456,29 +1457,29 @@ export default function AIForOrganizationsLanding() {
                     onSubmit={(e) => {
                       e.preventDefault();
                       setSubmitting(true);
-                      setTimeout(() => {
-                        setSubmitting(false);
-                        setSubmitted(true);
-                        setTimeout(() => setSubmitted(false), 2800);
-                      }, 650);
+                      setSubmitted(true);
+                      setTimeout(() => setSubmitted(false), 2800);
+                      e.currentTarget.reset();
+                      setSubmitting(false);
                     }}
                     className="space-y-6"
                   >
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Organization Name" required>
-                        <Input icon={Building2} iconColor={THEME.accent2} placeholder="Organization name" />
+                        <Input name="organizationName" icon={Building2} iconColor={THEME.accent2} placeholder="Organization name" />
                       </Field>
                       <Field label="Industry" required>
-                        <Input icon={Briefcase} iconColor={THEME.accent3} placeholder="e.g., Banking, Healthcare" />
+                        <Input name="industry" icon={Briefcase} iconColor={THEME.accent3} placeholder="e.g., Banking, Healthcare" />
                       </Field>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Country" required>
-                        <Input icon={MapPin} iconColor={THEME.accent4} placeholder="Country" />
+                        <Input name="country" icon={MapPin} iconColor={THEME.accent4} placeholder="Country" />
                       </Field>
                       <Field label="Organization Size" required>
                         <Select
+                          name="organizationSize"
                           icon={LineChart}
                           iconColor={THEME.accent}
                           value={orgSize}
@@ -1489,7 +1490,7 @@ export default function AIForOrganizationsLanding() {
                     </div>
 
                     <Field label="Department (Optional)">
-                      <Input icon={Compass} iconColor={THEME.accent2} placeholder="Department (optional)" />
+                      <Input name="department" icon={Compass} iconColor={THEME.accent2} placeholder="Department (optional)" />
                     </Field>
 
                     <div className="pt-2 text-xs font-semibold tracking-widest text-[#0B1220]/60">
@@ -1498,19 +1499,19 @@ export default function AIForOrganizationsLanding() {
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Full Name" required>
-                        <Input icon={BadgeCheck} iconColor={THEME.accent2} placeholder="Full name" />
+                        <Input name="contactFullName" icon={BadgeCheck} iconColor={THEME.accent2} placeholder="Full name" />
                       </Field>
                       <Field label="Position / Title" required>
-                        <Input icon={Briefcase} iconColor={THEME.accent3} placeholder="e.g., CIO, Director" />
+                        <Input name="contactPosition" icon={Briefcase} iconColor={THEME.accent3} placeholder="e.g., CIO, Director" />
                       </Field>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Corporate Email" required>
-                        <Input icon={Globe2} iconColor={THEME.accent} placeholder="name@company.com" type="email" />
+                        <Input name="corporateEmail" icon={Globe2} iconColor={THEME.accent} placeholder="name@company.com" type="email" />
                       </Field>
                       <Field label="Phone Number">
-                        <Input icon={Rocket} iconColor={THEME.accent4} placeholder="+000 000 000 000" />
+                        <Input name="phoneNumber" icon={Rocket} iconColor={THEME.accent4} placeholder="+000 000 000 000" />
                       </Field>
                     </div>
 
@@ -1554,6 +1555,7 @@ export default function AIForOrganizationsLanding() {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="AI Maturity Level" required>
                         <Select
+                          name="aiMaturityLevel"
                           icon={Target}
                           iconColor={THEME.accent2}
                           value={maturity}
@@ -1563,6 +1565,7 @@ export default function AIForOrganizationsLanding() {
                       </Field>
                       <Field label="Preferred Format" required>
                         <Select
+                          name="preferredFormat"
                           icon={Handshake}
                           iconColor={THEME.accent3}
                           value={format}
@@ -1574,6 +1577,7 @@ export default function AIForOrganizationsLanding() {
 
                     <Field label="Desired Timeline" required>
                       <Select
+                        name="desiredTimeline"
                         icon={Calendar}
                         iconColor={THEME.accent4}
                         value={timeline}
@@ -1583,7 +1587,7 @@ export default function AIForOrganizationsLanding() {
                     </Field>
 
                     <Field label="Additional Notes" hint="Describe your objectives or current challenges.">
-                      <Textarea placeholder="What are you trying to achieve? What constraints exist?" />
+                      <Textarea name="additionalNotes" placeholder="What are you trying to achieve? What constraints exist?" />
                     </Field>
 
                     <div className="pt-2">

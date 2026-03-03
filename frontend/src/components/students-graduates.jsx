@@ -39,6 +39,7 @@ import {
   HeartPulse,
   X,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 /**
  * IMPORTANT:
@@ -50,7 +51,7 @@ import {
  * - categories
  */
 
-const THEME = {
+export const THEME = {
   deep: "#0B1220",
   slate: "#1E2A3A",
   sand: "#E9E7DF",
@@ -62,22 +63,22 @@ const THEME = {
   star: "#F5D66B",
 };
 
-const DARK_SECTION_BG = "linear-gradient(90deg, #050B1F 0%, #071A3E 100%)";
-const ACCENT_RGB = "201,29,103";
-const accent = (a) => `rgba(${ACCENT_RGB}, ${a})`;
+export const DARK_SECTION_BG = "linear-gradient(90deg, #050B1F 0%, #071A3E 100%)";
+export const ACCENT_RGB = "201,29,103";
+export const accent = (a) => `rgba(${ACCENT_RGB}, ${a})`;
 
 const IMAGES = {
   heroMain: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80",
   germany: "/munich-08.webp",
 };
 
-const CATEGORY_PRICES = {
+export const CATEGORY_PRICES = {
   eng: 1400,
   business: 1200,
   health: 1300,
 };
 
-const categories = [
+export const categories = [
   {
     key: "eng",
     label: "Engineering & Technology",
@@ -470,6 +471,39 @@ const categories = [
 ];
 
 const iconStrongProps = { strokeWidth: 2.4 };
+
+function slugify(text = "") {
+  return text
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function buildProgramSlug(categoryKey, programName) {
+  return `${categoryKey}-${slugify(programName)}`;
+}
+
+export function getProgramDetailsPath(program) {
+  const categoryKey = program?.categoryKey || "eng";
+  return `/students-graduates/program/${buildProgramSlug(categoryKey, program?.name || "")}`;
+}
+
+export function getAllProgramsWithMeta() {
+  return categories.flatMap((cat) =>
+    cat.programs.map((program) => ({
+      ...program,
+      categoryKey: cat.key,
+      categoryLabel: cat.label,
+      price: CATEGORY_PRICES[cat.key],
+      slug: buildProgramSlug(cat.key, program.name),
+    }))
+  );
+}
+
+export function getProgramBySlug(programSlug) {
+  return getAllProgramsWithMeta().find((program) => program.slug === programSlug) || null;
+}
 
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -1161,7 +1195,7 @@ function ProgramCard({ program, index = 0, onOpen }) {
   );
 }
 
-function ApplyFlowModal({ open, program, onClose }) {
+export function ApplyFlowModal({ open, program, onClose }) {
   useLockBodyScroll(open);
   const selected = program || categories[0].programs[0];
   const [step, setStep] = useState(0);
@@ -1901,6 +1935,7 @@ function Bullet({ icon: Icon, text, color }) {
 
 /* -------------------- Main Page -------------------- */
 export default function StudentsGraduatesLanding() {
+  const navigate = useNavigate();
   const [activeCat, setActiveCat] = useState(categories[0].key);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1914,9 +1949,6 @@ export default function StudentsGraduatesLanding() {
   const cat = useMemo(() => categories.find((c) => c.key === activeCat) || categories[0], [activeCat]);
   const impact = useInViewOnce(0.25);
   const animateImpactNumbers = true;
-
-  const [openProgram, setOpenProgram] = useState(null);
-  const [applyProgram, setApplyProgram] = useState(null);
 
   const sliderRef = useRef(null);
   const scrollSlider = (dir) => {
@@ -1942,11 +1974,9 @@ export default function StudentsGraduatesLanding() {
     e.preventDefault();
     setSubmitting(true);
     setSubmitted(false);
-    window.setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-      setQuestionForm({ fullName: "", email: "", program: "", message: "" });
-    }, 650);
+    setSubmitting(false);
+    setSubmitted(true);
+    setQuestionForm({ fullName: "", email: "", program: "", message: "" });
   };
 
   return (
@@ -2127,9 +2157,14 @@ Turn theory into market-ready skills through hands-on projects.             </mo
                 {cat.programs.map((p, idx) => (
                   <div key={p.name} style={{ scrollSnapAlign: "start" }}>
                     <ProgramCard
-                      program={{ ...p, price: CATEGORY_PRICES[cat.key] }}
+                      program={{
+                        ...p,
+                        categoryKey: cat.key,
+                        categoryLabel: cat.label,
+                        price: CATEGORY_PRICES[cat.key],
+                      }}
                       index={idx}
-                      onOpen={setOpenProgram}
+                      onOpen={(selectedProgram) => navigate(getProgramDetailsPath(selectedProgram))}
                     />
                   </div>
                 ))}
@@ -2302,17 +2337,6 @@ Turn theory into market-ready skills through hands-on projects.             </mo
       </a>
 
       {/* Modal */}
-      <ProgramModal
-        open={!!openProgram}
-        program={openProgram}
-        onClose={() => setOpenProgram(null)}
-        onApply={(p) => {
-          setOpenProgram(null);
-          setApplyProgram(p || null);
-        }}
-      />
-      <ApplyFlowModal open={!!applyProgram} program={applyProgram} onClose={() => setApplyProgram(null)} />
-
       <style>{css}</style>
     </div>
   );

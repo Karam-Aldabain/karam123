@@ -56,7 +56,7 @@ function cx(...classes) {
 const iconStrongProps = { strokeWidth: 2.4 };
 
 /** ---------------------------------------------------------------------
- *  DATA (admin-editable via local “Edit mode”)
+ *  DATA (editable via local “Edit mode”)
  *  ------------------------------------------------------------------- */
 const DEFAULT_METRICS = [
   {

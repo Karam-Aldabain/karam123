@@ -1338,7 +1338,7 @@ function PartnershipForm() {
 
     setSubmitting(true);
 
-    // Simulate submission + capture metadata required for admin tracking
+    // Simulate submission and capture metadata locally
     const submission = {
       id: uid(),
       timestamp: new Date().toISOString(),
@@ -1350,9 +1350,7 @@ function PartnershipForm() {
       payload: form,
     };
 
-    // Hook this to your API
-    // await fetch("/api/partnership", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(submission) });
-    // For now:
+    // Keep local-only for now:
     console.log("PARTNERSHIP_SUBMISSION", submission);
 
     await new Promise((r) => setTimeout(r, reduce ? 250 : 650));

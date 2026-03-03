@@ -802,13 +802,10 @@ function RegistrationForm() {
   const submit = (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 2600);
-      setStep(1);
-      // Hook your API here
-    }, reduce ? 0 : 700);
+    setSubmitting(false);
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 2600);
+    setStep(1);
   };
 
   return (

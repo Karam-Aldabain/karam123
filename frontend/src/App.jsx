@@ -6,6 +6,14 @@ import CustomTrainingPage from "./components/custom-training";
 import BootcampPage from "./components/bootcamp";
 import CoursesWorkshopsPage from "./components/courses-workshops.jsx";
 import StudentsGraduatesPage from "./components/students-graduates";
+import StudentsGraduatesSoftwareEngineeringPage from "./components/students-graduates-software-engineering-page";
+import StudentsGraduatesCloudDevopsPage from "./components/students-graduates-cloud-devops-page";
+import StudentsGraduatesDigitalTwinPage from "./components/students-graduates-digital-twin-page";
+import StudentsGraduatesCybersecurityPage from "./components/students-graduates-cybersecurity-page";
+import StudentsGraduatesMobileAppDevelopmentPage from "./components/students-graduates-mobile-app-development-page";
+import StudentsGraduatesWebDevelopmentInternshipPage from "./components/students-graduates-web-development-internship-page";
+import StudentsGraduatesGameDevelopmentInternshipPage from "./components/students-graduates-game-development-internship-page";
+import StudentsGraduatesAiMachineLearningPage from "./components/students-graduates-ai-machine-learning-page";
 import AiForRealWorldCareersPage from "./components/ai-for-real-world-careers";
 import OneToOneCareerMentorshipPage from "./components/one-to-one-career-mentorship";
 import UniversitiesCompaniesPage from "./components/universities-companies";
@@ -20,6 +28,8 @@ import MissionVisionPage from "./components/mission-vision";
 import HowWeWorkPage from "./components/how-we-work";
 import PartnershipsPage from "./components/partnerships";
 import EcosystemPage from "./components/ecosystem";
+import ExpertsValuePropositionPage from "./components/experts-value-proposition";
+import ExpertsRegisterPage from "./components/experts-register";
 import SiteFooter from "./components/SiteFooter";
 import ImpressumPage from "./components/legal/ImpressumPage";
 import TermsOfUsePage from "./components/legal/TermsOfUsePage";
@@ -49,6 +59,34 @@ export default function App() {
           <Route path="/courses-workshops" element={<CoursesWorkshopsPage />} />
           <Route path="/students-graduates" element={<StudentsGraduatesPage />} />
           <Route path="/for-individuals/students-graduates" element={<StudentsGraduatesPage />} />
+          <Route
+            path="/students-graduates/program/eng-software-engineering-frontend-backend-full-stack"
+            element={<StudentsGraduatesSoftwareEngineeringPage />}
+          />
+          <Route
+            path="/students-graduates/program/eng-cloud-and-devops-engineering"
+            element={<StudentsGraduatesCloudDevopsPage />}
+          />
+          <Route path="/students-graduates/program/eng-digital-twin-engineering" element={<StudentsGraduatesDigitalTwinPage />} />
+          <Route path="/students-graduates/program/eng-cybersecurity" element={<StudentsGraduatesCybersecurityPage />} />
+          <Route path="/students-graduates/program/eng-mobile-app-development" element={<StudentsGraduatesMobileAppDevelopmentPage />} />
+          <Route path="/students-graduates/program/eng-web-development-internship" element={<StudentsGraduatesWebDevelopmentInternshipPage />} />
+          <Route path="/students-graduates/program/eng-game-development-internship" element={<StudentsGraduatesGameDevelopmentInternshipPage />} />
+          <Route path="/students-graduates/program/eng-ai-and-machine-learning-internship" element={<StudentsGraduatesAiMachineLearningPage />} />
+          <Route
+            path="/for-individuals/students-graduates/program/eng-software-engineering-frontend-backend-full-stack"
+            element={<StudentsGraduatesSoftwareEngineeringPage />}
+          />
+          <Route
+            path="/for-individuals/students-graduates/program/eng-cloud-and-devops-engineering"
+            element={<StudentsGraduatesCloudDevopsPage />}
+          />
+          <Route path="/for-individuals/students-graduates/program/eng-digital-twin-engineering" element={<StudentsGraduatesDigitalTwinPage />} />
+          <Route path="/for-individuals/students-graduates/program/eng-cybersecurity" element={<StudentsGraduatesCybersecurityPage />} />
+          <Route path="/for-individuals/students-graduates/program/eng-mobile-app-development" element={<StudentsGraduatesMobileAppDevelopmentPage />} />
+          <Route path="/for-individuals/students-graduates/program/eng-web-development-internship" element={<StudentsGraduatesWebDevelopmentInternshipPage />} />
+          <Route path="/for-individuals/students-graduates/program/eng-game-development-internship" element={<StudentsGraduatesGameDevelopmentInternshipPage />} />
+          <Route path="/for-individuals/students-graduates/program/eng-ai-and-machine-learning-internship" element={<StudentsGraduatesAiMachineLearningPage />} />
           <Route path="/for-individuals/ai-for-real-world-careers" element={<AiForRealWorldCareersPage />} />
           <Route path="/for-individuals/ai-across-industries" element={<AiForRealWorldCareersPage />} />
           <Route path="/for-individuals/mentorship" element={<OneToOneCareerMentorshipPage />} />
@@ -84,7 +122,9 @@ export default function App() {
           <Route path="/about/ecosystem/industry-engagements" element={<EcosystemPage />} />
           <Route path="/about/ecosystem/events" element={<EcosystemPage />} />
           <Route path="/about/ecosystem/hiring-initiatives" element={<EcosystemPage />} />
-          <Route path="/about/ecosystem/become-an-expert" element={<EcosystemPage />} />
+          <Route path="/about/ecosystem/become-an-expert" element={<ExpertsValuePropositionPage />} />
+          <Route path="/experts/value-proposition" element={<ExpertsValuePropositionPage />} />
+          <Route path="/experts/register" element={<ExpertsRegisterPage />} />
           <Route path="/about" element={<MissionVisionPage />} />
         </Routes>
       </main>

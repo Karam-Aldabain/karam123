@@ -2188,7 +2188,7 @@ export default function PartnershipsPage() {
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <MagneticButton href="#apply">Become a Partner</MagneticButton>
-                <MagneticButton href="#apply" variant="secondary">Become an Expert</MagneticButton>
+                <MagneticButton href="/experts/value-proposition" variant="secondary">Become an Expert</MagneticButton>
               </div>
 
             </motion.div>

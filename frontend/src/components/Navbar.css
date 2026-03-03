@@ -237,8 +237,8 @@
 
 .px-megaGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: start;
 }
 
@@ -341,9 +341,9 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.18);
-  color: color-mix(in srgb, white 90%, var(--px-accent));
+  background: color-mix(in srgb, white 72%, var(--px-sand));
+  border-color: color-mix(in srgb, var(--px-deep) 16%, transparent);
+  color: var(--px-accent);
 }
 
 /* Promo */
@@ -351,12 +351,9 @@
   text-decoration: none;
   border-radius: 16px;
   padding: 14px;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--px-deep) 92%, black),
-    color-mix(in srgb, var(--px-primary) 90%, black)
-  );
-  border: 1px solid color-mix(in srgb, var(--px-accent) 35%, transparent);
-  color: white;
+  background: color-mix(in srgb, white 72%, var(--px-sand));
+  border: 1px solid color-mix(in srgb, var(--px-deep) 14%, transparent);
+  color: var(--px-deep);
   display: grid;
   gap: 8px;
   align-self: start;
@@ -374,9 +371,9 @@
   animation: pxPromoIn .28s ease;
 }
 
-.px-promoEyebrow { color: color-mix(in srgb, white 75%, var(--px-sand)); font-weight: 900; font-size: 12px; }
+.px-promoEyebrow { color: color-mix(in srgb, var(--px-deep) 62%, transparent); font-weight: 900; font-size: 12px; }
 .px-promoTitle { font-weight: 1000; font-size: 16px; letter-spacing: -0.3px; }
-.px-promoText { color: color-mix(in srgb, white 80%, var(--px-sand)); font-weight: 650; font-size: 13px; line-height: 1.35; }
+.px-promoText { color: color-mix(in srgb, var(--px-deep) 68%, transparent); font-weight: 650; font-size: 13px; line-height: 1.35; }
 .px-promoCta { margin-top: 6px; font-weight: 950; color: color-mix(in srgb, var(--px-accent) 70%, white); }
 .px-promoCta {
   display: inline-flex;
@@ -415,7 +412,7 @@
   border-radius: 10px;
   padding: 9px 10px;
   border: 1px solid transparent;
-  color: rgba(255,255,255,0.9);
+  color: color-mix(in srgb, var(--px-deep) 84%, transparent);
   transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
   animation: pxPromoSubIn .24s ease both;
 }
@@ -423,15 +420,15 @@
 .px-promoSubLink:hover,
 .px-promoSubLink:focus-visible {
   outline: none;
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.12);
-  color: #fff;
+  background: color-mix(in srgb, var(--px-accent) 8%, white);
+  border-color: color-mix(in srgb, var(--px-accent) 28%, transparent);
+  color: var(--px-deep);
   transform: translateX(2px);
 }
 
 .px-promoSubArrow {
   margin-left: auto;
-  color: rgba(255,255,255,0.42);
+  color: color-mix(in srgb, var(--px-deep) 46%, transparent);
   transition: color .2s ease, transform .2s ease;
 }
 
@@ -444,9 +441,9 @@
   width: 24px;
   height: 24px;
   border-radius: 8px;
-  color: color-mix(in srgb, var(--px-accent) 72%, white);
-  border-color: rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.06);
+  color: var(--px-accent);
+  border-color: color-mix(in srgb, var(--px-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--px-accent) 8%, white);
   box-shadow: none;
 }
 
@@ -592,12 +589,9 @@
   margin-top: 4px;
   border-radius: 14px;
   padding: 12px;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--px-deep) 92%, black),
-    color-mix(in srgb, var(--px-primary) 90%, black)
-  );
-  border: 1px solid color-mix(in srgb, var(--px-accent) 30%, transparent);
-  color: white;
+  background: color-mix(in srgb, white 72%, var(--px-sand));
+  border: 1px solid color-mix(in srgb, var(--px-deep) 14%, transparent);
+  color: var(--px-deep);
   display: grid;
   gap: 8px;
 }
@@ -612,8 +606,8 @@
   text-decoration: none;
   padding: 12px 12px;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--px-deep) 88%, black);
-  color: white;
+  background: color-mix(in srgb, white 70%, var(--px-sand));
+  color: var(--px-deep);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -807,12 +801,8 @@
 }
 
 .px-header.dark .px-mega {
-  background: linear-gradient(
-    180deg,
-    rgba(20, 29, 38, 0.98) 0%,
-    rgba(36, 52, 71, 0.96) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--px-sand) 92%, white 8%);
+  border-color: color-mix(in srgb, var(--px-deep) 14%, transparent);
 }
 
 .px-header.dark .px-megaTop {
@@ -848,17 +838,13 @@
 }
 
 .px-header.dark .px-mobilePanel {
-  border-top: 1px solid rgba(255, 255, 255, 0.10);
-  background: linear-gradient(
-    180deg,
-    rgba(20, 29, 38, 0.97) 0%,
-    rgba(20, 29, 38, 0.93) 100%
-  );
+  border-top: 1px solid color-mix(in srgb, var(--px-deep) 12%, transparent);
+  background: color-mix(in srgb, var(--px-sand) 95%, white 5%);
 }
 
 .px-header.dark .px-accItem {
-  border-color: rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in srgb, var(--px-deep) 12%, transparent);
+  background: color-mix(in srgb, white 55%, var(--px-sand));
 }
 
 .px-header.dark .px-accTrigger,

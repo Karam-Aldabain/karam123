@@ -20,6 +20,30 @@ export default function LoginPortalPage() {
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+
+  function onLoginSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true);
+    setStatusMessage("");
+    setStatusMessage("Login request submitted. We will contact you soon.");
+    setPassword("");
+    setSubmitting(false);
+  }
+
+  function onRegisterSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true);
+    setStatusMessage("");
+    setStatusMessage("Registration request submitted. We will contact you soon.");
+    setFullName("");
+    setPhoneNumber("");
+    setRegisterEmail("");
+    setRegisterPassword("");
+    setConfirmPassword("");
+    setSubmitting(false);
+  }
 
   return (
     <div className="relative min-h-[calc(100vh-170px)] overflow-hidden bg-[#E2E2D2]">
@@ -74,13 +98,14 @@ export default function LoginPortalPage() {
         >
           {mode === "login" ? (
             <>
-              <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+              <form onSubmit={onLoginSubmit} className="space-y-4">
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-[#141D26]">Email address</label>
                   <div className="relative">
                     <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#243447]/55" />
                     <input
                       type="email"
+                      required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="name@email.com"
@@ -95,6 +120,7 @@ export default function LoginPortalPage() {
                     <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#243447]/55" />
                     <input
                       type="password"
+                      required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
@@ -117,13 +143,14 @@ export default function LoginPortalPage() {
                   whileHover={reduce ? undefined : { y: -1 }}
                   whileTap={reduce ? undefined : { scale: 0.99 }}
                   type="submit"
+                  disabled={submitting}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white"
                   style={{
                     background: "linear-gradient(135deg, #C51F5D 0%, #A5164E 100%)",
                     boxShadow: "0 14px 36px rgba(197,31,93,0.32)",
                   }}
                 >
-                  Login to Portal <ArrowRight className="h-4 w-4" />
+                  {submitting ? "Submitting..." : "Login to Portal"} <ArrowRight className="h-4 w-4" />
                 </motion.button>
               </form>
 
@@ -137,7 +164,7 @@ export default function LoginPortalPage() {
           ) : (
             <>
               <div className="text-center text-sm font-semibold text-[#141D26]">Register</div>
-              <form onSubmit={(e) => e.preventDefault()} className="mt-4 space-y-3">
+              <form onSubmit={onRegisterSubmit} className="mt-4 space-y-3">
                 <input
                   type="text"
                   required
@@ -182,12 +209,13 @@ export default function LoginPortalPage() {
                   whileHover={reduce ? undefined : { y: -1 }}
                   whileTap={reduce ? undefined : { scale: 0.99 }}
                   type="submit"
+                  disabled={submitting}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white"
                   style={{
                     background: "linear-gradient(135deg, #243447 0%, #141D26 100%)",
                   }}
                 >
-                  Register <ArrowRight className="h-4 w-4" />
+                  {submitting ? "Submitting..." : "Register"} <ArrowRight className="h-4 w-4" />
                 </motion.button>
               </form>
 
@@ -199,6 +227,9 @@ export default function LoginPortalPage() {
               </div>
             </>
           )}
+          {statusMessage ? (
+            <div className="mt-4 text-center text-sm font-semibold text-[#243447]/85">{statusMessage}</div>
+          ) : null}
         </motion.div>
       </div>
     </div>

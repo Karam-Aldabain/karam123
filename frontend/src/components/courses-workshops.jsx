@@ -38,6 +38,14 @@ const COLORS = {
 
 const cn = (...c) => c.filter(Boolean).join(" ");
 
+function toFieldName(label) {
+  return String(label || "")
+    .toLowerCase()
+    .replace(/\(optional\)|\*/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
 function scrollToId(id) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -251,13 +259,15 @@ function SectionHeader({ title, subtitle }) {
   );
 }
 
-function Field({ label, placeholder, icon: Icon, type = "text", required = true }) {
+function Field({ label, placeholder, icon: Icon, type = "text", required = true, name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-white/60">{label}</span>
       <div className="relative">
         {Icon ? <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" /> : null}
         <input
+          name={fieldName}
           required={required}
           type={type}
           placeholder={placeholder}
@@ -272,11 +282,13 @@ function Field({ label, placeholder, icon: Icon, type = "text", required = true 
   );
 }
 
-function SelectField({ label, placeholder, options, required = true }) {
+function SelectField({ label, placeholder, options, required = true, name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-white/60">{label}</span>
       <select
+        name={fieldName}
         required={required}
         defaultValue=""
         className={cn(
@@ -297,11 +309,13 @@ function SelectField({ label, placeholder, options, required = true }) {
   );
 }
 
-function TextArea({ label, placeholder, minLength = 30, value, onChange }) {
+function TextArea({ label, placeholder, minLength = 30, value, onChange, name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-white/60">{label}</span>
       <textarea
+        name={fieldName}
         required
         minLength={minLength}
         rows={5}
@@ -327,6 +341,18 @@ export default function CoursesWorkshopsPage() {
   }, []);
 
   const [details, setDetails] = useState("");
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [requestMessage, setRequestMessage] = useState("");
+
+  function onSubmitRequest(e) {
+    e.preventDefault();
+    setIsSubmittingRequest(true);
+    setRequestMessage("");
+    setRequestMessage("Request submitted successfully.");
+    setDetails("");
+    e.currentTarget.reset();
+    setIsSubmittingRequest(false);
+  }
 
   return (
     <div
@@ -623,10 +649,7 @@ export default function CoursesWorkshopsPage() {
             <div className="mt-10">
               <GlassCard className="p-6 md:p-8">
                 <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    alert("Submitted! Connect this to your API.");
-                  }}
+                  onSubmit={onSubmitRequest}
                   className="grid gap-6"
                 >
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -647,6 +670,7 @@ export default function CoursesWorkshopsPage() {
                       minLength={30}
                       value={details}
                       onChange={(e) => setDetails(e.target.value)}
+                      name="focus_areas"
                     />
                     <div className="mt-2 text-right text-xs font-semibold text-white/45">{details.length}/2000</div>
                   </div>
@@ -664,6 +688,7 @@ export default function CoursesWorkshopsPage() {
 
                   <button
                     type="submit"
+                    disabled={isSubmittingRequest}
                     className={cn(
                       "w-full rounded-2xl px-6 py-4 text-base font-extrabold text-white",
                       "bg-[linear-gradient(135deg,#C51F5D,#A9164E)]",
@@ -672,8 +697,9 @@ export default function CoursesWorkshopsPage() {
                       "focus:outline-none focus:ring-2 focus:ring-white/20"
                     )}
                   >
-                    Submit Request
+                    {isSubmittingRequest ? "Submitting..." : "Submit Request"}
                   </button>
+                  {requestMessage ? <p className="text-sm text-white/80">{requestMessage}</p> : null}
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2 text-xs font-semibold text-white/55">

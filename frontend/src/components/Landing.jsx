@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   AnimatePresence,
   motion,
@@ -353,7 +353,7 @@ function Pill({ children, className = "" }) {
 function Chip({ variant = "green", children }) {
   const map = {
     green:
-      "bg-[rgba(46,204,113,0.12)] border-[rgba(46,204,113,0.24)] text-[color:var(--text)]",
+      "bg-[rgba(59,130,246,0.12)] border-[rgba(59,130,246,0.24)] text-[color:var(--text)]",
     blue:
       "bg-[rgba(59,130,246,0.12)] border-[rgba(59,130,246,0.24)] text-[color:var(--text)]",
     pink:
@@ -570,7 +570,7 @@ function LearningHeroLikeRef({
         style={{
           background:
             "radial-gradient(1200px 800px at 18% 25%, rgba(255,46,147,0.14), transparent 62%)," +
-            "radial-gradient(1100px 800px at 78% 30%, rgba(0,230,167,0.14), transparent 58%)," +
+            "radial-gradient(1100px 800px at 78% 30%, rgba(59,130,246,0.14), transparent 58%)," +
             "linear-gradient(135deg, #0b0f1f 0%, #111827 100%)",
         }}
       />
@@ -829,7 +829,7 @@ function EcosystemCanvas({ pulseKey, reduce }) {
       const count = mobile ? 20 : 34;
       const palette = [
         "rgba(255,46,147,0.92)",
-        "rgba(0,230,167,0.90)",
+        "rgba(59,130,246,0.90)",
         "rgba(59,130,246,0.58)",
         "rgba(255,255,255,0.85)",
       ];
@@ -906,7 +906,7 @@ function EcosystemCanvas({ pulseKey, reduce }) {
           const dist = Math.hypot(dx, dy);
           if (dist > maxDist) continue;
           const alpha = (1 - dist / maxDist) * (0.12 + 0.48 * formation);
-          const lineMix = Math.sin((i + j + phase) * 0.3) > 0 ? "255,46,147" : "0,230,167";
+          const lineMix = Math.sin((i + j + phase) * 0.3) > 0 ? "255,46,147" : "59,130,246";
           ctx.strokeStyle = `rgba(${lineMix}, ${alpha})`;
           ctx.lineWidth = formation > 0.6 ? 1 : 0.8;
           ctx.beginPath();
@@ -1049,7 +1049,7 @@ function DigitalCoreCanvas({ pulseKey, reduce }) {
       ctx.globalAlpha = 1;
 
       drawRing(cx, cy, base * 1.34 * breath, rotOuter, "255,46,147", 1.6, 0.35 + glowPulse * 0.25);
-      drawRing(cx, cy, base * 1.05 * breath, rotInner, "0,230,167", 1.2, 0.28 + glowPulse * 0.3);
+      drawRing(cx, cy, base * 1.05 * breath, rotInner, "59,130,246", 1.2, 0.28 + glowPulse * 0.3);
 
       ctx.save();
       ctx.translate(cx, cy);
@@ -1076,7 +1076,7 @@ function DigitalCoreCanvas({ pulseKey, reduce }) {
         const rr = base * (0.9 + (i % 3) * 0.18);
         const x = cx + Math.cos(a) * rr;
         const y = cy + Math.sin(a) * rr * 0.66;
-        const color = i % 2 === 0 ? "rgba(255,46,147,0.85)" : "rgba(0,230,167,0.85)";
+        const color = i % 2 === 0 ? "rgba(255,46,147,0.85)" : "rgba(59,130,246,0.85)";
         ctx.shadowBlur = 10 + pulseBoost * 10;
         ctx.shadowColor = color;
         ctx.fillStyle = color;
@@ -1183,7 +1183,7 @@ function StructuredGridCanvas({ pulseKey, reduce }) {
           Math.abs(r - (rows * 0.52 + Math.sin(ts * 0.00035) * 0.8)) < 1.2 ||
           (!mobile && Math.abs(r - activeBand) < 0.85);
         const glowColor = active
-          ? (r % 2 === 0 ? "rgba(255,46,147,0.55)" : "rgba(0,230,167,0.55)")
+          ? (r % 2 === 0 ? "rgba(255,46,147,0.55)" : "rgba(59,130,246,0.55)")
           : "rgba(255,255,255,0.10)";
         for (let c = -4; c <= 4; c += 1) {
           const x = center + (c / 4) * xSpread;
@@ -1272,7 +1272,7 @@ function HeroEcosystem({ mode, y, scale, opacity, pulseKey, reduce }) {
           }
           style={{
             inset: isMobile ? 10 : 16,
-            boxShadow: "0 0 0 1px rgba(82,214,149,0.34), 0 0 46px rgba(82,214,149,0.20)",
+            boxShadow: "0 0 0 1px rgba(59,130,246,0.34), 0 0 46px rgba(59,130,246,0.20)",
           }}
         />
         <motion.div
@@ -1301,7 +1301,7 @@ function HeroEcosystem({ mode, y, scale, opacity, pulseKey, reduce }) {
             style={{
               background:
                 "radial-gradient(circle at 26% 30%, rgba(197,31,93,0.18), transparent 54%)," +
-                "radial-gradient(circle at 74% 64%, rgba(82,214,149,0.20), transparent 58%)",
+                "radial-gradient(circle at 74% 64%, rgba(59,130,246,0.20), transparent 58%)",
             }}
           />
         </div>
@@ -1617,8 +1617,8 @@ function ExpertCard({ person }) {
   const toggle = () => setFlipped((v) => !v);
 
   const ORANGE = "#FF6A00";
-  const BACK_TOP = "#0B3C46";   // teal-ish like screenshot
-  const BACK_BOTTOM = "#071F26";
+  const BACK_TOP = "#0B2E63";
+  const BACK_BOTTOM = "#071A3E";
 
   return (
     <div className="w-full" style={{ perspective: 1400 }}>
@@ -1800,7 +1800,14 @@ export default function LandingPage() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const expertMaxStart = Math.max(0, EXPERTS.length - expertVisible);
+  const expertsList = useMemo(() => {
+    return EXPERTS.map((expert) => ({
+      ...expert,
+      id: `${expert.name}-${expert.linkedin}`,
+    }));
+  }, []);
+
+  const expertMaxStart = Math.max(0, expertsList.length - expertVisible);
   React.useEffect(() => {
     setExpertIndex((prev) => Math.min(prev, expertMaxStart));
   }, [expertMaxStart]);
@@ -2329,13 +2336,24 @@ export default function LandingPage() {
                 animate={{ x: `-${(expertIndex * 100) / expertVisible}%` }}
                 transition={SPRING}
               >
-                {EXPERTS.map((p) => (
-                  <div key={p.name} className="shrink-0 px-2" style={{ flex: `0 0 ${100 / expertVisible}%` }}>
+                {expertsList.map((p) => (
+                  <div key={p.id || p.name} className="shrink-0 px-2" style={{ flex: `0 0 ${100 / expertVisible}%` }}>
                     <ExpertCard person={p} />
                   </div>
                 ))}
               </motion.div>
             </div>
+          </div>
+          </MotionItem>
+
+          <MotionItem>
+          <div className="mt-10 flex justify-center">
+            <a
+              href="/experts/value-proposition"
+              className="inline-flex items-center gap-2 rounded-full border border-[rgba(197,31,93,0.45)] bg-[linear-gradient(135deg,rgba(197,31,93,1),rgba(165,22,78,1))] px-7 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(197,31,93,0.35)] transition hover:brightness-105"
+            >
+              Start as Expert
+            </a>
           </div>
           </MotionItem>
           </MotionSection>
@@ -2521,6 +2539,7 @@ export default function LandingPage() {
     </div>
   );
 }
+
 
 
 

@@ -47,7 +47,7 @@ export default function SiteFooter() {
         <FooterCol title="Participate">
           <FooterLink href="/about/partnerships#application-form" dark={isDark}>Become a Partner</FooterLink>
           <FooterLink href="/for-organizations/universities-companies" dark={isDark}>Become a Co-Host</FooterLink>
-          <FooterLink href="/about/partnerships#application-form" accent dark={isDark}>
+          <FooterLink href="/experts/value-proposition" accent dark={isDark}>
             Become an Expert
           </FooterLink>
         </FooterCol>
