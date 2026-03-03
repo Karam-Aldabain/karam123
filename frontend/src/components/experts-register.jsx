@@ -74,6 +74,51 @@ const ENGAGEMENT_OPTIONS = [
   "Research Supervision",
 ];
 
+const FALLBACK_COUNTRIES = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina",
+  "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados",
+  "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana",
+  "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon",
+  "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros",
+  "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark",
+  "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
+  "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia",
+  "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
+  "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
+  "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
+  "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania",
+  "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands",
+  "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro",
+  "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand",
+  "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan",
+  "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
+  "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
+  "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+  "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
+  "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka",
+  "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Tajikistan", "Tanzania", "Thailand",
+  "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay",
+  "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe",
+];
+
+const COUNTRIES = (() => {
+  try {
+    if (!Intl.DisplayNames || typeof Intl.supportedValuesOf !== "function") {
+      return FALLBACK_COUNTRIES;
+    }
+
+    const display = new Intl.DisplayNames(["en"], { type: "region" });
+    return Intl.supportedValuesOf("region")
+      .filter((code) => code.length === 2)
+      .map((code) => display.of(code))
+      .filter((name) => name && !/unknown region/i.test(name))
+      .sort((a, b) => a.localeCompare(b));
+  } catch {
+    return FALLBACK_COUNTRIES;
+  }
+})();
+
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -346,7 +391,14 @@ export default function ExpertsRegisterPage() {
                   <Input error={fieldErrors.phone} icon={Phone} iconColor="#34D399" placeholder="Example: +49 151 23456789" value={basic.phone} onChange={(e) => setBasic({ ...basic, phone: e.target.value })} />
                 </Field>
                 <Field label="Country of Residence" required error={fieldErrors.country}>
-                  <Input error={fieldErrors.country} icon={MapPin} iconColor="#F59E0B" placeholder="Example: Germany" value={basic.country} onChange={(e) => setBasic({ ...basic, country: e.target.value })} />
+                  <CountrySelect
+                    error={fieldErrors.country}
+                    icon={MapPin}
+                    iconColor="#F59E0B"
+                    value={basic.country}
+                    onChange={(e) => setBasic({ ...basic, country: e.target.value })}
+                    options={COUNTRIES}
+                  />
                 </Field>
                 <Field label="Organization Name" required error={fieldErrors.orgName}>
                   <Input error={fieldErrors.orgName} icon={Building2} iconColor="#22D3EE" placeholder="Example: Berlin Tech University" value={basic.orgName} onChange={(e) => setBasic({ ...basic, orgName: e.target.value })} />
@@ -838,6 +890,29 @@ function Select({ options, value, error = false, ...props }) {
         </option>
       ))}
     </select>
+  );
+}
+
+function CountrySelect({ options, value, icon: Icon, iconColor = "#F59E0B", error = false, ...props }) {
+  return (
+    <div className="relative">
+      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+        <Icon className="h-4 w-4" style={{ color: iconColor }} />
+      </span>
+      <select
+        {...props}
+        value={value}
+        className={cn(inputClass, "pl-11 pr-9", error && "expert-field-error")}
+        style={{ color: value ? "#000000" : "#9CA3AF", fontWeight: 500 }}
+      >
+        <option value="">Select country</option>
+        {options.map((country) => (
+          <option key={country} value={country}>
+            {country}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 
