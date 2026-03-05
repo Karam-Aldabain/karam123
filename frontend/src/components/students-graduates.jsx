@@ -43,7 +43,7 @@ import {
   Chrome,
   X,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 /**
  * IMPORTANT:
@@ -2659,6 +2659,7 @@ function Bullet({ icon: Icon, text, color }) {
 /* -------------------- Main Page -------------------- */
 export default function StudentsGraduatesLanding() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeCat, setActiveCat] = useState(categories[0].key);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -2887,7 +2888,19 @@ Turn theory into market-ready skills through hands-on projects.             </mo
                         price: CATEGORY_PRICES[cat.key],
                       }}
                       index={idx}
-                      onOpen={(selectedProgram) => navigate(getProgramDetailsPath(selectedProgram))}
+                      onOpen={(selectedProgram) => {
+                        const targetPath = getProgramDetailsPath(selectedProgram);
+                        if (window.location.hash) {
+                          window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+                        }
+                        if (location.pathname === targetPath) {
+                          window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                          return;
+                        }
+                        navigate({ pathname: targetPath, search: "", hash: "" });
+                        requestAnimationFrame(() => window.scrollTo(0, 0));
+                        setTimeout(() => window.scrollTo(0, 0), 120);
+                      }}
                     />
                   </div>
                 ))}

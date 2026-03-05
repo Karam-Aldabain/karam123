@@ -35,15 +35,29 @@ import ImpressumPage from "./components/legal/ImpressumPage";
 import TermsOfUsePage from "./components/legal/TermsOfUsePage";
 import PrivacyPolicyPage from "./components/legal/PrivacyPolicyPage";
 import FaqPage from "./components/faq";
-import { Route, Routes } from "react-router-dom";
-import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { useEffect, useLayoutEffect } from "react";
 import "./App.css";
 
 export default function App() {
+  const location = useLocation();
+
   useEffect(() => {
     document.documentElement.lang = "en";
     document.documentElement.dir = "ltr";
   }, []);
+
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => window.scrollTo(0, 0));
+    setTimeout(() => window.scrollTo(0, 0), 120);
+  }, [location.pathname, location.search, location.hash]);
 
   return (
     <div className="flex min-h-screen flex-col" dir="ltr">

@@ -294,7 +294,28 @@ export default function PraktixInternshipProgramPage() {
   const [openSection, setOpenSection] = useState("overview"); // default open
 
   useLayoutEffect(() => {
-    window.scrollTo(0, 0);
+    // Force this route to always start from hero/top, even if browser/router tries to restore.
+    if (window.location.hash) {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    }
+
+    const forceTop = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    forceTop();
+    requestAnimationFrame(forceTop);
+    const t1 = setTimeout(forceTop, 60);
+    const t2 = setTimeout(forceTop, 180);
+    const t3 = setTimeout(forceTop, 360);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, []);
 
   const DARK_BG = "linear-gradient(180deg, #050B1F 0%, #071A3E 55%, #0B1220 100%)";
@@ -788,7 +809,5 @@ export default function PraktixInternshipProgramPage() {
     </div>
   );
 }
-
-
 
 
