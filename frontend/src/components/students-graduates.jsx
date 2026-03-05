@@ -24,6 +24,7 @@ import {
   LineChart,
   MapPin,
   Shield,
+  Lock,
   Sparkles,
   Star,
   Target,
@@ -37,6 +38,9 @@ import {
   Wallet,
   Boxes,
   HeartPulse,
+  Facebook,
+  Linkedin,
+  Chrome,
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -77,6 +81,205 @@ export const CATEGORY_PRICES = {
   business: 1200,
   health: 1300,
 };
+
+const WORLD_COUNTRIES = [
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bhutan",
+  "Bolivia",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Brazil",
+  "Brunei",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cabo Verde",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Colombia",
+  "Comoros",
+  "Congo",
+  "Costa Rica",
+  "Cote d'Ivoire",
+  "Croatia",
+  "Cuba",
+  "Cyprus",
+  "Czechia",
+  "Democratic Republic of the Congo",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Fiji",
+  "Finland",
+  "France",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Grenada",
+  "Guatemala",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Honduras",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Israel",
+  "Italy",
+  "Jamaica",
+  "Japan",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Laos",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Mauritania",
+  "Mauritius",
+  "Mexico",
+  "Micronesia",
+  "Moldova",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands",
+  "New Zealand",
+  "Nicaragua",
+  "Niger",
+  "Nigeria",
+  "North Korea",
+  "North Macedonia",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines",
+  "Poland",
+  "Portugal",
+  "Qatar",
+  "Romania",
+  "Russia",
+  "Rwanda",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Korea",
+  "South Sudan",
+  "Spain",
+  "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Sweden",
+  "Switzerland",
+  "Syria",
+  "Taiwan",
+  "Tajikistan",
+  "Tanzania",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "United Arab Emirates",
+  "United Kingdom",
+  "United States",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Vatican City",
+  "Venezuela",
+  "Vietnam",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
+];
 
 export const categories = [
   {
@@ -1199,35 +1402,85 @@ export function ApplyFlowModal({ open, program, onClose }) {
   useLockBodyScroll(open);
   const selected = program || categories[0].programs[0];
   const [step, setStep] = useState(0);
-  const [method, setMethod] = useState("Stripe");
+  const [method, setMethod] = useState("");
+  const [authMode, setAuthMode] = useState("login");
+  const [socialProvider, setSocialProvider] = useState(null);
+  const [auth, setAuth] = useState({
+    email: "",
+    password: "",
+    remember: true,
+  });
+  const [createForm, setCreateForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [tuitionCode, setTuitionCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [paymentPlan, setPaymentPlan] = useState("full");
   const [form, setForm] = useState({
     fullName: "",
     email: "",
     phone: "",
     country: "",
-    persona: "University Student",
-    academicYear: "Final Year",
+    persona: "",
+    academicYear: "",
     specialization: "",
-    preferredCategory: "Engineering & Technology",
-    startTimeline: "Within 1 Month",
+    preferredCategory: "",
+    startTimeline: "",
+  });
+  const [stripeData, setStripeData] = useState({
+    cardName: "",
+    cardNumber: "",
+    expiry: "",
+    cvc: "",
+  });
+  const [paypalData, setPaypalData] = useState({
+    email: "",
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!open) return;
     setStep(0);
-    setMethod("Stripe");
+    setMethod("");
+    setAuthMode("login");
+    setSocialProvider(null);
     setErrors({});
+    setAuth({
+      email: "",
+      password: "",
+      remember: true,
+    });
+    setCreateForm({
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setTuitionCode("");
+    setPromoApplied(false);
+    setPaymentPlan("full");
     setForm({
       fullName: "",
       email: "",
       phone: "",
       country: "",
-      persona: "University Student",
-      academicYear: "Final Year",
+      persona: "",
+      academicYear: "",
       specialization: "",
-      preferredCategory: "Engineering & Technology",
-      startTimeline: "Within 1 Month",
+      preferredCategory: "",
+      startTimeline: "",
+    });
+    setStripeData({
+      cardName: "",
+      cardNumber: "",
+      expiry: "",
+      cvc: "",
+    });
+    setPaypalData({
+      email: "",
     });
   }, [open, selected?.name]);
 
@@ -1245,21 +1498,109 @@ export function ApplyFlowModal({ open, program, onClose }) {
   const price = Number(selected.price || CATEGORY_PRICES.eng);
   const vat = Number((price * 0.19).toFixed(2));
   const total = Number((price + vat).toFixed(2));
+  const earlyBenefit = promoApplied ? Math.min(118, Number((total * 0.08).toFixed(2))) : 0;
+  const discountedTotal = Number(Math.max(0, total - earlyBenefit).toFixed(2));
+  const paymentPlans = [
+    { id: "full", label: "Full Amount", amount: discountedTotal, oldAmount: total, accent: true },
+    { id: "two", label: "2 Installments", amount: Number((discountedTotal * 1.02).toFixed(2)), oldAmount: Number((total * 1.06).toFixed(2)) },
+    { id: "three", label: "3 Installments", amount: Number((discountedTotal * 1.05).toFixed(2)), oldAmount: Number((total * 1.09).toFixed(2)) },
+  ];
+  const selectedPlan = paymentPlans.find((p) => p.id === paymentPlan) || paymentPlans[0];
+  const installmentPlanFee = Number(Math.max(0, selectedPlan.amount - discountedTotal).toFixed(2));
+  const twoFirstPayment = Number((paymentPlans[1].amount * 0.55).toFixed(2));
+  const twoSecondPayment = Number((paymentPlans[1].amount - twoFirstPayment).toFixed(2));
+  const threeFirstPayment = Number((paymentPlans[2].amount * 0.36).toFixed(2));
+  const threeRemaining = Number((paymentPlans[2].amount - threeFirstPayment).toFixed(2));
+  const threeSecondPayment = Number((threeRemaining / 2).toFixed(2));
+  const threeThirdPayment = Number((paymentPlans[2].amount - threeFirstPayment - threeSecondPayment).toFixed(2));
+  const payToday =
+    paymentPlan === "full" ? selectedPlan.amount : paymentPlan === "two" ? twoFirstPayment : threeFirstPayment;
+  const formatMoney = (value) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
 
   const validateForm = () => {
     const e = {};
     if (!form.fullName.trim()) e.fullName = "Full name is required.";
     if (!form.email.trim()) e.email = "Email is required.";
+    if (!form.persona) e.persona = "Please select an option.";
+    if (!form.academicYear) e.academicYear = "Please select an option.";
+    if (!form.preferredCategory) e.preferredCategory = "Please select an option.";
+    if (!form.startTimeline) e.startTimeline = "Please select an option.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
+  const validateLogin = () => {
+    const e = {};
+    if (!auth.email.trim()) e.loginEmail = "Email is required.";
+    if (!auth.password.trim()) e.loginPassword = "Password is required.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const validateCreateAccount = () => {
+    const e = {};
+    if (!createForm.fullName.trim()) e.createFullName = "Full name is required.";
+    if (!createForm.email.trim()) e.createEmail = "Email is required.";
+    if (!createForm.password.trim()) e.createPassword = "Password is required.";
+    if (!createForm.confirmPassword.trim()) e.createConfirmPassword = "Please confirm your password.";
+    if (createForm.password && createForm.confirmPassword && createForm.password !== createForm.confirmPassword) {
+      e.createConfirmPassword = "Passwords do not match.";
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const openSocialAuth = (provider) => {
+    const urls = {
+      google: "https://accounts.google.com/AccountChooser",
+      facebook: "https://www.facebook.com/login.php",
+      linkedin: "https://www.linkedin.com/login",
+    };
+    const url = urls[provider];
+    if (!url) return;
+
+    const popup = window.open(
+      url,
+      "social_auth_popup",
+      "width=520,height=720,menubar=no,toolbar=no,location=yes,status=no,resizable=yes,scrollbars=yes"
+    );
+    if (!popup) return;
+
+    const timer = window.setInterval(() => {
+      if (popup.closed) {
+        window.clearInterval(timer);
+        setErrors({});
+        setStep(1);
+      }
+    }, 500);
+  };
+
+  const completeSocialLogin = (email) => {
+    setAuth((p) => ({ ...p, email, password: "social-auth" }));
+    setSocialProvider(null);
+    setStep(1);
+  };
+
   const next = () => {
-    if (step === 0 && !validateForm()) return;
-    setStep((p) => Math.min(p + 1, 2));
+    if (step === 0) {
+      if (authMode === "create" && !validateCreateAccount()) return;
+      if (authMode === "login" && !validateLogin()) return;
+    }
+    if (step === 1 && !validateForm()) return;
+    setStep((p) => Math.min(p + 1, 4));
   };
 
   const back = () => setStep((p) => Math.max(p - 1, 0));
+  const paymentMethodValid =
+    method === "Stripe"
+      ? stripeData.cardName.trim() &&
+        stripeData.cardNumber.trim() &&
+        stripeData.expiry.trim() &&
+        stripeData.cvc.trim()
+      : method === "PayPal"
+      ? paypalData.email.trim()
+      : false;
 
   return (
     <AnimatePresence>
@@ -1285,8 +1626,8 @@ export function ApplyFlowModal({ open, program, onClose }) {
           </div>
 
           <div className="max-h-[calc(100dvh-84px)] overflow-y-auto px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:max-h-[calc(95vh-84px)] sm:px-6 sm:py-6">
-            <div className="mb-6 grid grid-cols-3 gap-2">
-              {["Form", "Review", "Pay"].map((label, idx) => {
+            <div className="mb-6 grid grid-cols-5 gap-2">
+              {["Log In", "Form", "Payment", "Review", "Pay"].map((label, idx) => {
                 const active = idx === step;
                 return (
                   <button
@@ -1306,6 +1647,167 @@ export function ApplyFlowModal({ open, program, onClose }) {
             </div>
 
             {step === 0 ? (
+              <div className="mx-auto max-w-[520px] space-y-4 rounded-[20px] bg-[#F3F4F6] p-2 sm:p-4">
+                <div className="text-center text-[28px] font-semibold leading-tight text-[#0B1220] sm:text-[34px]">Applying to a Program?</div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("create");
+                    setErrors({});
+                  }}
+                  className="w-full bg-[#F0B323] px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95 sm:text-base"
+                >
+                  Create Account
+                </button>
+
+                {authMode === "login" ? (
+                  <>
+                    {socialProvider ? (
+                      <div className="space-y-3 rounded-[16px] border border-[#0B1220]/12 bg-white p-4">
+                        <div className="text-sm font-semibold uppercase tracking-wide text-[#0B1220]/65">
+                          Choose {socialProvider} account
+                        </div>
+                        {[
+                          `student.${socialProvider}@gmail.com`,
+                          `applicant.${socialProvider}@gmail.com`,
+                          `intern.${socialProvider}@gmail.com`,
+                        ].map((email) => (
+                          <button
+                            key={email}
+                            type="button"
+                            onClick={() => completeSocialLogin(email)}
+                            className="w-full rounded-xl border border-[#0B1220]/12 bg-[#F8FAFC] px-4 py-3 text-left text-sm text-[#0B1220] transition hover:bg-[#EEF2F7]"
+                          >
+                            Continue as {email}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => setSocialProvider(null)}
+                          className="w-full rounded-xl border border-[#0B1220]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0B1220]/75 transition hover:bg-[#F3F4F6]"
+                        >
+                          Back to login options
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-4 py-3">
+                          <div className="h-px flex-1 bg-[#0B1220]/20" />
+                          <div className="text-base font-semibold text-[#0B1220]/85">OR</div>
+                          <div className="h-px flex-1 bg-[#0B1220]/20" />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => openSocialAuth("facebook")}
+                          className="flex w-full items-center gap-4 bg-[#2D73DA] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
+                        >
+                          <Facebook className="h-6 w-6" />
+                          <span className="text-center w-full -ml-8">Log In with Facebook</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => openSocialAuth("google")}
+                          className="flex w-full items-center gap-4 border-2 border-[#8B8B8B] bg-white px-5 py-3 text-left text-[18px] font-bold uppercase text-[#5C6470] transition hover:bg-[#FAFAFA] sm:text-[20px]"
+                        >
+                          <Chrome className="h-6 w-6" />
+                          <span className="text-center w-full -ml-8">Log In with Google</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => openSocialAuth("linkedin")}
+                          className="flex w-full items-center gap-4 bg-[#356BB0] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
+                        >
+                          <Linkedin className="h-6 w-6" />
+                          <span className="text-center w-full -ml-8">Log In with LinkedIn</span>
+                        </button>
+
+                        <div className="space-y-3 pt-2">
+                          <input
+                            type="email"
+                            value={auth.email}
+                            onChange={(e) => setAuth((p) => ({ ...p, email: e.target.value }))}
+                            placeholder="Email"
+                            className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                          />
+                          {errors.loginEmail ? <p className="text-xs text-rose-600">{errors.loginEmail}</p> : null}
+                          <input
+                            type="password"
+                            value={auth.password}
+                            onChange={(e) => setAuth((p) => ({ ...p, password: e.target.value }))}
+                            placeholder="Password"
+                            className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                          />
+                          {errors.loginPassword ? <p className="text-xs text-rose-600">{errors.loginPassword}</p> : null}
+                        </div>
+
+                        <button type="button" className="block w-full text-center text-[20px] font-medium text-[#B00020] sm:text-[22px]">
+                          I forgot my password
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="space-y-3 pt-2">
+                    <input
+                      type="text"
+                      value={createForm.fullName}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, fullName: e.target.value }))}
+                      placeholder="Full Name"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createFullName ? <p className="text-xs text-rose-600">{errors.createFullName}</p> : null}
+                    <input
+                      type="email"
+                      value={createForm.email}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, email: e.target.value }))}
+                      placeholder="Email"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createEmail ? <p className="text-xs text-rose-600">{errors.createEmail}</p> : null}
+                    <input
+                      type="password"
+                      value={createForm.password}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, password: e.target.value }))}
+                      placeholder="Password"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createPassword ? <p className="text-xs text-rose-600">{errors.createPassword}</p> : null}
+                    <input
+                      type="password"
+                      value={createForm.confirmPassword}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, confirmPassword: e.target.value }))}
+                      placeholder="Confirm Password"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createConfirmPassword ? <p className="text-xs text-rose-600">{errors.createConfirmPassword}</p> : null}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode("login");
+                        setErrors({});
+                      }}
+                      className="block w-full text-center text-[16px] font-medium text-[#356BB0] hover:underline"
+                    >
+                      Already have an account? Log In
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={next}
+                  className="w-full bg-[#F0B323] px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95 sm:text-base"
+                >
+                  {authMode === "create" ? "Create Account & Continue" : "Log In"}
+                </button>
+              </div>
+            ) : null}
+
+            {step === 1 ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
@@ -1327,7 +1829,14 @@ export function ApplyFlowModal({ open, program, onClose }) {
                   </div>
                   <div>
                     <div className="mb-2 text-sm font-semibold text-[#0B1220]">Country</div>
-                    <Input icon={MapPin} iconColor={THEME.accent4} placeholder="Country" value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))} />
+                    <Select
+                      icon={MapPin}
+                      iconColor={THEME.accent4}
+                      value={form.country}
+                      onChange={(v) => setForm((p) => ({ ...p, country: v }))}
+                      placeholder="Select country"
+                      options={WORLD_COUNTRIES}
+                    />
                     {errors.country ? <p className="mt-2 text-xs text-rose-600">{errors.country}</p> : null}
                   </div>
                 </div>
@@ -1339,8 +1848,10 @@ export function ApplyFlowModal({ open, program, onClose }) {
                       iconColor={THEME.accent3}
                       value={form.persona}
                       onChange={(v) => setForm((p) => ({ ...p, persona: v }))}
+                      placeholder="Select"
                       options={["University Student", "Graduate"]}
                     />
+                    {errors.persona ? <p className="mt-2 text-xs text-rose-600">{errors.persona}</p> : null}
                   </div>
                   <div>
                     <div className="mb-2 text-sm font-semibold text-[#0B1220]">Current Academic Year</div>
@@ -1349,8 +1860,10 @@ export function ApplyFlowModal({ open, program, onClose }) {
                       iconColor={THEME.accent}
                       value={form.academicYear}
                       onChange={(v) => setForm((p) => ({ ...p, academicYear: v }))}
+                      placeholder="Select"
                       options={["1st", "2nd", "3rd", "Final Year"]}
                     />
+                    {errors.academicYear ? <p className="mt-2 text-xs text-rose-600">{errors.academicYear}</p> : null}
                   </div>
                 </div>
                 <div>
@@ -1371,12 +1884,14 @@ export function ApplyFlowModal({ open, program, onClose }) {
                       iconColor={THEME.accent4}
                       value={form.preferredCategory}
                       onChange={(v) => setForm((p) => ({ ...p, preferredCategory: v }))}
+                      placeholder="Select"
                       options={[
                         "Engineering & Technology",
                         "Business, Finance & Consulting",
                         "Digital Health & Emerging Fields",
                       ]}
                     />
+                    {errors.preferredCategory ? <p className="mt-2 text-xs text-rose-600">{errors.preferredCategory}</p> : null}
                   </div>
                   <div>
                     <div className="mb-2 text-sm font-semibold text-[#0B1220]">Preferred Start Timeline</div>
@@ -1385,8 +1900,10 @@ export function ApplyFlowModal({ open, program, onClose }) {
                       iconColor={THEME.accent}
                       value={form.startTimeline}
                       onChange={(v) => setForm((p) => ({ ...p, startTimeline: v }))}
+                      placeholder="Select"
                       options={["Immediately", "Within 1 Month", "Within 2-3 Months"]}
                     />
+                    {errors.startTimeline ? <p className="mt-2 text-xs text-rose-600">{errors.startTimeline}</p> : null}
                   </div>
                 </div>
                 <div>
@@ -1396,7 +1913,167 @@ export function ApplyFlowModal({ open, program, onClose }) {
               </div>
             ) : null}
 
-            {step === 1 ? (
+            {step === 2 ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="text-[#0B1220]/70">
+                    Application <span className="font-semibold text-[#0B1220]">&gt; Payment</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 font-semibold text-[#0B1220]">
+                    <Lock className="h-4 w-4" {...iconStrongProps} />
+                    Secure Checkout
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                  <div className="space-y-4">
+                    <div className="text-2xl font-semibold text-[#0B1220]">Course Details</div>
+                    <div className="rounded-[18px] bg-[#E9EFEC] p-4 ring-1 ring-[#0B1220]/10">
+                      <div className="flex gap-4">
+                        <img
+                          src={selected.cover || IMAGES.heroMain}
+                          alt={selected.name}
+                          className="h-20 w-20 rounded-xl object-cover"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-lg font-semibold text-[#0B1220]">{selected.name}</div>
+                          <div className="mt-2 text-sm text-[#0B1220]/70">
+                            Starts: <span className="font-semibold">March 12, 2026</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-[1fr_auto] gap-3">
+                      <input
+                        type="text"
+                        value={tuitionCode}
+                        onChange={(e) => setTuitionCode(e.target.value)}
+                        placeholder="Tuition Assistance Code"
+                        className="rounded-none border border-[#0B1220]/20 bg-white px-4 py-3 text-base text-[#0B1220] outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPromoApplied(Boolean(tuitionCode.trim()))}
+                        className="min-w-[130px] border border-[#0B1220]/35 bg-white px-6 py-3 text-sm font-semibold uppercase text-[#0B1220]"
+                      >
+                        Apply
+                      </button>
+                    </div>
+
+                    <div className="text-2xl font-semibold text-[#0B1220]">Payment Plan</div>
+                    <div className="space-y-3">
+                      {paymentPlans.map((plan) => {
+                        const active = paymentPlan === plan.id;
+                        return (
+                          <button
+                            key={plan.id}
+                            type="button"
+                            onClick={() => setPaymentPlan(plan.id)}
+                            className={cx(
+                              "w-full rounded-xl border px-4 py-4 text-left transition",
+                              active ? "border-[#B11F3A] bg-white" : "border-[#0B1220]/15 bg-white/80 hover:bg-white"
+                            )}
+                          >
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="inline-flex items-center gap-3">
+                                <span
+                                  className={cx(
+                                    "inline-flex h-6 w-6 items-center justify-center rounded-full border",
+                                    active ? "border-[#B11F3A]" : "border-[#0B1220]/25"
+                                  )}
+                                >
+                                  {active ? <span className="h-2.5 w-2.5 rounded-full bg-[#B11F3A]" /> : null}
+                                </span>
+                                <span className="text-base font-semibold text-[#0B1220]">{plan.label}</span>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-2xl font-semibold text-[#0B1220]">{formatMoney(plan.amount)}</div>
+                                <div className="text-sm text-[#0B1220]/45 line-through">{formatMoney(plan.oldAmount)}</div>
+                              </div>
+                            </div>
+
+                            {active && plan.id === "two" ? (
+                              <div className="mt-3 border-t border-[#0B1220]/10 pt-3 text-sm text-[#0B1220]/75">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold">1st Payment - due immediately</span>
+                                  <span>{formatMoney(twoFirstPayment)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between">
+                                  <span>2nd Payment - due April 6, 2026</span>
+                                  <span>{formatMoney(twoSecondPayment)}</span>
+                                </div>
+                                <div className="mt-3">Subsequent payments will be auto-charged to the credit card on file.</div>
+                              </div>
+                            ) : null}
+
+                            {active && plan.id === "three" ? (
+                              <div className="mt-3 border-t border-[#0B1220]/10 pt-3 text-sm text-[#0B1220]/75">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold">1st Payment - due immediately</span>
+                                  <span>{formatMoney(threeFirstPayment)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between">
+                                  <span>2nd Payment - due March 27, 2026</span>
+                                  <span>{formatMoney(threeSecondPayment)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between">
+                                  <span>3rd Payment - due April 11, 2026</span>
+                                  <span>{formatMoney(threeThirdPayment)}</span>
+                                </div>
+                                <div className="mt-3">Subsequent payments will be auto-charged to the credit card on file.</div>
+                              </div>
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="text-2xl font-semibold text-[#0B1220]">Payment Details</div>
+                    <div className="rounded-[18px] bg-white p-5 ring-1 ring-[#0B1220]/10">
+                      <div className="space-y-3 text-base text-[#0B1220]/80">
+                        <div className="flex items-center justify-between">
+                          <span>Course Fee</span>
+                          <span className="font-semibold text-[#0B1220]">{formatMoney(total)}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-emerald-700">
+                          <span>Early Registration Benefit</span>
+                          <span>{promoApplied ? `-${formatMoney(earlyBenefit)}` : formatMoney(0)}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Installment Plan Fee</span>
+                          <span className="font-semibold text-[#0B1220]">{formatMoney(installmentPlanFee)}</span>
+                        </div>
+                        <div className="border-t border-[#0B1220]/12 pt-3">
+                          <div className="flex items-center justify-between text-xl font-semibold text-[#0B1220]">
+                            <span>Total Amount</span>
+                            <span>{formatMoney(selectedPlan.amount)}</span>
+                          </div>
+                        </div>
+                        <div className="border-t border-[#0B1220]/12 pt-3">
+                          <div className="flex items-center justify-between text-xl font-semibold text-[#0B1220]">
+                            <span>Pay Today</span>
+                            <span>{formatMoney(payToday)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={next}
+                      className="w-full bg-[#F0B323] px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95"
+                    >
+                      Continue to Review
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {step === 3 ? (
               <div className="space-y-4">
                 <div className="rounded-[22px] bg-white p-5 ring-1 ring-[#0B1220]/10">
                   <div className="text-lg font-semibold text-[#0B1220]">Review Application</div>
@@ -1427,7 +2104,7 @@ export function ApplyFlowModal({ open, program, onClose }) {
               </div>
             ) : null}
 
-            {step === 2 ? (
+            {step === 4 ? (
               <div className="space-y-5">
                 <div className="rounded-[22px] bg-gradient-to-br from-[#0B1220] to-[#152238] p-7 text-center ring-1 ring-[#0B1220]/20">
                   <div className="text-4xl font-semibold leading-tight text-white sm:text-5xl">Complete Your Purchase</div>
@@ -1493,13 +2170,66 @@ export function ApplyFlowModal({ open, program, onClose }) {
                           );
                         })}
                       </div>
+
+                      {method === "Stripe" ? (
+                        <div className="mt-4 space-y-3">
+                          <Input
+                            placeholder="Cardholder Name"
+                            value={stripeData.cardName}
+                            onChange={(e) => setStripeData((p) => ({ ...p, cardName: e.target.value }))}
+                          />
+                          <Input
+                            placeholder="Card Number"
+                            value={stripeData.cardNumber}
+                            onChange={(e) => setStripeData((p) => ({ ...p, cardNumber: e.target.value }))}
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <Input
+                              placeholder="MM/YY"
+                              value={stripeData.expiry}
+                              onChange={(e) => setStripeData((p) => ({ ...p, expiry: e.target.value }))}
+                            />
+                            <Input
+                              placeholder="CVC"
+                              value={stripeData.cvc}
+                              onChange={(e) => setStripeData((p) => ({ ...p, cvc: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {method === "PayPal" ? (
+                        <div className="mt-4 space-y-3">
+                          <Input
+                            placeholder="PayPal Email"
+                            value={paypalData.email}
+                            onChange={(e) => setPaypalData({ email: e.target.value })}
+                          />
+                        </div>
+                      ) : null}
+
+                      <button
+                        type="button"
+                        disabled={!paymentMethodValid}
+                        onClick={() => {
+                          alert(`Payment details accepted for ${method}.`);
+                          onClose();
+                        }}
+                        className={cx(
+                          "mt-4 w-full rounded-full px-6 py-3 text-sm font-semibold text-white transition",
+                          paymentMethodValid ? "bg-[#0B1220] hover:opacity-95" : "cursor-not-allowed bg-[#0B1220]/35"
+                        )}
+                      >
+                        Continue
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             ) : null}
 
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-between">
+            {step > 0 ? (
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-between">
               <button
                 type="button"
                 onClick={step === 0 ? onClose : back}
@@ -1507,29 +2237,19 @@ export function ApplyFlowModal({ open, program, onClose }) {
               >
                 {step === 0 ? "Cancel" : "Back"}
               </button>
-              {step < 2 ? (
+              {step < 4 && step !== 2 ? (
                 <button
                   type="button"
                   onClick={next}
                   className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white"
                   style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.74)} 90%)` }}
                 >
-                  {step === 1 ? "Continue to Pay" : "Continue"}
+                  {step === 0 ? "Log In & Continue" : step === 3 ? "Continue to Pay" : "Continue"}
                   <ChevronRight className="h-4 w-4" {...iconStrongProps} />
                 </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert(`Proceeding with ${method} payment for EUR${total.toFixed(2)}.`);
-                    onClose();
-                  }}
-                  className="inline-flex items-center justify-center rounded-full bg-[#0B1220] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95"
-                >
-                  Proceed to Secure Payment • EUR{total.toFixed(2)}
-                </button>
-              )}
-            </div>
+              ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
       </motion.div>
@@ -1851,7 +2571,7 @@ function Textarea(props) {
   );
 }
 
-function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent }) {
+function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent, placeholder = "Select" }) {
   const hasIcon = !!Icon;
   return (
     <div className="relative">
@@ -1871,6 +2591,9 @@ function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent
           hasIcon ? "pl-11" : ""
         )}
       >
+        <option value="" disabled>
+          {placeholder}
+        </option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
@@ -2397,3 +3120,5 @@ const css = `
   78%{ transform: translateX(120%); }
 }
 `;
+
+
