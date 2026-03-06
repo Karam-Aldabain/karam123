@@ -1523,7 +1523,7 @@ export function ApplyFlowModal({ open, program, onClose }) {
     if (!form.fullName.trim()) e.fullName = "Full name is required.";
     if (!form.email.trim()) e.email = "Email is required.";
     if (!form.persona) e.persona = "Please select an option.";
-    if (!form.academicYear) e.academicYear = "Please select an option.";
+    if (form.persona !== "Graduate" && !form.academicYear) e.academicYear = "Please select an option.";
     if (!form.preferredCategory) e.preferredCategory = "Please select an option.";
     if (!form.startTimeline) e.startTimeline = "Please select an option.";
     setErrors(e);
@@ -1847,7 +1847,13 @@ export function ApplyFlowModal({ open, program, onClose }) {
                       icon={GraduationCap}
                       iconColor={THEME.accent3}
                       value={form.persona}
-                      onChange={(v) => setForm((p) => ({ ...p, persona: v }))}
+                      onChange={(v) =>
+                        setForm((p) => ({
+                          ...p,
+                          persona: v,
+                          academicYear: v === "Graduate" ? "" : p.academicYear,
+                        }))
+                      }
                       placeholder="Select"
                       options={["University Student", "Graduate"]}
                     />
@@ -1862,8 +1868,11 @@ export function ApplyFlowModal({ open, program, onClose }) {
                       onChange={(v) => setForm((p) => ({ ...p, academicYear: v }))}
                       placeholder="Select"
                       options={["1st", "2nd", "3rd", "Final Year"]}
+                      disabled={form.persona === "Graduate"}
                     />
-                    {errors.academicYear ? <p className="mt-2 text-xs text-rose-600">{errors.academicYear}</p> : null}
+                    {form.persona !== "Graduate" && errors.academicYear ? (
+                      <p className="mt-2 text-xs text-rose-600">{errors.academicYear}</p>
+                    ) : null}
                   </div>
                 </div>
                 <div>
@@ -2571,7 +2580,15 @@ function Textarea(props) {
   );
 }
 
-function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent, placeholder = "Select" }) {
+function Select({
+  value,
+  onChange,
+  options,
+  icon: Icon,
+  iconColor = THEME.accent,
+  placeholder = "Select",
+  disabled = false,
+}) {
   const hasIcon = !!Icon;
   return (
     <div className="relative">
@@ -2584,11 +2601,13 @@ function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
         className={cx(
           "w-full appearance-none rounded-2xl px-4 py-3 pr-10 text-sm outline-none ring-1 transition",
           "bg-white/60 text-[#0B1220]",
           "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]",
-          hasIcon ? "pl-11" : ""
+          hasIcon ? "pl-11" : "",
+          disabled ? "cursor-not-allowed opacity-55" : ""
         )}
       >
         <option value="" disabled>
