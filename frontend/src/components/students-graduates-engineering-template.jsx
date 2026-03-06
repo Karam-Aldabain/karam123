@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useState } from "react";
+﻿import React, { useLayoutEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Briefcase,
@@ -332,7 +332,7 @@ export default function PraktixInternshipProgramPage() {
     () => ({
       brandTitle: "Praktix Professional Internship Program",
 
-      // ✅ Mobile App Development
+      // âœ… Mobile App Development
       hero: {
         title: "Mobile App Development Internship",
         title2: "Ship Real iOS & Android Apps",
@@ -350,20 +350,20 @@ export default function PraktixInternshipProgramPage() {
         ceus: "EARN 2.0 EEUs",
         heroImage: "/mobile-app-development.jpg",
         infoRow: [
-          { label: "Next Available Date", value: "Mar 12–Apr 30, 2026" },
+          { label: "Next Available Date", value: "Mar 12â€“Apr 30, 2026" },
           { label: "Format", value: "Self-Paced Online" },
           { label: "Location", value: "Online" },
           { label: "Duration", value: "6 weeks" },
-          { label: "Commitment", value: "4–6 hours/week" },
+          { label: "Commitment", value: "4â€“6 hours/week" },
           { label: "Tuition", value: "$2,950" },
         ],
       },
 
       snapshot: [
         { label: "Next Cohort", value: "Applications Open", icon: CalendarDays },
-        { label: "Format", value: "Online – Expert Led", icon: Globe },
-        { label: "Duration", value: "12–15 Weeks", icon: Clock3 },
-        { label: "Commitment", value: "6–10 Hours / Week", icon: ClipboardList },
+        { label: "Format", value: "Online â€“ Expert Led", icon: Globe },
+        { label: "Duration", value: "12â€“15 Weeks", icon: Clock3 },
+        { label: "Commitment", value: "6â€“10 Hours / Week", icon: ClipboardList },
         { label: "Project Type", value: "Mobile Product Simulation", icon: Layers },
         { label: "Outcome", value: "App Portfolio + Store-Ready Build", icon: Trophy },
       ],
@@ -377,89 +377,117 @@ export default function PraktixInternshipProgramPage() {
       ],
 
       workOn: {
-        intro: "The internship revolves around building a complete mobile product as the central project.",
+        intro:
+          "The internship revolves around developing a *complete software system* as the central project.",
+        lifecycle:
+          "Participants work through the full product lifecycle â€” from defining the technical scope to deploying a working application.",
         types: [
-          "Mobile UI components and design systems",
-          "API integration and offline-first patterns",
-          "Authentication, permissions, and secure storage",
-          "State management and modular architecture",
-          "Testing (unit/UI) and quality gates",
-          "Release workflow (builds, signing, distribution)",
+          "Web platforms and applications",
+          "SaaS products and internal tools",
+          "Data-driven web applications",
+          "API-based systems and backend services",
+          "Developer productivity tools",
+          "Scalable backend architectures",
         ],
-        tracks: ["iOS Development", "Android Development", "Cross-Platform (React Native/Flutter)"],
-        emphasis: "The emphasis is on building maintainable, high-performance mobile apps with production workflows.",
+        tracks: [
+          "Frontend Engineering â€” building responsive user interfaces and interactive web experiences.",
+          "Backend Engineering â€” designing APIs, databases, and scalable server-side systems.",
+          "Full Stack Development â€” developing complete applications that integrate frontend and backend technologies.",
+        ],
+        emphasis:
+          "The goal is to build software that reflects real engineering standards used in modern product teams.",
       },
 
       benefits: [
         {
           icon: Rocket,
-          title: "Real Mobile Product Experience",
-          desc: "Participants build a complete mobile app project that mirrors real-world mobile engineering environments.",
+          title: "Real Software Development Experience",
+          desc:
+            "Work on a structured engineering project that simulates the workflow of professional software teams and modern product development environments.",
         },
         {
           icon: Smartphone,
-          title: "Portfolio-Ready App Builds",
-          desc: "Graduate with a demonstrable app and assets that hiring teams can evaluate quickly.",
-          bullets: ["App demo (video/links)", "Clean architecture + codebase", "Release-ready build artifacts", "Feature documentation"],
+          title: "Professional Engineering Portfolio",
+          desc: "Each participant graduates with a portfolio that may include:",
+          bullets: [
+            "GitHub project repository",
+            "Technical system documentation",
+            "Architecture explanations",
+            "Deployment links and working application",
+          ],
         },
         {
           icon: Sparkles,
-          title: "AI-Assisted Code & UX Review",
-          desc: "AI tools provide structured feedback on code quality, UI consistency, and documentation to accelerate improvement.",
+          title: "AI-Assisted Code Evaluation",
+          desc:
+            "Participants receive structured feedback on code quality, maintainability, and engineering practices through AI-assisted evaluation tools and expert review.",
         },
         {
           icon: Bug,
-          title: "Debugging & Performance Skills",
-          desc: "Learn practical debugging workflows, profiling basics, and performance optimization patterns for mobile apps.",
+          title: "Open Source Contribution Experience",
+          desc:
+            "Participants learn how to collaborate in open-source environments, understand repository workflows, and contribute to real projects when applicable.",
         },
         {
           icon: GraduationCap,
-          title: "Mobile Interview Preparation",
-          desc: "Includes scenario-based interviews: architecture choices, state management tradeoffs, debugging, and feature delivery.",
+          title: "Technical Interview Preparation",
+          desc:
+            "The program includes technical interview preparation sessions where participants practice explaining their projects, discussing architecture decisions, and approaching engineering problem-solving scenarios.",
         },
       ],
 
       howItWorks: [
         {
           phase: "Phase 1",
-          title: "Product Definition & User Flows",
-          bullets: ["Define app concept", "Map user journeys", "Set scope and MVP features"],
+          title: "Problem Definition & Product Concept",
+          bullets: [
+            "Participants define the product idea, identify the user problem, and determine the technical scope of the project.",
+          ],
           icon: HelpCircle,
         },
         {
           phase: "Phase 2",
-          title: "Mobile Architecture & Design System",
-          bullets: ["Choose architecture pattern", "Set state management approach", "Create UI components and navigation"],
+          title: "System Architecture",
+          bullets: [
+            "Participants design the architecture of the system including database structure, API design, and the selected technology stack.",
+          ],
           icon: Layers,
         },
         {
           phase: "Phase 3",
-          title: "Core Mobile Development",
-          bullets: ["Build screens and flows", "Integrate APIs", "Implement auth, storage, permissions"],
+          title: "Core Development",
+          bullets: [
+            "Participants build the core components of the system including frontend interfaces, backend services, authentication mechanisms, and database integration.",
+          ],
           icon: Code2,
         },
         {
           phase: "Phase 4",
-          title: "Testing, Debugging & Performance",
-          bullets: ["Add tests", "Debugging workflows", "Optimize UX and performance", "Stabilize app"],
+          title: "Integration & Testing",
+          bullets: [
+            "Participants test the system, debug issues, optimize performance, and ensure that all system components function correctly together.",
+          ],
           icon: Database,
         },
         {
           phase: "Phase 5",
-          title: "Release Workflow & Presentation",
-          bullets: ["Build and sign app", "Prepare distribution package", "Present architecture decisions", "Demo end-to-end product"],
+          title: "Deployment & Project Presentation",
+          bullets: [
+            "Participants deploy their application, document their technical decisions, and present the architecture, development process, and engineering challenges encountered during the project.",
+          ],
           icon: Cloud,
         },
       ],
 
       programTakeaways: [
-        "Experience building production-grade mobile apps",
-        "A professional mobile portfolio with demo assets",
-        "Understanding of mobile architecture and state management",
-        "Experience integrating APIs and handling offline behavior",
-        "Exposure to testing and release workflows",
-        "Practical preparation for mobile engineering interviews",
-        "Structured performance evaluation based on real project work",
+        "Experience building production-level software systems from concept to deployment.",
+        "A professional engineering portfolio that demonstrates real development work.",
+        "A GitHub repository showcasing the completed project and development process.",
+        "Understanding of software architecture, system design, and engineering workflows.",
+        "Experience working with collaborative development practices used in modern technology teams.",
+        "Exposure to open-source contribution environments and engineering communities.",
+        "Preparation for software engineering interviews including technical discussions and project walkthroughs.",
+        "Structured performance evaluation based on real project work and engineering practices.",
       ],
 
       learningOutcomes: [
@@ -470,17 +498,23 @@ export default function PraktixInternshipProgramPage() {
         "Test, debug, and optimize mobile performance",
         "Communicate technical decisions clearly in interviews and reviews",
       ],
-
       whoShouldApply: [
-        "Final-year university students in computer science or related fields",
-        "Recent graduates pursuing iOS/Android/mobile careers",
-        "Early-career developers seeking structured mobile experience",
-        "Individuals with basic programming knowledge looking to build real mobile apps",
+        "University Students — students in computer science or related fields who want to gain real development experience before entering the job market.",
+        "Recent Graduates — graduates seeking practical engineering experience and a portfolio that strengthens their employability.",
+        "Career Switchers — individuals transitioning into software engineering who want to build real systems and demonstrate practical capability to employers.",
       ],
 
+      careerValue: {
+        paragraphs: [
+          "By the end of the internship, participants graduate with both practical experience and tangible career assets.",
+          "Throughout the internship, participants receive mentorship and structured feedback to improve both technical execution and engineering thinking.",
+          "New cohorts begin every three months, and applicants are enrolled in the next available program.",
+        ],
+      },
+
       programStructure: [
-        { label: "Duration", value: "12–15 Weeks" },
-        { label: "Format", value: "Online – Expert-Led" },
+        { label: "Duration", value: "12â€“15 Weeks" },
+        { label: "Format", value: "Online â€“ Expert-Led" },
         { label: "Learning Model", value: "Project-Based Internship" },
         { label: "Project Format", value: "Mobile Product Simulation" },
         { label: "Evaluation Model", value: "Performance-Based Assessment" },
@@ -507,8 +541,12 @@ export default function PraktixInternshipProgramPage() {
       },
 
       cta: {
-        title: "Start Building Mobile Apps",
-        subtitle: "Applications for the next cohort are now open.",
+        title: "Start Building Real Software Systems",
+        subtitle: "Applications for the next cohort are currently open.",
+        extra:
+          "New cohorts begin every three months, and applicants are enrolled in the next available program.",
+        text:
+          "Build a production-level software system, receive structured technical feedback, and graduate with a portfolio that demonstrates real engineering capability.",
       },
     }),
     []
@@ -517,10 +555,9 @@ export default function PraktixInternshipProgramPage() {
   const tabs = useMemo(
     () => [
       { id: "overview", label: "Overview" },
-      { id: "work", label: "What You’ll Work On" },
+      { id: "work", label: "What Youâ€™ll Work On" },
       { id: "benefits", label: "Key Benefits" },
       { id: "how", label: "How It Works" },
-      { id: "outcomes", label: "Outcomes" },
       { id: "structure", label: "Program Structure" },
       { id: "why", label: "Why Praktix" },
     ],
@@ -622,23 +659,19 @@ export default function PraktixInternshipProgramPage() {
               <div className="grid gap-4 lg:grid-cols-12">
                 <Card className="lg:col-span-7">
                   <div className="text-sm leading-relaxed text-white/70">{data.workOn.intro}</div>
-                  <div className="mt-5 text-xs font-semibold tracking-wide text-white/60">PROJECT COMPONENTS MAY INCLUDE</div>
+                  <div className="mt-4 text-sm leading-relaxed text-white/70">{data.workOn.lifecycle}</div>
+                  <div className="mt-5 text-xs font-semibold tracking-wide text-white/60">
+                    Depending on the instructorâ€™s expertise and project focus, projects may include:
+                  </div>
                   <BulletList items={data.workOn.types} />
                   <div className="mt-5 text-sm leading-relaxed text-white/70">{data.workOn.emphasis}</div>
                 </Card>
 
                 <Card className="lg:col-span-5">
-                  <div className="text-xs font-semibold tracking-wide text-white/60">TRACKS</div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {data.workOn.tracks.map((t) => (
-                      <span
-                        key={t}
-                        className="inline-flex items-center rounded-full bg-white/5 px-4 py-2 text-sm font-semibold text-[#E9E7DF] ring-1 ring-white/10"
-                      >
-                        {t}
-                      </span>
-                    ))}
+                  <div className="text-xs font-semibold tracking-wide text-white/60">
+                    Participants may specialize in one of three tracks:
                   </div>
+                  <BulletList items={data.workOn.tracks} />
                 </Card>
               </div>
             </div>
@@ -649,7 +682,7 @@ export default function PraktixInternshipProgramPage() {
               <SectionTitle
                 eyebrow="Key benefits"
                 title="What you get from the internship"
-                subtitle="Practical outcomes designed to translate into real mobile hiring advantages."
+                subtitle="Participants gain practical experience and career advantages that extend beyond traditional training programs."
               />
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 {data.benefits.map((b) => (
@@ -664,8 +697,11 @@ export default function PraktixInternshipProgramPage() {
               <SectionTitle
                 eyebrow="Workflow"
                 title="How the internship works"
-                subtitle="A structured development framework based on professional mobile workflows."
+                subtitle="The internship follows a structured engineering workflow similar to the processes used in professional development teams."
               />
+              <p className="text-sm leading-relaxed text-white/70">
+                Participants progress through five development phases while building their software system.
+              </p>
 
               <div className="space-y-4">
                 {data.howItWorks.map((p) => (
@@ -683,38 +719,25 @@ export default function PraktixInternshipProgramPage() {
                   </Card>
                 ))}
               </div>
+              <p className="text-sm leading-relaxed text-white/70">
+                Throughout the internship, participants receive mentorship and structured feedback to improve both technical execution and engineering thinking.
+              </p>
             </div>
           )}
 
           {openSection === "outcomes" && (
             <div className="space-y-4">
               <SectionTitle
-                eyebrow="Outcomes"
-                title="Learning outcomes, takeaways & final deliverables"
-                subtitle="What you’ll be able to do—and what you’ll graduate with."
+                eyebrow="Outcomes & Career Value"
+                title="Outcomes & Career Value"
+                subtitle="By the end of the internship, participants graduate with both practical experience and tangible career assets."
               />
+              <p className="text-sm leading-relaxed text-white/70">Participants gain:</p>
 
               <div className="grid gap-4 lg:grid-cols-12">
-                <Card className="lg:col-span-6">
-                  <div className="text-xs font-semibold tracking-wide text-white/60">PROGRAM TAKEAWAYS</div>
+                <Card className="lg:col-span-12">
+                  <div className="text-xs font-semibold tracking-wide text-white/60">PARTICIPANTS GAIN</div>
                   <BulletList items={data.programTakeaways} />
-                </Card>
-
-                <Card className="lg:col-span-6">
-                  <div className="text-xs font-semibold tracking-wide text-white/60">LEARNING OUTCOMES</div>
-                  <BulletList items={data.learningOutcomes} />
-                </Card>
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-12">
-                <Card className="lg:col-span-6">
-                  <div className="text-xs font-semibold tracking-wide text-white/60">FINAL DELIVERABLES</div>
-                  <BulletList items={data.finalDeliverables} />
-                </Card>
-
-                <Card className="lg:col-span-6">
-                  <div className="text-xs font-semibold tracking-wide text-white/60">WHO SHOULD APPLY</div>
-                  <BulletList items={data.whoShouldApply} />
                 </Card>
               </div>
             </div>
@@ -751,8 +774,8 @@ export default function PraktixInternshipProgramPage() {
                     EVALUATION & OUTCOME
                   </div>
                   <div className="mt-3 text-sm leading-relaxed text-white/70">
-                    You’ll be evaluated based on real mobile product work, architecture quality, testing discipline, UI quality,
-                    and your ability to communicate technical decisions—ending with a release-ready app and portfolio assets.
+                    Youâ€™ll be evaluated based on real mobile product work, architecture quality, testing discipline, UI quality,
+                    and your ability to communicate technical decisionsâ€”ending with a release-ready app and portfolio assets.
                   </div>
                 </Card>
               </div>
@@ -795,7 +818,7 @@ export default function PraktixInternshipProgramPage() {
           )}
 
           <div className="mt-10">
-            <SectionTitle eyebrow="Call to action" title={data.cta.title} subtitle={data.cta.subtitle} />
+            <SectionTitle title={data.cta.title} subtitle={data.cta.subtitle} />
             <Card className="relative overflow-hidden p-6 sm:p-8">
               <div
                 className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full blur-2xl"
@@ -814,8 +837,11 @@ export default function PraktixInternshipProgramPage() {
                 </div>
 
                 <div className="text-sm leading-relaxed text-white/75 sm:max-w-3xl">
-                  Build a release-ready mobile app, receive structured technical feedback, and graduate with artifacts hiring
-                  managers can evaluate directly (repo, architecture notes, demos, and release workflow).
+                  {data.cta.extra}
+                </div>
+
+                <div className="text-sm leading-relaxed text-white/75 sm:max-w-3xl">
+                  {data.cta.text}
                 </div>
 
                 <button
@@ -847,3 +873,6 @@ export default function PraktixInternshipProgramPage() {
     </div>
   );
 }
+
+
+

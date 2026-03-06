@@ -318,7 +318,7 @@ export default function PraktixInternshipProgramPage() {
         subtitle:
           "Develop production-level software through a structured internship designed to simulate real engineering environments used in modern technology companies.",
         subtitle2:
-          "Participants work on a complete software project from concept to deployment while applying professional engineering practices used in global tech teams.",
+"Participants work on a complete software project from concept to deployment while applying professional engineering practices used in global tech teams.",
         tracks: ["Frontend Engineering", "Backend Engineering", "Full Stack Development"],
       },
 
@@ -326,7 +326,7 @@ export default function PraktixInternshipProgramPage() {
         bg: "#F3E6D3",
         ink: "#1F2937",
         breadcrumb: ["Home", "For Individuals", "Software Engineering"],
-        category: "Professional Internship",
+        category: "",
         ratingValue: 5,
         ceus: "Career-Focused Program",
         heroImage: "/what-is-software-engineering.jpg",
@@ -506,6 +506,8 @@ export default function PraktixInternshipProgramPage() {
       finalCta: {
         title: "Start Building Real Software Systems",
         subtitle: "Applications for the next cohort are currently open.",
+        extra:
+          "New cohorts begin every three months, and applicants are enrolled in the next available program.",
         text:
           "Build a production-level software system, receive structured technical feedback, and graduate with a portfolio that demonstrates real engineering capability.",
       },
@@ -519,7 +521,7 @@ export default function PraktixInternshipProgramPage() {
       { id: "build", label: "What You Will Build" },
       { id: "benefits", label: "Key Benefits" },
       { id: "how", label: "How the Internship Works" },
-      { id: "outcomes", label: "Outcomes & Career Value" },
+      { id: "who", label: "WHO THIS INTERNSHIP IS FOR" },
     ],
     []
   );
@@ -565,7 +567,6 @@ export default function PraktixInternshipProgramPage() {
           {openSection === "overview" && (
             <div className="space-y-4">
               <SectionTitle
-                eyebrow="Overview"
                 title="Build engineering thinking, not just coding skills"
                 subtitle="A structured environment for learning how real software systems are designed, built, tested, and deployed."
               />
@@ -616,7 +617,6 @@ export default function PraktixInternshipProgramPage() {
           {openSection === "build" && (
             <div className="space-y-4">
               <SectionTitle
-                eyebrow="What You Will Build"
                 title="A complete software system from concept to deployment"
                 subtitle="Participants work through the full product lifecycle while specializing in one of three engineering tracks."
               />
@@ -666,7 +666,6 @@ export default function PraktixInternshipProgramPage() {
           {openSection === "benefits" && (
             <div className="space-y-4">
               <SectionTitle
-                eyebrow="Key Benefits"
                 title="Career advantages beyond traditional training"
                 subtitle="Practical outcomes designed to strengthen employability and demonstrate real engineering capability."
               />
@@ -681,7 +680,6 @@ export default function PraktixInternshipProgramPage() {
           {openSection === "how" && (
             <div className="space-y-4">
               <SectionTitle
-                eyebrow="How the Internship Works"
                 title="A workflow modeled on professional software teams"
                 subtitle="Participants progress through five structured development phases while building their software system."
               />
@@ -712,42 +710,42 @@ export default function PraktixInternshipProgramPage() {
           {openSection === "outcomes" && (
             <div className="space-y-4">
               <SectionTitle
-                eyebrow="Outcomes & Career Value"
                 title="Graduate with practical experience and tangible career assets"
                 subtitle="The internship is designed to produce visible outputs that employers can evaluate directly."
               />
 
               <div className="grid gap-4 lg:grid-cols-12">
-                <Card className="lg:col-span-7">
+                <Card className="lg:col-span-12">
                   <div className="text-xs font-semibold tracking-wide text-white/60">
                     PARTICIPANTS GAIN
                   </div>
                   <BulletList items={data.outcomes} />
                 </Card>
+              </div>
+            </div>
+          )}
 
-                <Card className="lg:col-span-5">
+          {openSection === "who" && (
+            <div className="space-y-4">
+              <SectionTitle
+                title="Who This Internship Is For"
+                subtitle="Participant profiles that benefit most from this internship."
+              />
+
+              <div className="grid gap-4 lg:grid-cols-12">
+                <Card className="lg:col-span-12">
                   <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-white/60">
                     <BadgeCheck className="h-4 w-4" {...iconStrongProps} />
                     WHO THIS INTERNSHIP IS FOR
                   </div>
                   <BulletList items={data.whoShouldApply} />
-
-                  <div className="mt-6 space-y-3 text-sm leading-relaxed text-white/70">
-                    {data.careerValue.paragraphs.map((p, i) => (
-                      <p key={i}>{p}</p>
-                    ))}
-                  </div>
                 </Card>
               </div>
             </div>
           )}
 
           <div className="mt-10">
-            <SectionTitle
-              eyebrow="Call to action"
-              title={data.finalCta.title}
-              subtitle={data.finalCta.subtitle}
-            />
+            <SectionTitle title={data.finalCta.title} subtitle={data.finalCta.subtitle} />
             <Card className="relative overflow-hidden p-6 sm:p-8">
               <div
                 className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full blur-2xl"
@@ -763,6 +761,10 @@ export default function PraktixInternshipProgramPage() {
                       {item}
                     </div>
                   ))}
+                </div>
+
+                <div className="text-sm leading-relaxed text-white/75 sm:max-w-3xl">
+                  {data.finalCta.extra}
                 </div>
 
                 <div className="text-sm leading-relaxed text-white/75 sm:max-w-3xl">
