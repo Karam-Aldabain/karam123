@@ -1,4 +1,3 @@
-/* Make px-* use the same vars you already set on .lp */
 .lp {
   --px-accent: var(--accent);
   --px-primary: var(--primary);
@@ -237,7 +236,7 @@
 
 .px-megaGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   align-items: start;
 }
@@ -754,9 +753,9 @@
 /* Theme: Dark */
 .px-header.dark .px-nav {
   background: linear-gradient(
-    180deg,
-    rgba(20, 29, 38, 0.94) 0%,
-    rgba(20, 29, 38, 0.90) 100%
+    90deg,
+    rgba(20, 29, 38, 0.98) 0%,
+    rgba(34, 47, 62, 0.96) 100%
   );
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }

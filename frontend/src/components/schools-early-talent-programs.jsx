@@ -802,13 +802,10 @@ function RegistrationForm() {
   const submit = (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 2600);
-      setStep(1);
-      // Hook your API here
-    }, reduce ? 0 : 700);
+    setSubmitting(false);
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 2600);
+    setStep(1);
   };
 
   return (
@@ -1892,20 +1889,27 @@ export default function SchoolsEarlyTalentLanding() {
                     animate={impactInView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
                     transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.05 }}
                     whileHover={{ scale: 1.01 }}
-                    className="p-5"
+                    className={[
+                      "p-5",
+                      i < 3 ? "border-b border-[#0B1220]/10" : "",
+                      i % 2 === 0 ? "sm:border-r sm:border-[#0B1220]/10" : "",
+                      i < 2 ? "sm:border-b sm:border-[#0B1220]/10" : "sm:border-b-0",
+                      i < 3 ? "lg:border-r lg:border-[#0B1220]/10" : "lg:border-r-0",
+                      "lg:border-b-0",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                     style={{
                       background: "rgba(255,255,255,0.55)",
-                      borderRight: i < 3 ? "1px solid rgba(11,18,32,0.10)" : "none",
-                      borderBottom: i < 2 ? "1px solid rgba(11,18,32,0.10)" : "none",
                     }}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-3 text-xs font-semibold tracking-widest text-[#0B1220]/60">
+                      <div className="min-w-0">
+                        <div className="flex flex-col items-start gap-3 text-[10px] font-semibold tracking-[0.18em] text-[#0B1220]/60 sm:flex-row sm:items-center sm:text-xs sm:tracking-widest">
                           <IconBadge color={s.color} size={34}>
                             <Icon className="h-4 w-4" {...iconStrongProps} />
                           </IconBadge>
-                          <span>{s.label.toUpperCase()}</span>
+                          <span className="break-words leading-relaxed">{s.label.toUpperCase()}</span>
                         </div>
                         <div className="mt-3 text-3xl font-semibold text-[#0B1220]">
                           {impactInView ? <AnimatedNumber value={s.value} suffix={s.suffix} /> : <span>0</span>}

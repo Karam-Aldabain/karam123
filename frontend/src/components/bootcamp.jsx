@@ -52,6 +52,14 @@ const COLORS = {
 
 const cn = (...c) => c.filter(Boolean).join(" ");
 
+function toFieldName(label) {
+  return String(label || "")
+    .toLowerCase()
+    .replace(/\(optional\)|\*/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
 function scrollToId(id) {
   void motion;
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -393,13 +401,15 @@ function Chip({ children }) {
   );
 }
 
-function Field({ label, placeholder, icon: Icon, required, type = "text" }) {
+function Field({ label, placeholder, icon: Icon, required, type = "text", name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-[#E2E2D2]/85">{label}</span>
       <div className="relative">
         {Icon ? <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#E2E2D2]/40" /> : null}
         <input
+          name={fieldName}
           required={required}
           type={type}
           className={cn(
@@ -415,11 +425,13 @@ function Field({ label, placeholder, icon: Icon, required, type = "text" }) {
   );
 }
 
-function SelectField({ label, options, required = true, placeholder = "Select option" }) {
+function SelectField({ label, options, required = true, placeholder = "Select option", name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-[#E2E2D2]/85">{label}</span>
       <select
+        name={fieldName}
         required={required}
         defaultValue=""
         className={cn(
@@ -440,11 +452,13 @@ function SelectField({ label, options, required = true, placeholder = "Select op
   );
 }
 
-function TextArea({ label, placeholder, minLength, value, onChange }) {
+function TextArea({ label, placeholder, minLength, value, onChange, name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-[#E2E2D2]/85">{label}</span>
       <textarea
+        name={fieldName}
         required
         minLength={minLength}
         rows={5}
@@ -659,6 +673,19 @@ export default function BootcampPage () {
   // form
   const [why, setWhy] = useState("");
   const whyCount = why.length;
+  const [isApplying, setIsApplying] = useState(false);
+  const [applyMessage, setApplyMessage] = useState("");
+
+  function onApplySubmit(e) {
+    e.preventDefault();
+    setIsApplying(true);
+    setApplyMessage("");
+    setConfettiKey((k) => k + 1);
+    setApplyMessage("Application submitted successfully.");
+    setWhy("");
+    e.currentTarget.reset();
+    setIsApplying(false);
+  }
 
   return (
     <div className="min-h-screen bg-[#141D26] text-[#E2E2D2]" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
@@ -1194,11 +1221,7 @@ export default function BootcampPage () {
           <GradientBorder>
             <div className="p-6 md:p-8">
               <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setConfettiKey((k) => k + 1);
-                  alert("Submitted! Hook this up to your API.");
-                }}
+                onSubmit={onApplySubmit}
                 className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur md:p-8"
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -1234,6 +1257,7 @@ export default function BootcampPage () {
                     minLength={150}
                     value={why}
                     onChange={(e) => setWhy(e.target.value)}
+                    name="motivation"
                   />
                   <div className="mt-2 text-right text-xs text-[#E2E2D2]/55">{whyCount}/2000 characters</div>
                 </div>
@@ -1255,6 +1279,7 @@ export default function BootcampPage () {
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     type="submit"
+                    disabled={isApplying}
                     className={cn(
                       "w-full rounded-2xl px-6 py-4 text-base font-extrabold",
                       "bg-[#C51F5D] text-[#141D26]",
@@ -1262,9 +1287,10 @@ export default function BootcampPage () {
                       "focus:outline-none focus:ring-2 focus:ring-[#E2E2D2]/40"
                     )}
                   >
-                    Submit Application
+                    {isApplying ? "Submitting..." : "Submit Application"}
                   </motion.button>
                 </div>
+                {applyMessage ? <p className="mt-3 text-sm text-[#E2E2D2]/80">{applyMessage}</p> : null}
               </form>
             </div>
           </GradientBorder>

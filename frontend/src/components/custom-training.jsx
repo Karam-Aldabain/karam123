@@ -43,6 +43,14 @@ const COLORS = {
 
 const cn = (...c) => c.filter(Boolean).join(" ");
 
+function toFieldName(label) {
+  return String(label || "")
+    .toLowerCase()
+    .replace(/\(optional\)|\*/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
 const STATS = [
   { icon: Users, value: "500+", label: "Companies Trained", gradient: "from-[#2563EB] to-[#06B6D4]" },
   { icon: Award, value: "95%", label: "Success Rate", gradient: "from-[#9333EA] to-[#EC4899]" },
@@ -702,6 +710,8 @@ export default function CustomTrainingPage() {
   const topBar = useSpring(scrollYProgress, { stiffness: 140, damping: 22 });
 
   const [confettiKey, setConfettiKey] = useState(0);
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [requestMessage, setRequestMessage] = useState("");
 
   const [tab, setTab] = useState("field");
   const cards = tab === "format" ? FORMAT_CARDS : tab === "duration" ? DURATION_CARDS : FIELD_CARDS;
@@ -713,6 +723,16 @@ export default function CustomTrainingPage() {
   }, [tab]);
 
   const metaLabel = tab === "format" ? "Training Format" : tab === "duration" ? "Program Duration" : "Training Field";
+
+  function onSubmitRequest(e) {
+    e.preventDefault();
+    setIsSubmittingRequest(true);
+    setRequestMessage("");
+    setConfettiKey((k) => k + 1);
+    setRequestMessage("Request submitted successfully.");
+    e.currentTarget.reset();
+    setIsSubmittingRequest(false);
+  }
 
   return (
     <div className="min-h-screen bg-[#141D26] text-[#E2E2D2]" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
@@ -1084,11 +1104,7 @@ export default function CustomTrainingPage() {
           <GradientBorder>
             <div className="p-6 md:p-8">
               <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setConfettiKey((k) => k + 1);
-                  alert("Submitted! Connect this form to your backend.");
-                }}
+                onSubmit={onSubmitRequest}
                 className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur md:p-8"
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -1117,6 +1133,7 @@ export default function CustomTrainingPage() {
                     Additional Details * (min 50 characters)
                   </span>
                   <textarea
+                    name="additional_details"
                     required
                     minLength={50}
                     rows={5}
@@ -1140,11 +1157,12 @@ export default function CustomTrainingPage() {
                   <ConfettiBurst fireKey={confettiKey + 2000} />
                   <MagneticButton type="submit" variant="primary" className="w-full py-4 text-base" icon={false}>
                     <span className="inline-flex items-center justify-center gap-3">
-                      Submit Request
+                      {isSubmittingRequest ? "Submitting..." : "Submit Request"}
                       <Send className="h-5 w-5" />
                     </span>
                   </MagneticButton>
                 </div>
+                {requestMessage ? <p className="mt-3 text-sm text-[#E2E2D2]/80">{requestMessage}</p> : null}
               </form>
             </div>
           </GradientBorder>
@@ -1314,11 +1332,13 @@ export default function CustomTrainingPage() {
   );
 }
 
-function Field({ label, placeholder }) {
+function Field({ label, placeholder, name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-[#E2E2D2]/85">{label}</span>
       <input
+        name={fieldName}
         required
         placeholder={placeholder}
         className="w-full rounded-2xl border border-white/10 bg-[#141D26]/45 px-5 py-3 text-sm text-[#E2E2D2] placeholder:text-[#E2E2D2]/35 focus:outline-none focus:ring-2 focus:ring-[#C51F5D]/40"
@@ -1327,11 +1347,13 @@ function Field({ label, placeholder }) {
   );
 }
 
-function SelectField({ label, placeholder, options }) {
+function SelectField({ label, placeholder, options, name }) {
+  const fieldName = name || toFieldName(label);
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-extrabold text-[#E2E2D2]/85">{label}</span>
       <select
+        name={fieldName}
         required
         defaultValue=""
         className="w-full rounded-2xl border border-white/10 bg-[#141D26]/45 px-5 py-3 text-sm text-[#E2E2D2] focus:outline-none focus:ring-2 focus:ring-[#C51F5D]/40"

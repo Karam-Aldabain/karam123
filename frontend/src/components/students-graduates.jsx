@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from "react";
+﻿﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   motion,
   AnimatePresence,
@@ -24,6 +24,7 @@ import {
   LineChart,
   MapPin,
   Shield,
+  Lock,
   Sparkles,
   Star,
   Target,
@@ -37,20 +38,19 @@ import {
   Wallet,
   Boxes,
   HeartPulse,
+  Facebook,
+  Linkedin,
+  Chrome,
   X,
 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
 
-/**
- * IMPORTANT:
- * Keep these EXACTLY as-is from your original code (do not change data/colors):
- * - THEME
- * - DARK_SECTION_BG
- * - ACCENT_RGB + accent(a)
- * - IMAGES
- * - categories
- */
+void motion;
 
-const THEME = {
+
+
+export const THEME = {
   deep: "#0B1220",
   slate: "#1E2A3A",
   sand: "#E9E7DF",
@@ -62,22 +62,221 @@ const THEME = {
   star: "#F5D66B",
 };
 
-const DARK_SECTION_BG = "linear-gradient(90deg, #050B1F 0%, #071A3E 100%)";
-const ACCENT_RGB = "201,29,103";
-const accent = (a) => `rgba(${ACCENT_RGB}, ${a})`;
+export const DARK_SECTION_BG = "linear-gradient(90deg, #050B1F 0%, #071A3E 100%)";
+export const ACCENT_RGB = "201,29,103";
+export const accent = (a) => `rgba(${ACCENT_RGB}, ${a})`;
 
 const IMAGES = {
   heroMain: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80",
   germany: "/munich-08.webp",
 };
 
-const CATEGORY_PRICES = {
+export const CATEGORY_PRICES = {
   eng: 1400,
   business: 1200,
   health: 1300,
 };
 
-const categories = [
+const WORLD_COUNTRIES = [
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bhutan",
+  "Bolivia",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Brazil",
+  "Brunei",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cabo Verde",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Colombia",
+  "Comoros",
+  "Congo",
+  "Costa Rica",
+  "Cote d'Ivoire",
+  "Croatia",
+  "Cuba",
+  "Cyprus",
+  "Czechia",
+  "Democratic Republic of the Congo",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Fiji",
+  "Finland",
+  "France",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Grenada",
+  "Guatemala",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Honduras",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Israel",
+  "Italy",
+  "Jamaica",
+  "Japan",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Laos",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Mauritania",
+  "Mauritius",
+  "Mexico",
+  "Micronesia",
+  "Moldova",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands",
+  "New Zealand",
+  "Nicaragua",
+  "Niger",
+  "Nigeria",
+  "North Korea",
+  "North Macedonia",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines",
+  "Poland",
+  "Portugal",
+  "Qatar",
+  "Romania",
+  "Russia",
+  "Rwanda",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Korea",
+  "South Sudan",
+  "Spain",
+  "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Sweden",
+  "Switzerland",
+  "Syria",
+  "Taiwan",
+  "Tajikistan",
+  "Tanzania",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "United Arab Emirates",
+  "United Kingdom",
+  "United States",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Vatican City",
+  "Venezuela",
+  "Vietnam",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
+];
+
+export const categories = [
   {
     key: "eng",
     label: "Engineering & Technology",
@@ -471,6 +670,39 @@ const categories = [
 
 const iconStrongProps = { strokeWidth: 2.4 };
 
+function slugify(text = "") {
+  return text
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function buildProgramSlug(categoryKey, programName) {
+  return `${categoryKey}-${slugify(programName)}`;
+}
+
+export function getProgramDetailsPath(program) {
+  const categoryKey = program?.categoryKey || "eng";
+  return `/students-graduates/program/${buildProgramSlug(categoryKey, program?.name || "")}`;
+}
+
+export function getAllProgramsWithMeta() {
+  return categories.flatMap((cat) =>
+    cat.programs.map((program) => ({
+      ...program,
+      categoryKey: cat.key,
+      categoryLabel: cat.label,
+      price: CATEGORY_PRICES[cat.key],
+      slug: buildProgramSlug(cat.key, program.name),
+    }))
+  );
+}
+
+export function getProgramBySlug(programSlug) {
+  return getAllProgramsWithMeta().find((program) => program.slug === programSlug) || null;
+}
+
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -526,10 +758,7 @@ function AnimatedNumber({ value, suffix, durationMs = 900 }) {
   const [n, setN] = useState(reduce ? value : 0);
 
   useEffect(() => {
-    if (reduce) {
-      setN(value);
-      return;
-    }
+    if (reduce) return;
     let raf = 0;
     const start = performance.now();
     const from = 0;
@@ -545,7 +774,7 @@ function AnimatedNumber({ value, suffix, durationMs = 900 }) {
 
   return (
     <span>
-      {n.toLocaleString()}
+      {(reduce ? value : n).toLocaleString()}
       {suffix}
     </span>
   );
@@ -816,7 +1045,8 @@ function HeroVisual() {
   );
 }
 
-function FloatingChip({ icon: Icon, title, desc, color }) {
+function FloatingChip({ icon, title, desc, color }) {
+  const Icon = icon;
   return (
     <motion.div
       initial={{ opacity: 0, x: -14, y: 6, filter: "blur(6px)" }}
@@ -1161,41 +1391,105 @@ function ProgramCard({ program, index = 0, onOpen }) {
   );
 }
 
-function ApplyFlowModal({ open, program, onClose }) {
+function ApplyFlowModal({
+  open,
+  program,
+  onClose,
+  hidePreferredCategory = false,
+  hideSelectedProgram = false,
+}) {
   useLockBodyScroll(open);
   const selected = program || categories[0].programs[0];
+  const inferredPreferredCategory =
+    selected.categoryLabel ||
+    categories.find((category) => category.programs.some((item) => item.name === selected.name))?.label ||
+    "";
   const [step, setStep] = useState(0);
-  const [method, setMethod] = useState("Stripe");
+  const [method, setMethod] = useState("");
+  const [authMode, setAuthMode] = useState("login");
+  const [socialProvider, setSocialProvider] = useState(null);
+  const [auth, setAuth] = useState({
+    email: "",
+    password: "",
+    remember: true,
+  });
+  const [createForm, setCreateForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [tuitionCode, setTuitionCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [paymentPlan, setPaymentPlan] = useState("full");
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
     email: "",
     phone: "",
     country: "",
-    persona: "University Student",
-    academicYear: "Final Year",
+    persona: "",
+    academicYear: "",
     specialization: "",
-    preferredCategory: "Engineering & Technology",
-    startTimeline: "Within 1 Month",
+    preferredCategory: hidePreferredCategory ? inferredPreferredCategory : "",
+    startTimeline: "",
+  });
+  const [stripeData, setStripeData] = useState({
+    cardName: "",
+    cardNumber: "",
+    expiry: "",
+    cvc: "",
+  });
+  const [paypalData, setPaypalData] = useState({
+    fullName: "",
+    email: "",
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!open) return;
     setStep(0);
-    setMethod("Stripe");
+    setMethod("");
+    setAuthMode("login");
+    setSocialProvider(null);
     setErrors({});
+    setAuth({
+      email: "",
+      password: "",
+      remember: true,
+    });
+    setCreateForm({
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setTuitionCode("");
+    setPromoApplied(false);
+    setPaymentPlan("full");
+    setPaymentSuccess(false);
     setForm({
       fullName: "",
       email: "",
       phone: "",
       country: "",
-      persona: "University Student",
-      academicYear: "Final Year",
+      persona: "",
+      academicYear: "",
       specialization: "",
-      preferredCategory: "Engineering & Technology",
-      startTimeline: "Within 1 Month",
+      preferredCategory: hidePreferredCategory ? inferredPreferredCategory : "",
+      startTimeline: "",
     });
-  }, [open, selected?.name]);
+    setStripeData({
+      cardName: "",
+      cardNumber: "",
+      expiry: "",
+      cvc: "",
+    });
+    setPaypalData({
+      fullName: "",
+      email: "",
+    });
+  }, [hidePreferredCategory, inferredPreferredCategory, open, selected?.name]);
 
   useEffect(() => {
     if (!open) return;
@@ -1206,26 +1500,122 @@ function ApplyFlowModal({ open, program, onClose }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!paymentSuccess) return;
+    const timer = setTimeout(() => {
+      window.location.href = "/";
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [paymentSuccess]);
+
   if (!open || !selected) return null;
 
   const price = Number(selected.price || CATEGORY_PRICES.eng);
   const vat = Number((price * 0.19).toFixed(2));
   const total = Number((price + vat).toFixed(2));
+  const earlyBenefit = promoApplied ? Math.min(118, Number((total * 0.08).toFixed(2))) : 0;
+  const discountedTotal = Number(Math.max(0, total - earlyBenefit).toFixed(2));
+  const paymentPlans = [
+    { id: "full", label: "Full Amount", amount: discountedTotal, oldAmount: total, accent: true },
+    { id: "two", label: "2 Installments", amount: Number((discountedTotal * 1.02).toFixed(2)), oldAmount: Number((total * 1.06).toFixed(2)) },
+    { id: "three", label: "3 Installments", amount: Number((discountedTotal * 1.05).toFixed(2)), oldAmount: Number((total * 1.09).toFixed(2)) },
+  ];
+  const selectedPlan = paymentPlans.find((p) => p.id === paymentPlan) || paymentPlans[0];
+  const installmentPlanFee = Number(Math.max(0, selectedPlan.amount - discountedTotal).toFixed(2));
+  const twoFirstPayment = Number((paymentPlans[1].amount * 0.55).toFixed(2));
+  const twoSecondPayment = Number((paymentPlans[1].amount - twoFirstPayment).toFixed(2));
+  const threeFirstPayment = Number((paymentPlans[2].amount * 0.36).toFixed(2));
+  const threeRemaining = Number((paymentPlans[2].amount - threeFirstPayment).toFixed(2));
+  const threeSecondPayment = Number((threeRemaining / 2).toFixed(2));
+  const threeThirdPayment = Number((paymentPlans[2].amount - threeFirstPayment - threeSecondPayment).toFixed(2));
+  const payToday =
+    paymentPlan === "full" ? selectedPlan.amount : paymentPlan === "two" ? twoFirstPayment : threeFirstPayment;
+  const formatMoney = (value) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
 
   const validateForm = () => {
     const e = {};
     if (!form.fullName.trim()) e.fullName = "Full name is required.";
-    if (!form.email.trim()) e.email = "Email is required.";
+    if (!form.phone.trim()) e.phone = "Phone number is required.";
+    if (!form.persona) e.persona = "Please select an option.";
+    if (form.persona !== "Graduate" && !form.academicYear) e.academicYear = "Please select an option.";
+    if (!hidePreferredCategory && !form.preferredCategory) e.preferredCategory = "Please select an option.";
+    if (!form.startTimeline) e.startTimeline = "Please select an option.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
+  const validateLogin = () => {
+    const e = {};
+    if (!auth.email.trim()) e.loginEmail = "Email is required.";
+    if (!auth.password.trim()) e.loginPassword = "Password is required.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const validateCreateAccount = () => {
+    const e = {};
+    if (!createForm.fullName.trim()) e.createFullName = "Full name is required.";
+    if (!createForm.email.trim()) e.createEmail = "Email is required.";
+    if (!createForm.password.trim()) e.createPassword = "Password is required.";
+    if (!createForm.confirmPassword.trim()) e.createConfirmPassword = "Please confirm your password.";
+    if (createForm.password && createForm.confirmPassword && createForm.password !== createForm.confirmPassword) {
+      e.createConfirmPassword = "Passwords do not match.";
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const openSocialAuth = (provider) => {
+    const urls = {
+      google: "https://accounts.google.com/AccountChooser",
+      facebook: "https://www.facebook.com/login.php",
+      linkedin: "https://www.linkedin.com/login",
+    };
+    const url = urls[provider];
+    if (!url) return;
+
+    const popup = window.open(
+      url,
+      "social_auth_popup",
+      "width=520,height=720,menubar=no,toolbar=no,location=yes,status=no,resizable=yes,scrollbars=yes"
+    );
+    if (!popup) return;
+
+    const timer = window.setInterval(() => {
+      if (popup.closed) {
+        window.clearInterval(timer);
+        setErrors({});
+        setStep(1);
+      }
+    }, 500);
+  };
+
+  const completeSocialLogin = (email) => {
+    setAuth((p) => ({ ...p, email, password: "social-auth" }));
+    setSocialProvider(null);
+    setStep(1);
+  };
+
   const next = () => {
-    if (step === 0 && !validateForm()) return;
-    setStep((p) => Math.min(p + 1, 2));
+    if (step === 0) {
+      if (authMode === "create" && !validateCreateAccount()) return;
+      if (authMode === "login" && !validateLogin()) return;
+    }
+    if (step === 1 && !validateForm()) return;
+    setStep((p) => Math.min(p + 1, 3));
   };
 
   const back = () => setStep((p) => Math.max(p - 1, 0));
+  const paymentMethodValid =
+    method === "Stripe"
+      ? stripeData.cardName.trim() &&
+        stripeData.cardNumber.trim() &&
+        stripeData.expiry.trim() &&
+        stripeData.cvc.trim()
+      : method === "PayPal"
+      ? paypalData.fullName.trim() && paypalData.email.trim()
+      : false;
 
   return (
     <AnimatePresence>
@@ -1251,8 +1641,8 @@ function ApplyFlowModal({ open, program, onClose }) {
           </div>
 
           <div className="max-h-[calc(100dvh-84px)] overflow-y-auto px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:max-h-[calc(95vh-84px)] sm:px-6 sm:py-6">
-            <div className="mb-6 grid grid-cols-3 gap-2">
-              {["Form", "Review", "Pay"].map((label, idx) => {
+            <div className="mb-6 grid grid-cols-4 gap-2">
+              {["Log In", "Form", "Review", "Payment"].map((label, idx) => {
                 const active = idx === step;
                 return (
                   <button
@@ -1272,28 +1662,189 @@ function ApplyFlowModal({ open, program, onClose }) {
             </div>
 
             {step === 0 ? (
+              <div className="mx-auto max-w-[520px] space-y-4 rounded-[20px] bg-[#F3F4F6] p-2 sm:p-4">
+                <div className="text-center text-[28px] font-semibold leading-tight text-[#0B1220] sm:text-[34px]">Applying to a Program?</div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("create");
+                    setErrors({});
+                  }}
+                  className="w-full bg-[#F0B323] px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95 sm:text-base"
+                >
+                  Create Account
+                </button>
+
+                {authMode === "login" ? (
+                  <>
+                    {socialProvider ? (
+                      <div className="space-y-3 rounded-[16px] border border-[#0B1220]/12 bg-white p-4">
+                        <div className="text-sm font-semibold uppercase tracking-wide text-[#0B1220]/65">
+                          Choose {socialProvider} account
+                        </div>
+                        {[
+                          `student.${socialProvider}@gmail.com`,
+                          `applicant.${socialProvider}@gmail.com`,
+                          `intern.${socialProvider}@gmail.com`,
+                        ].map((email) => (
+                          <button
+                            key={email}
+                            type="button"
+                            onClick={() => completeSocialLogin(email)}
+                            className="w-full rounded-xl border border-[#0B1220]/12 bg-[#F8FAFC] px-4 py-3 text-left text-sm text-[#0B1220] transition hover:bg-[#EEF2F7]"
+                          >
+                            Continue as {email}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => setSocialProvider(null)}
+                          className="w-full rounded-xl border border-[#0B1220]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0B1220]/75 transition hover:bg-[#F3F4F6]"
+                        >
+                          Back to login options
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-4 py-3">
+                          <div className="h-px flex-1 bg-[#0B1220]/20" />
+                          <div className="text-base font-semibold text-[#0B1220]/85">OR</div>
+                          <div className="h-px flex-1 bg-[#0B1220]/20" />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => openSocialAuth("facebook")}
+                          className="flex w-full items-center gap-4 bg-[#2D73DA] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
+                        >
+                          <Facebook className="h-6 w-6" />
+                          <span className="text-center w-full -ml-8">Log In with Facebook</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => openSocialAuth("google")}
+                          className="flex w-full items-center gap-4 border-2 border-[#8B8B8B] bg-white px-5 py-3 text-left text-[18px] font-bold uppercase text-[#5C6470] transition hover:bg-[#FAFAFA] sm:text-[20px]"
+                        >
+                          <Chrome className="h-6 w-6" />
+                          <span className="text-center w-full -ml-8">Log In with Google</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => openSocialAuth("linkedin")}
+                          className="flex w-full items-center gap-4 bg-[#356BB0] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
+                        >
+                          <Linkedin className="h-6 w-6" />
+                          <span className="text-center w-full -ml-8">Log In with LinkedIn</span>
+                        </button>
+
+                        <div className="space-y-3 pt-2">
+                          <input
+                            type="email"
+                            value={auth.email}
+                            onChange={(e) => setAuth((p) => ({ ...p, email: e.target.value }))}
+                            placeholder="Email"
+                            className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                          />
+                          {errors.loginEmail ? <p className="text-xs text-rose-600">{errors.loginEmail}</p> : null}
+                          <input
+                            type="password"
+                            value={auth.password}
+                            onChange={(e) => setAuth((p) => ({ ...p, password: e.target.value }))}
+                            placeholder="Password"
+                            className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                          />
+                          {errors.loginPassword ? <p className="text-xs text-rose-600">{errors.loginPassword}</p> : null}
+                        </div>
+
+                        <button type="button" className="block w-full text-center text-[20px] font-medium text-[#B00020] sm:text-[22px]">
+                          I forgot my password
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="space-y-3 pt-2">
+                    <input
+                      type="text"
+                      value={createForm.fullName}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, fullName: e.target.value }))}
+                      placeholder="Full Name"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createFullName ? <p className="text-xs text-rose-600">{errors.createFullName}</p> : null}
+                    <input
+                      type="email"
+                      value={createForm.email}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, email: e.target.value }))}
+                      placeholder="Email"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createEmail ? <p className="text-xs text-rose-600">{errors.createEmail}</p> : null}
+                    <input
+                      type="password"
+                      value={createForm.password}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, password: e.target.value }))}
+                      placeholder="Password"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createPassword ? <p className="text-xs text-rose-600">{errors.createPassword}</p> : null}
+                    <input
+                      type="password"
+                      value={createForm.confirmPassword}
+                      onChange={(e) => setCreateForm((p) => ({ ...p, confirmPassword: e.target.value }))}
+                      placeholder="Confirm Password"
+                      className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                    />
+                    {errors.createConfirmPassword ? <p className="text-xs text-rose-600">{errors.createConfirmPassword}</p> : null}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode("login");
+                        setErrors({});
+                      }}
+                      className="block w-full text-center text-[16px] font-medium text-[#356BB0] hover:underline"
+                    >
+                      Already have an account? Log In
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={next}
+                  className="w-full bg-[#F0B323] px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95 sm:text-base"
+                >
+                  {authMode === "create" ? "Create Account & Continue" : "Log In"}
+                </button>
+              </div>
+            ) : null}
+
+            {step === 1 ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <div className="mb-2 text-sm font-semibold text-[#0B1220]">Full Name <span style={{ color: THEME.pink }}>*</span></div>
-                    <Input icon={BadgeCheck} iconColor={THEME.accent2} placeholder="Your full name" value={form.fullName} onChange={(e) => setForm((p) => ({ ...p, fullName: e.target.value }))} />
-                    {errors.fullName ? <p className="mt-2 text-xs text-rose-600">{errors.fullName}</p> : null}
-                  </div>
-                  <div>
-                    <div className="mb-2 text-sm font-semibold text-[#0B1220]">Email Address <span style={{ color: THEME.pink }}>*</span></div>
-                    <Input icon={Globe2} iconColor={THEME.accent} placeholder="name@email.com" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} />
-                    {errors.email ? <p className="mt-2 text-xs text-rose-600">{errors.email}</p> : null}
-                  </div>
+                <div>
+                  <div className="mb-2 text-sm font-semibold text-[#0B1220]">Full Name <span style={{ color: THEME.pink }}>*</span></div>
+                  <Input icon={BadgeCheck} iconColor={THEME.accent2} placeholder="Your full name" value={form.fullName} onChange={(e) => setForm((p) => ({ ...p, fullName: e.target.value }))} />
+                  {errors.fullName ? <p className="mt-2 text-xs text-rose-600">{errors.fullName}</p> : null}
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <div className="mb-2 text-sm font-semibold text-[#0B1220]">Phone Number</div>
+                    <div className="mb-2 text-sm font-semibold text-[#0B1220]">Phone Number <span style={{ color: THEME.pink }}>*</span></div>
                     <Input icon={Briefcase} iconColor={THEME.accent3} placeholder="+20 000 000 000" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
                     {errors.phone ? <p className="mt-2 text-xs text-rose-600">{errors.phone}</p> : null}
                   </div>
                   <div>
                     <div className="mb-2 text-sm font-semibold text-[#0B1220]">Country</div>
-                    <Input icon={MapPin} iconColor={THEME.accent4} placeholder="Country" value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))} />
+                    <Select
+                      icon={MapPin}
+                      iconColor={THEME.accent4}
+                      value={form.country}
+                      onChange={(v) => setForm((p) => ({ ...p, country: v }))}
+                      placeholder="Select country"
+                      options={WORLD_COUNTRIES}
+                    />
                     {errors.country ? <p className="mt-2 text-xs text-rose-600">{errors.country}</p> : null}
                   </div>
                 </div>
@@ -1304,9 +1855,17 @@ function ApplyFlowModal({ open, program, onClose }) {
                       icon={GraduationCap}
                       iconColor={THEME.accent3}
                       value={form.persona}
-                      onChange={(v) => setForm((p) => ({ ...p, persona: v }))}
+                      onChange={(v) =>
+                        setForm((p) => ({
+                          ...p,
+                          persona: v,
+                          academicYear: v === "Graduate" ? "" : p.academicYear,
+                        }))
+                      }
+                      placeholder="Select"
                       options={["University Student", "Graduate"]}
                     />
+                    {errors.persona ? <p className="mt-2 text-xs text-rose-600">{errors.persona}</p> : null}
                   </div>
                   <div>
                     <div className="mb-2 text-sm font-semibold text-[#0B1220]">Current Academic Year</div>
@@ -1315,8 +1874,13 @@ function ApplyFlowModal({ open, program, onClose }) {
                       iconColor={THEME.accent}
                       value={form.academicYear}
                       onChange={(v) => setForm((p) => ({ ...p, academicYear: v }))}
+                      placeholder="Select"
                       options={["1st", "2nd", "3rd", "Final Year"]}
+                      disabled={form.persona === "Graduate"}
                     />
+                    {form.persona !== "Graduate" && errors.academicYear ? (
+                      <p className="mt-2 text-xs text-rose-600">{errors.academicYear}</p>
+                    ) : null}
                   </div>
                 </div>
                 <div>
@@ -1329,21 +1893,25 @@ function ApplyFlowModal({ open, program, onClose }) {
                     onChange={(e) => setForm((p) => ({ ...p, specialization: e.target.value }))}
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <div className="mb-2 text-sm font-semibold text-[#0B1220]">Preferred Internship Category</div>
-                    <Select
-                      icon={Briefcase}
-                      iconColor={THEME.accent4}
-                      value={form.preferredCategory}
-                      onChange={(v) => setForm((p) => ({ ...p, preferredCategory: v }))}
-                      options={[
-                        "Engineering & Technology",
-                        "Business, Finance & Consulting",
-                        "Digital Health & Emerging Fields",
-                      ]}
-                    />
-                  </div>
+                <div className={cx("grid grid-cols-1 gap-4", hidePreferredCategory ? "" : "sm:grid-cols-2")}>
+                  {!hidePreferredCategory ? (
+                    <div>
+                      <div className="mb-2 text-sm font-semibold text-[#0B1220]">Preferred Internship Category</div>
+                      <Select
+                        icon={Briefcase}
+                        iconColor={THEME.accent4}
+                        value={form.preferredCategory}
+                        onChange={(v) => setForm((p) => ({ ...p, preferredCategory: v }))}
+                        placeholder="Select"
+                        options={[
+                          "Engineering & Technology",
+                          "Business, Finance & Consulting",
+                          "Digital Health & Emerging Fields",
+                        ]}
+                      />
+                      {errors.preferredCategory ? <p className="mt-2 text-xs text-rose-600">{errors.preferredCategory}</p> : null}
+                    </div>
+                  ) : null}
                   <div>
                     <div className="mb-2 text-sm font-semibold text-[#0B1220]">Preferred Start Timeline</div>
                     <Select
@@ -1351,24 +1919,27 @@ function ApplyFlowModal({ open, program, onClose }) {
                       iconColor={THEME.accent}
                       value={form.startTimeline}
                       onChange={(v) => setForm((p) => ({ ...p, startTimeline: v }))}
-                      options={["Immediately", "Within 1 Month", "Within 2-3 Months"]}
+                      placeholder="Select"
+                      options={["ASAP", "Within 1 Month", "Within 2-3 Months"]}
                     />
+                    {errors.startTimeline ? <p className="mt-2 text-xs text-rose-600">{errors.startTimeline}</p> : null}
                   </div>
                 </div>
-                <div>
-                  <div className="mb-2 text-sm font-semibold text-[#0B1220]">Selected Program</div>
-                  <Input icon={Sparkles} iconColor={THEME.pink} value={selected.name} readOnly />
-                </div>
+                {!hideSelectedProgram ? (
+                  <div>
+                    <div className="mb-2 text-sm font-semibold text-[#0B1220]">Selected Program</div>
+                    <Input icon={Sparkles} iconColor={THEME.pink} value={selected.name} readOnly />
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
-            {step === 1 ? (
+            {step === 2 ? (
               <div className="space-y-4">
                 <div className="rounded-[22px] bg-white p-5 ring-1 ring-[#0B1220]/10">
                   <div className="text-lg font-semibold text-[#0B1220]">Review Application</div>
                   <div className="mt-3 space-y-1 text-sm text-[#0B1220]/80">
                     <div><span className="font-semibold">Name:</span> {form.fullName}</div>
-                    <div><span className="font-semibold">Email:</span> {form.email}</div>
                     <div><span className="font-semibold">Phone:</span> {form.phone}</div>
                     <div><span className="font-semibold">Country:</span> {form.country}</div>
                     <div><span className="font-semibold">Are You?:</span> {form.persona}</div>
@@ -1393,40 +1964,150 @@ function ApplyFlowModal({ open, program, onClose }) {
               </div>
             ) : null}
 
-            {step === 2 ? (
-              <div className="space-y-5">
-                <div className="rounded-[22px] bg-gradient-to-br from-[#0B1220] to-[#152238] p-7 text-center ring-1 ring-[#0B1220]/20">
-                  <div className="text-4xl font-semibold leading-tight text-white sm:text-5xl">Complete Your Purchase</div>
-                  <div className="mt-2 text-sm text-white/70">Secure checkout with VAT-inclusive pricing.</div>
+            {step === 3 ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="text-[#0B1220]/70">
+                    Application <span className="font-semibold text-[#0B1220]">&gt; Payment</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 font-semibold text-[#0B1220]">
+                    <Lock className="h-4 w-4" {...iconStrongProps} />
+                    Secure Checkout
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_1fr]">
-                  <div className="rounded-[22px] bg-white p-7 ring-1 ring-[#0B1220]/10">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="text-2xl font-semibold text-[#0B1220]">{selected.name}</div>
-                      <div className="text-2xl font-semibold text-[#0B1220]">EUR{price.toFixed(2)}</div>
-                    </div>
-                    <div className="mt-6 space-y-2">
-                      {selected.includes.map((x) => (
-                        <div key={x} className="flex items-start gap-3 text-sm text-[#0B1220]/75">
-                          <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full" style={{ background: THEME.accent3 }}>
-                            <Check className="h-3.5 w-3.5 text-white" {...iconStrongProps} />
-                          </span>
-                          <span>{x}</span>
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                  <div className="space-y-4">
+                    <div className="text-2xl font-semibold text-[#0B1220]">Course Details</div>
+                    <div className="rounded-[18px] bg-[#E9EFEC] p-4 ring-1 ring-[#0B1220]/10">
+                      <div className="flex gap-4">
+                        <img
+                          src={selected.cover || IMAGES.heroMain}
+                          alt={selected.name}
+                          className="h-20 w-20 rounded-xl object-cover"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-lg font-semibold text-[#0B1220]">{selected.name}</div>
+                          <div className="mt-2 text-sm text-[#0B1220]/70">
+                            Starts: <span className="font-semibold">March 12, 2026</span>
+                          </div>
                         </div>
-                      ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-[1fr_auto] gap-3">
+                      <input
+                        type="text"
+                        value={tuitionCode}
+                        onChange={(e) => setTuitionCode(e.target.value)}
+                        placeholder="Tuition Assistance Code"
+                        className="rounded-none border border-[#0B1220]/20 bg-white px-4 py-3 text-base text-[#0B1220] outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPromoApplied(Boolean(tuitionCode.trim()))}
+                        className="min-w-[130px] border border-[#0B1220]/35 bg-white px-6 py-3 text-sm font-semibold uppercase text-[#0B1220]"
+                      >
+                        Apply
+                      </button>
+                    </div>
+
+                    <div className="text-2xl font-semibold text-[#0B1220]">Payment Plan</div>
+                    <div className="space-y-3">
+                      {paymentPlans.map((plan) => {
+                        const active = paymentPlan === plan.id;
+                        return (
+                          <button
+                            key={plan.id}
+                            type="button"
+                            onClick={() => setPaymentPlan(plan.id)}
+                            className={cx(
+                              "w-full rounded-xl border px-4 py-4 text-left transition",
+                              active ? "border-[#B11F3A] bg-white" : "border-[#0B1220]/15 bg-white/80 hover:bg-white"
+                            )}
+                          >
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="inline-flex items-center gap-3">
+                                <span
+                                  className={cx(
+                                    "inline-flex h-6 w-6 items-center justify-center rounded-full border",
+                                    active ? "border-[#B11F3A]" : "border-[#0B1220]/25"
+                                  )}
+                                >
+                                  {active ? <span className="h-2.5 w-2.5 rounded-full bg-[#B11F3A]" /> : null}
+                                </span>
+                                <span className="text-base font-semibold text-[#0B1220]">{plan.label}</span>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-2xl font-semibold text-[#0B1220]">{formatMoney(plan.amount)}</div>
+                                <div className="text-sm text-[#0B1220]/45 line-through">{formatMoney(plan.oldAmount)}</div>
+                              </div>
+                            </div>
+
+                            {active && plan.id === "two" ? (
+                              <div className="mt-3 border-t border-[#0B1220]/10 pt-3 text-sm text-[#0B1220]/75">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold">1st Payment - due immediately</span>
+                                  <span>{formatMoney(twoFirstPayment)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between">
+                                  <span>2nd Payment - due April 6, 2026</span>
+                                  <span>{formatMoney(twoSecondPayment)}</span>
+                                </div>
+                                <div className="mt-3">Subsequent payments will be auto-charged to the credit card on file.</div>
+                              </div>
+                            ) : null}
+
+                            {active && plan.id === "three" ? (
+                              <div className="mt-3 border-t border-[#0B1220]/10 pt-3 text-sm text-[#0B1220]/75">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold">1st Payment - due immediately</span>
+                                  <span>{formatMoney(threeFirstPayment)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between">
+                                  <span>2nd Payment - due March 27, 2026</span>
+                                  <span>{formatMoney(threeSecondPayment)}</span>
+                                </div>
+                                <div className="mt-1 flex items-center justify-between">
+                                  <span>3rd Payment - due April 11, 2026</span>
+                                  <span>{formatMoney(threeThirdPayment)}</span>
+                                </div>
+                                <div className="mt-3">Subsequent payments will be auto-charged to the credit card on file.</div>
+                              </div>
+                            ) : null}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="rounded-[22px] bg-white p-6 ring-1 ring-[#0B1220]/10">
-                      <div className="text-2xl font-semibold text-[#0B1220]">Order Summary</div>
-                      <div className="mt-4 space-y-2 text-base text-[#0B1220]/80">
-                        <div className="flex items-center justify-between"><span>Ticket Price</span><span className="font-semibold text-[#0B1220]">EUR{price.toFixed(2)}</span></div>
-                        <div className="flex items-center justify-between"><span>Price before VAT</span><span className="font-semibold text-[#0B1220]">EUR{price.toFixed(2)}</span></div>
-                        <div className="flex items-center justify-between"><span>VAT (19%)</span><span className="font-semibold text-[#0B1220]">EUR{vat.toFixed(2)}</span></div>
+                    <div className="text-2xl font-semibold text-[#0B1220]">Payment Details</div>
+                    <div className="rounded-[18px] bg-white p-5 ring-1 ring-[#0B1220]/10">
+                      <div className="space-y-3 text-base text-[#0B1220]/80">
+                        <div className="flex items-center justify-between">
+                          <span>Course Fee</span>
+                          <span className="font-semibold text-[#0B1220]">{formatMoney(total)}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-emerald-700">
+                          <span>Early Registration Benefit</span>
+                          <span>{promoApplied ? `-${formatMoney(earlyBenefit)}` : formatMoney(0)}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Installment Plan Fee</span>
+                          <span className="font-semibold text-[#0B1220]">{formatMoney(installmentPlanFee)}</span>
+                        </div>
                         <div className="border-t border-[#0B1220]/12 pt-3">
-                          <div className="flex items-center justify-between text-xl font-semibold text-[#0B1220]"><span>Total Amount</span><span>EUR{total.toFixed(2)}</span></div>
+                          <div className="flex items-center justify-between text-xl font-semibold text-[#0B1220]">
+                            <span>Total Amount</span>
+                            <span>{formatMoney(selectedPlan.amount)}</span>
+                          </div>
+                        </div>
+                        <div className="border-t border-[#0B1220]/12 pt-3">
+                          <div className="flex items-center justify-between text-xl font-semibold text-[#0B1220]">
+                            <span>Pay Today</span>
+                            <span>{formatMoney(payToday)}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1459,13 +2140,85 @@ function ApplyFlowModal({ open, program, onClose }) {
                           );
                         })}
                       </div>
+
+                      {method === "Stripe" ? (
+                        <div className="mt-4 space-y-3">
+                          <div className="flex flex-wrap gap-2">
+                            {["visa", "mastercard", "amex"].map((brand) => (
+                              <PaymentBrandBadge
+                                key={brand}
+                                brand={brand}
+                              />
+                            ))}
+                          </div>
+                          <Input
+                            placeholder="Cardholder Name *"
+                            value={stripeData.cardName}
+                            onChange={(e) => setStripeData((p) => ({ ...p, cardName: e.target.value }))}
+                          />
+                          <Input
+                            placeholder="Card Number *"
+                            value={stripeData.cardNumber}
+                            onChange={(e) => setStripeData((p) => ({ ...p, cardNumber: e.target.value }))}
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <Input
+                              placeholder="MM/YY *"
+                              value={stripeData.expiry}
+                              onChange={(e) => setStripeData((p) => ({ ...p, expiry: e.target.value }))}
+                            />
+                            <Input
+                              placeholder="CVC *"
+                              value={stripeData.cvc}
+                              onChange={(e) => setStripeData((p) => ({ ...p, cvc: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {method === "PayPal" ? (
+                        <div className="mt-4 space-y-3">
+                          <div className="inline-flex items-center rounded-full bg-[#003087] px-3 py-1 text-xs font-bold text-white ring-1 ring-[#0B1220]/10">
+                            PayPal
+                          </div>
+                          <Input
+                            placeholder="PayPal Account Name *"
+                            value={paypalData.fullName}
+                            onChange={(e) => setPaypalData((p) => ({ ...p, fullName: e.target.value }))}
+                          />
+                          <Input
+                            placeholder="PayPal Email *"
+                            value={paypalData.email}
+                            onChange={(e) => setPaypalData((p) => ({ ...p, email: e.target.value }))}
+                          />
+                        </div>
+                      ) : null}
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentSuccess(true)}
+                        disabled={!paymentMethodValid}
+                        className={cx(
+                          "mt-4 w-full rounded-full px-6 py-3 text-sm font-semibold text-white transition",
+                          paymentMethodValid ? "bg-[#0B1220] hover:opacity-95" : "cursor-not-allowed bg-[#0B1220]/35"
+                        )}
+                      >
+                        Submit and Pay
+                      </button>
+                      {paymentSuccess ? (
+                        <p className="mt-3 text-sm text-emerald-700">
+                          Payment submitted. Redirecting to the landing page in 3 seconds.
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 </div>
               </div>
             ) : null}
 
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-between">
+
+            {step > 0 ? (
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-between">
               <button
                 type="button"
                 onClick={step === 0 ? onClose : back}
@@ -1473,29 +2226,19 @@ function ApplyFlowModal({ open, program, onClose }) {
               >
                 {step === 0 ? "Cancel" : "Back"}
               </button>
-              {step < 2 ? (
+              {step !== 3 ? (
                 <button
                   type="button"
                   onClick={next}
                   className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white"
                   style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.74)} 90%)` }}
                 >
-                  {step === 1 ? "Continue to Pay" : "Continue"}
+                  {step === 0 ? "Log In & Continue" : step === 2 ? "Continue to Payment" : "Continue"}
                   <ChevronRight className="h-4 w-4" {...iconStrongProps} />
                 </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert(`Proceeding with ${method} payment for EUR${total.toFixed(2)}.`);
-                    onClose();
-                  }}
-                  className="inline-flex items-center justify-center rounded-full bg-[#0B1220] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95"
-                >
-                  Proceed to Secure Payment • EUR{total.toFixed(2)}
-                </button>
-              )}
-            </div>
+              ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
       </motion.div>
@@ -1724,7 +2467,8 @@ function ImpactPanel({ inView, animateNumbers = true }) {
 }
 
 /* -------------------- Germany Section Cards -------------------- */
-function DayCard({ day, title, icon: Icon, color }) {
+function DayCard({ day, title, icon, color }) {
+  const Icon = icon;
   return (
     <motion.div
       initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
@@ -1746,14 +2490,6 @@ function DayCard({ day, title, icon: Icon, color }) {
 }
 
 /* -------------------- Form Components -------------------- */
-const formWrapV = {
-  hidden: { opacity: 0, y: 14 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: EASE, when: "beforeChildren", staggerChildren: 0.06 },
-  },
-};
 const fieldV = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
@@ -1780,7 +2516,8 @@ function Field({ label, required, hint, children }) {
   );
 }
 
-function Input({ icon: Icon, iconColor = THEME.accent, className, ...props }) {
+function Input({ icon, iconColor = THEME.accent, className, ...props }) {
+  const Icon = icon;
   const hasIcon = !!Icon;
   return (
     <div className="relative">
@@ -1803,6 +2540,58 @@ function Input({ icon: Icon, iconColor = THEME.accent, className, ...props }) {
   );
 }
 
+function PaymentBrandLogo({ brand }) {
+  if (brand === "visa") {
+    return (
+      <svg viewBox="0 0 64 24" aria-label="Visa" className="h-5 w-auto" role="img">
+        <rect width="64" height="24" rx="12" fill="#FFFFFF" />
+        <text
+          x="32"
+          y="15.5"
+          textAnchor="middle"
+          fontSize="12"
+          fontWeight="900"
+          letterSpacing="-0.6"
+          fill="#1434CB"
+          fontStyle="italic"
+          fontFamily="Arial, sans-serif"
+        >
+          VISA
+        </text>
+      </svg>
+    );
+  }
+
+  if (brand === "mastercard") {
+    return (
+      <svg viewBox="0 0 72 24" aria-label="Mastercard" className="h-5 w-auto" role="img">
+        <rect width="72" height="24" rx="12" fill="#FFFFFF" />
+        <circle cx="28" cy="12" r="7" fill="#EB001B" />
+        <circle cx="38" cy="12" r="7" fill="#F79E1B" />
+        <path d="M33 6.8C34.5 8.1 35.4 9.9 35.4 12C35.4 14.1 34.5 15.9 33 17.2C31.5 15.9 30.6 14.1 30.6 12C30.6 9.9 31.5 8.1 33 6.8Z" fill="#FF5F00" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 88 24" aria-label="American Express" className="h-5 w-auto" role="img">
+      <rect width="88" height="24" rx="5" fill="#006FCF" />
+      <rect x="2" y="2" width="84" height="20" rx="4" fill="#2E77BC" />
+      <text x="44" y="15" textAnchor="middle" fontSize="8.4" fontWeight="700" fill="#FFFFFF" fontFamily="Arial, sans-serif">
+        AMERICAN EXPRESS
+      </text>
+    </svg>
+  );
+}
+
+function PaymentBrandBadge({ brand }) {
+  return (
+    <span className="inline-flex items-center rounded-xl border border-[#0B1220]/10 bg-white px-2.5 py-1.5 shadow-[0_6px_18px_rgba(11,18,32,0.08)]">
+      <PaymentBrandLogo brand={brand} />
+    </span>
+  );
+}
+
 function Textarea(props) {
   return (
     <textarea
@@ -1817,7 +2606,16 @@ function Textarea(props) {
   );
 }
 
-function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent }) {
+function Select({
+  value,
+  onChange,
+  options,
+  icon,
+  iconColor = THEME.accent,
+  placeholder = "Select",
+  disabled = false,
+}) {
+  const Icon = icon;
   const hasIcon = !!Icon;
   return (
     <div className="relative">
@@ -1830,13 +2628,18 @@ function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
         className={cx(
           "w-full appearance-none rounded-2xl px-4 py-3 pr-10 text-sm outline-none ring-1 transition",
           "bg-white/60 text-[#0B1220]",
           "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]",
-          hasIcon ? "pl-11" : ""
+          hasIcon ? "pl-11" : "",
+          disabled ? "cursor-not-allowed opacity-55" : ""
         )}
       >
+        <option value="" disabled>
+          {placeholder}
+        </option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
@@ -1888,7 +2691,8 @@ function FilePicker({ onFile }) {
   );
 }
 
-function Bullet({ icon: Icon, text, color }) {
+function Bullet({ icon, text, color }) {
+  const Icon = icon;
   return (
     <div className="flex items-start gap-3">
       <IconBadge color={color}>
@@ -1901,6 +2705,8 @@ function Bullet({ icon: Icon, text, color }) {
 
 /* -------------------- Main Page -------------------- */
 export default function StudentsGraduatesLanding() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeCat, setActiveCat] = useState(categories[0].key);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1912,11 +2718,8 @@ export default function StudentsGraduatesLanding() {
   });
 
   const cat = useMemo(() => categories.find((c) => c.key === activeCat) || categories[0], [activeCat]);
-  const impact = useInViewOnce(0.25);
+  const { ref: impactRef, inView: impactInView } = useInViewOnce(0.25);
   const animateImpactNumbers = true;
-
-  const [openProgram, setOpenProgram] = useState(null);
-  const [applyProgram, setApplyProgram] = useState(null);
 
   const sliderRef = useRef(null);
   const scrollSlider = (dir) => {
@@ -1931,22 +2734,13 @@ export default function StudentsGraduatesLanding() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 18]);
 
-  const scrollToApply = (programName = "") => {
-    if (programName) {
-      setQuestionForm((prev) => ({ ...prev, program: programName }));
-    }
-    document.getElementById("apply")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const submitQuestions = (e) => {
     e.preventDefault();
     setSubmitting(true);
     setSubmitted(false);
-    window.setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-      setQuestionForm({ fullName: "", email: "", program: "", message: "" });
-    }, 650);
+    setSubmitting(false);
+    setSubmitted(true);
+    setQuestionForm({ fullName: "", email: "", program: "", message: "" });
   };
 
   return (
@@ -2024,9 +2818,9 @@ Turn theory into market-ready skills through hands-on projects.             </mo
 
       {/* IMPACT */}
       <section id="impact" className="relative" style={{ background: DARK_SECTION_BG }}>
-        <div ref={impact.ref} className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
+        <div ref={impactRef} className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
           <SectionHeader title="Impact & Numbers" subtitle={null} dark />
-          <ImpactPanel inView={impact.inView} animateNumbers={animateImpactNumbers} />
+          <ImpactPanel inView={impactInView} animateNumbers={animateImpactNumbers} />
         </div>
       </section>
 
@@ -2127,9 +2921,26 @@ Turn theory into market-ready skills through hands-on projects.             </mo
                 {cat.programs.map((p, idx) => (
                   <div key={p.name} style={{ scrollSnapAlign: "start" }}>
                     <ProgramCard
-                      program={{ ...p, price: CATEGORY_PRICES[cat.key] }}
+                      program={{
+                        ...p,
+                        categoryKey: cat.key,
+                        categoryLabel: cat.label,
+                        price: CATEGORY_PRICES[cat.key],
+                      }}
                       index={idx}
-                      onOpen={setOpenProgram}
+                      onOpen={(selectedProgram) => {
+                        const targetPath = getProgramDetailsPath(selectedProgram);
+                        if (window.location.hash) {
+                          window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+                        }
+                        if (location.pathname === targetPath) {
+                          window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                          return;
+                        }
+                        navigate({ pathname: targetPath, search: "", hash: "" });
+                        requestAnimationFrame(() => window.scrollTo(0, 0));
+                        setTimeout(() => window.scrollTo(0, 0), 120);
+                      }}
                     />
                   </div>
                 ))}
@@ -2302,21 +3113,12 @@ Turn theory into market-ready skills through hands-on projects.             </mo
       </a>
 
       {/* Modal */}
-      <ProgramModal
-        open={!!openProgram}
-        program={openProgram}
-        onClose={() => setOpenProgram(null)}
-        onApply={(p) => {
-          setOpenProgram(null);
-          setApplyProgram(p || null);
-        }}
-      />
-      <ApplyFlowModal open={!!applyProgram} program={applyProgram} onClose={() => setApplyProgram(null)} />
-
       <style>{css}</style>
     </div>
   );
 }
+
+export { ApplyFlowModal };
 
 /** ---- CSS (Upgraded) ---- */
 const css = `

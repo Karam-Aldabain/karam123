@@ -583,7 +583,7 @@ export default function CareerMentorshipPage() {
             transition={{ duration: 0.75, ease: "easeOut", delay: 0.05 }}
             className="relative"
           >
-            <div className="relative mx-auto aspect-[4/3] w-full max-w-[560px]">
+            <div className="relative mx-auto h-[540px] w-full max-w-[560px] sm:h-auto sm:aspect-[4/3]">
               <div
                 className="absolute inset-0 rounded-[44px] ring-1 ring-white/10"
                 style={{
@@ -608,10 +608,10 @@ export default function CareerMentorshipPage() {
               </div>
 
               {/* Right side: “expert in consultation” (placeholder image) */}
-              <div className="absolute inset-6 grid grid-cols-2 gap-4">
-                <div className="flex flex-col justify-between rounded-[36px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur">
+              <div className="absolute inset-4 grid grid-cols-1 gap-3 sm:inset-6 sm:grid-cols-2 sm:gap-4">
+                <div className="flex flex-col justify-between rounded-[32px] bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur sm:rounded-[36px] sm:p-5">
                   <div>
-                    <div className="mt-2 text-xl font-semibold text-white">Strategic Mentorship for Serious Professionals</div>
+                    <div className="mt-2 text-lg font-semibold leading-tight text-white sm:text-xl">Strategic Mentorship for Serious Professionals</div>
                     <p className="mt-3 text-sm leading-relaxed text-white/70">This is not motivational coaching. This is structured advisory designed to:</p>
                   </div>
 
@@ -624,7 +624,7 @@ export default function CareerMentorshipPage() {
                   </div>
                 </div>
 
-                <div className="relative overflow-hidden rounded-[36px] ring-1 ring-white/10">
+                <div className="relative min-h-[220px] overflow-hidden rounded-[32px] ring-1 ring-white/10 sm:min-h-0 sm:rounded-[36px]">
                   {/* Replace src with your own asset */}
                   <img
                     src="/a_colored_Woman_Showing_Documents_1390x940_2502_d14330746b.jpg"
@@ -1060,12 +1060,15 @@ export default function CareerMentorshipPage() {
                       />
                     </div>
 
-                    <div className="mt-3 flex items-center gap-2">
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
                       {steps.map((s, i) => {
                         const active = i === step;
                         const done = i < step;
                         return (
-                          <div key={s} className="flex items-center gap-2">
+                          <div
+                            key={s}
+                            className="flex min-w-0 items-start gap-2 rounded-2xl bg-white/35 px-2.5 py-2 sm:w-auto sm:items-center sm:rounded-none sm:bg-transparent sm:px-0 sm:py-0"
+                          >
                             <div
                               className="grid h-7 w-7 place-items-center rounded-full ring-1"
                               style={{
@@ -1080,7 +1083,7 @@ export default function CareerMentorshipPage() {
                             >
                               <span className="text-xs font-black">{i + 1}</span>
                             </div>
-                            <div className={cx("text-xs font-semibold", active ? "text-[#0B1220]" : "text-[#0B1220]/55")}>
+                            <div className={cx("min-w-0 text-xs font-semibold leading-tight", active ? "text-[#0B1220]" : "text-[#0B1220]/55")}>
                               {s}
                             </div>
                           </div>

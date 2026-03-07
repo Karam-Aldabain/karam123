@@ -1898,7 +1898,7 @@ export default function AIForRealWorldCareersPage() {
                         </IconBadge>
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center justify-between gap-3">
+                        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="text-lg font-semibold text-[#0B1220]">{s.title}</div>
                           <span
                             className="rounded-full px-3 py-1 text-xs font-semibold ring-1"
