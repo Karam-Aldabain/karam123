@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   Briefcase,
@@ -134,6 +134,7 @@ export default function ExpertsRegisterPage() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [showStepError, setShowStepError] = useState(false);
+  const formTopRef = useRef(null);
 
   const [basic, setBasic] = useState({
     fullName: "",
@@ -340,10 +341,15 @@ export default function ExpertsRegisterPage() {
     return () => clearTimeout(timer);
   }, [submitted]);
 
+  useEffect(() => {
+    if (typeof window === "undefined" || window.innerWidth >= 640) return;
+    formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [step]);
+
   return (
     <div className="expert-register-page min-h-screen px-4 py-8 sm:px-6" style={{ background: THEME.sand }}>
       <div className="mx-auto max-w-7xl">
-        <div className="rounded-[36px] bg-[#F3F3F1] p-6 ring-1 ring-black/5 sm:p-8">
+        <div ref={formTopRef} className="rounded-[36px] bg-[#F3F3F1] p-6 ring-1 ring-black/5 sm:p-8">
           <h1 className="text-3xl font-semibold text-[#0B1220] sm:text-4xl">Expert Account Registration</h1>
           <p className="mt-2 text-sm text-[#0B1220]/65">
             Industry Expert / University Professor application form.
