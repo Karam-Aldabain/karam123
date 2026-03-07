@@ -665,9 +665,7 @@ export default function PraktixInternshipProgramPage() {
                           >
                             {i + 1}
                           </span>
-                          <div className="text-xs font-semibold tracking-[0.16em] text-white/60">
-                            POINT
-                          </div>
+                        
                         </div>
                         <p className="mt-4 text-[15px] leading-8 text-white/85">{p}</p>
                       </div>
@@ -965,7 +963,7 @@ export default function PraktixInternshipProgramPage() {
                         className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold text-white"
                         style={{ background: "linear-gradient(135deg, rgba(201,29,103,0.95) 0%, rgba(233,76,144,0.95) 100%)" }}
                       >
-                        8 Outcomes
+                        Outcomes
                       </span>
                     </div>
                     <div className="h-px w-full bg-gradient-to-r from-[#C91D67]/60 via-white/10 to-transparent" />
@@ -988,9 +986,7 @@ export default function PraktixInternshipProgramPage() {
                     <BadgeCheck className="h-4 w-4 text-[#FFD2E3]" {...iconStrongProps} />
                     WHO THIS INTERNSHIP IS FOR
                     </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                      3 Profiles
-                    </span>
+                   
                   </div>
                   <div className="mt-4 space-y-5">
                     {[
