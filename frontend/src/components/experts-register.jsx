@@ -33,6 +33,7 @@ const STEPS = [
   { key: "alignment", label: "Alignment & Compliance" },
   { key: "review", label: "Review & Submit" },
 ];
+const VISIBLE_STEP_ORDER = [0, 1, 3, 4];
 
 const CURRENCIES = ["EUR", "USD", "GBP", "AED", "EGP", "SAR", "Custom currency (manual approval)"];
 const PRICING_MODELS = [
@@ -153,7 +154,7 @@ export default function ExpertsRegisterPage() {
     roleTypeOther: "",
     availability: "",
     engagement: [],
-    delivery: "",
+    delivery: [],
     hasMaterial: "",
     projectsDesc: "",
     portfolio: "",
@@ -218,10 +219,9 @@ export default function ExpertsRegisterPage() {
           roleTypeOtherValid &&
           expert.availability &&
           expert.engagement.length &&
-          expert.delivery &&
+          expert.delivery.length &&
           expert.hasMaterial &&
           expert.projectsDesc &&
-          expert.portfolio &&
           expert.collaborationModel &&
           uploads.photo
       );
@@ -248,6 +248,8 @@ export default function ExpertsRegisterPage() {
     return true;
   }, [step, basic, expert, pricing, alignment, uploads]);
 
+  const currentVisibleStepIndex = VISIBLE_STEP_ORDER.indexOf(step);
+
   const fieldErrors = useMemo(() => {
     if (!showStepError) return {};
     const errors = {};
@@ -273,7 +275,6 @@ export default function ExpertsRegisterPage() {
       errors.delivery = isBlank(expert.delivery);
       errors.hasMaterial = isBlank(expert.hasMaterial);
       errors.projectsDesc = isBlank(expert.projectsDesc);
-      errors.portfolio = isBlank(expert.portfolio);
       errors.collaborationModel = isBlank(expert.collaborationModel);
       errors.photo = !uploads.photo;
     }
@@ -306,12 +307,20 @@ export default function ExpertsRegisterPage() {
       return;
     }
     setShowStepError(false);
-    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+    setStep((s) => {
+      const visibleIndex = VISIBLE_STEP_ORDER.indexOf(s);
+      if (visibleIndex === -1) return s;
+      return VISIBLE_STEP_ORDER[Math.min(visibleIndex + 1, VISIBLE_STEP_ORDER.length - 1)];
+    });
   }
 
   function back() {
     setShowStepError(false);
-    setStep((s) => Math.max(s - 1, 0));
+    setStep((s) => {
+      const visibleIndex = VISIBLE_STEP_ORDER.indexOf(s);
+      if (visibleIndex === -1) return s;
+      return VISIBLE_STEP_ORDER[Math.max(visibleIndex - 1, 0)];
+    });
   }
 
   function submit() {
@@ -327,7 +336,7 @@ export default function ExpertsRegisterPage() {
     if (!submitted) return;
     const timer = setTimeout(() => {
       window.location.href = "/";
-    }, 8000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, [submitted]);
 
@@ -341,10 +350,11 @@ export default function ExpertsRegisterPage() {
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {STEPS.map((s, idx) => {
-              const active = idx === step;
-              const done = idx < step;
-              const locked = idx > step;
+            {VISIBLE_STEP_ORDER.map((stepIndex, idx) => {
+              const s = STEPS[stepIndex];
+              const active = idx === currentVisibleStepIndex;
+              const done = idx < currentVisibleStepIndex;
+              const locked = idx > currentVisibleStepIndex;
               return (
                 <button
                   key={s.key}
@@ -355,7 +365,7 @@ export default function ExpertsRegisterPage() {
                       return;
                     }
                     setShowStepError(false);
-                    setStep(idx);
+                    setStep(stepIndex);
                   }}
                   className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ring-1 transition disabled:cursor-not-allowed"
                   disabled={locked}
@@ -382,13 +392,13 @@ export default function ExpertsRegisterPage() {
             {step === 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Full Name" required error={fieldErrors.fullName}>
-                  <Input error={fieldErrors.fullName} icon={UserRound} iconColor="#A78BFA" placeholder="Example: John Doe" value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} />
+                  <Input error={fieldErrors.fullName} icon={UserRound} iconColor="#A78BFA" placeholder="ex: John Doe" value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} />
                 </Field>
                 <Field label="Email Address" required error={fieldErrors.email}>
-                  <Input error={fieldErrors.email} type="email" spellCheck={false} icon={Mail} iconColor="#22D3EE" placeholder="Example: john.doe@email.com" value={basic.email} onChange={(e) => setBasic({ ...basic, email: e.target.value })} />
+                  <Input error={fieldErrors.email} type="email" spellCheck={false} icon={Mail} iconColor="#22D3EE" placeholder="ex: john.doe@email.com" value={basic.email} onChange={(e) => setBasic({ ...basic, email: e.target.value })} />
                 </Field>
                 <Field label="Phone Number" required error={fieldErrors.phone}>
-                  <Input error={fieldErrors.phone} icon={Phone} iconColor="#34D399" placeholder="Example: +49 151 23456789" value={basic.phone} onChange={(e) => setBasic({ ...basic, phone: e.target.value })} />
+                  <Input error={fieldErrors.phone} icon={Phone} iconColor="#34D399" placeholder="ex: +49 151 23456789" value={basic.phone} onChange={(e) => setBasic({ ...basic, phone: e.target.value })} />
                 </Field>
                 <Field label="Country of Residence" required error={fieldErrors.country}>
                   <CountrySelect
@@ -401,16 +411,16 @@ export default function ExpertsRegisterPage() {
                   />
                 </Field>
                 <Field label="Organization Name" required error={fieldErrors.orgName}>
-                  <Input error={fieldErrors.orgName} icon={Building2} iconColor="#22D3EE" placeholder="Example: Berlin Tech University" value={basic.orgName} onChange={(e) => setBasic({ ...basic, orgName: e.target.value })} />
+                  <Input error={fieldErrors.orgName} icon={Building2} iconColor="#22D3EE" placeholder="ex: Berlin Tech University" value={basic.orgName} onChange={(e) => setBasic({ ...basic, orgName: e.target.value })} />
                 </Field>
                 <Field label="Current Position / Title" required error={fieldErrors.position}>
-                  <Input error={fieldErrors.position} icon={Briefcase} iconColor="#34D399" placeholder="Example: Senior Data Scientist" value={basic.position} onChange={(e) => setBasic({ ...basic, position: e.target.value })} />
+                  <Input error={fieldErrors.position} icon={Briefcase} iconColor="#34D399" placeholder="ex: Senior Data Scientist" value={basic.position} onChange={(e) => setBasic({ ...basic, position: e.target.value })} />
                 </Field>
                 <Field label="LinkedIn Profile URL" required error={fieldErrors.linkedin}>
-                  <Input error={fieldErrors.linkedin} type="url" spellCheck={false} icon={LinkIcon} iconColor="#A78BFA" placeholder="Example: https://linkedin.com/in/johndoe" value={basic.linkedin} onChange={(e) => setBasic({ ...basic, linkedin: e.target.value })} />
+                  <Input error={fieldErrors.linkedin} type="url" spellCheck={false} icon={LinkIcon} iconColor="#A78BFA" placeholder="ex: https://linkedin.com/in/johndoe" value={basic.linkedin} onChange={(e) => setBasic({ ...basic, linkedin: e.target.value })} />
                 </Field>
                 <Field label="Company / University Website">
-                  <Input type="url" spellCheck={false} icon={Globe2} iconColor="#F59E0B" placeholder="Example: https://example.org" value={basic.website} onChange={(e) => setBasic({ ...basic, website: e.target.value })} />
+                  <Input type="url" spellCheck={false} icon={Globe2} iconColor="#F59E0B" placeholder="ex: https://example.org" value={basic.website} onChange={(e) => setBasic({ ...basic, website: e.target.value })} />
                 </Field>
               </div>
             ) : null}
@@ -438,7 +448,7 @@ export default function ExpertsRegisterPage() {
                       error={fieldErrors.expertiseOther}
                       icon={Briefcase}
                       iconColor="#A78BFA"
-                      placeholder="Example: Quantum Computing"
+                      placeholder="ex: Quantum Computing"
                       value={expert.expertiseOther}
                       onChange={(e) => setExpert({ ...expert, expertiseOther: e.target.value })}
                     />
@@ -457,7 +467,7 @@ export default function ExpertsRegisterPage() {
                       error={fieldErrors.roleTypeOther}
                       icon={Briefcase}
                       iconColor="#A78BFA"
-                      placeholder="Example: Research Architect"
+                      placeholder="ex: Research Architect"
                       value={expert.roleTypeOther}
                       onChange={(e) => setExpert({ ...expert, roleTypeOther: e.target.value })}
                     />
@@ -481,8 +491,20 @@ export default function ExpertsRegisterPage() {
                     }
                   />
                 </Field>
-                <Field label="Delivery preference" required error={fieldErrors.delivery}>
-                  <Select error={fieldErrors.delivery} value={expert.delivery} onChange={(e) => setExpert({ ...expert, delivery: e.target.value })} options={["", "Online", "Hybrid", "Onsite (Europe)", "Onsite (MENA)"]} />
+                <Field label="Delivery preference" required hint="Multi-select" className="sm:col-span-2" error={fieldErrors.delivery}>
+                  <MultiSelect
+                    error={fieldErrors.delivery}
+                    options={["Online", "Hybrid", "Onsite (Europe)", "Onsite (MENA)"]}
+                    selected={expert.delivery}
+                    onToggle={(value) =>
+                      setExpert((prev) => ({
+                        ...prev,
+                        delivery: prev.delivery.includes(value)
+                          ? prev.delivery.filter((x) => x !== value)
+                          : [...prev.delivery, value],
+                      }))
+                    }
+                  />
                 </Field>
                 <Field label="Do you have existing training material?" required error={fieldErrors.hasMaterial}>
                   <Select error={fieldErrors.hasMaterial} value={expert.hasMaterial} onChange={(e) => setExpert({ ...expert, hasMaterial: e.target.value })} options={["", "Yes", "No", "Partially"]} />
@@ -504,8 +526,8 @@ export default function ExpertsRegisterPage() {
                     {expert.projectsDesc.length} / 300 characters
                   </p>
                 </Field>
-                <Field label="Portfolio / personal website URL" required error={fieldErrors.portfolio}>
-                  <Input error={fieldErrors.portfolio} type="url" spellCheck={false} icon={Globe2} iconColor="#34D399" placeholder="https://..." value={expert.portfolio} onChange={(e) => setExpert({ ...expert, portfolio: e.target.value })} />
+                <Field label="Portfolio / personal website URL">
+                  <Input type="url" spellCheck={false} icon={Globe2} iconColor="#34D399" placeholder="https://..." value={expert.portfolio} onChange={(e) => setExpert({ ...expert, portfolio: e.target.value })} />
                 </Field>
                 <Field label="Preferred collaboration model" required error={fieldErrors.collaborationModel}>
                   <Select error={fieldErrors.collaborationModel} value={expert.collaborationModel} onChange={(e) => setExpert({ ...expert, collaborationModel: e.target.value })} options={["", "Per Program", "Per Hour"]} />
@@ -551,7 +573,7 @@ export default function ExpertsRegisterPage() {
                           error={fieldErrors.customCurrency}
                           icon={Coins}
                           iconColor="#A78BFA"
-                          placeholder="Example: JOD"
+                          placeholder="ex: JOD"
                           value={pricing.customCurrency}
                           onChange={(e) => setPricing({ ...pricing, customCurrency: e.target.value })}
                         />
@@ -711,9 +733,9 @@ export default function ExpertsRegisterPage() {
                   />
                 </Field>
                 <div className={cn("rounded-3xl bg-white/60 p-4 ring-1", fieldErrors.confirm || fieldErrors.contact || fieldErrors.consent ? "ring-[#C91D67]/50" : "ring-black/10")}>
-                  <CheckRow error={fieldErrors.confirm} checked={alignment.confirm} onChange={(v) => setAlignment({ ...alignment, confirm: v })} label="I confirm the information provided is accurate." />
-                  <CheckRow error={fieldErrors.contact} checked={alignment.contact} onChange={(v) => setAlignment({ ...alignment, contact: v })} label="I agree to be contacted regarding partnership opportunities." />
-                  <CheckRow error={fieldErrors.consent} checked={alignment.consent} onChange={(v) => setAlignment({ ...alignment, consent: v })} label="I consent to data processing in accordance with the privacy policy." />
+                  <CheckRow error={fieldErrors.confirm} checked={alignment.confirm} onChange={(v) => setAlignment({ ...alignment, confirm: v })} label="I confirm the information provided is accurate. *" />
+                  <CheckRow error={fieldErrors.contact} checked={alignment.contact} onChange={(v) => setAlignment({ ...alignment, contact: v })} label="I agree to be contacted regarding partnership opportunities. *" />
+                  <CheckRow error={fieldErrors.consent} checked={alignment.consent} onChange={(v) => setAlignment({ ...alignment, consent: v })} label="I consent to data processing in accordance with the privacy policy. *" />
                 </div>
               </div>
             ) : null}
@@ -733,6 +755,7 @@ export default function ExpertsRegisterPage() {
                     <p><strong>Email:</strong> {basic.email || "--"}</p>
                     <p><strong>Expertise:</strong> {expert.expertise.join(", ") || "--"}</p>
                     <p><strong>Engagement:</strong> {expert.engagement.join(", ") || "--"}</p>
+                    <p><strong>Delivery Preference:</strong> {expert.delivery.join(", ") || "--"}</p>
                     <p><strong>Currency:</strong> {pricing.defaultCurrency}</p>
                     <p><strong>Pricing Models:</strong> {pricing.pricingModels.join(", ") || "--"}</p>
                     <p><strong>Duration:</strong> {pricing.durationWeeks || "--"} weeks / {pricing.totalHours || "--"} hours</p>
@@ -758,7 +781,7 @@ export default function ExpertsRegisterPage() {
                 <ChevronLeft className="h-4 w-4" />
                 Back
               </button>
-              {step < STEPS.length - 1 ? (
+              {currentVisibleStepIndex < VISIBLE_STEP_ORDER.length - 1 ? (
                 <button
                   type="button"
                   onClick={next}
@@ -918,7 +941,7 @@ function CountrySelect({ options, value, icon: Icon, iconColor = "#F59E0B", erro
 
 function MultiSelect({ options, selected, onToggle, error = false }) {
   return (
-    <div className="rounded-3xl bg-white/40 p-4 ring-1" style={{ borderColor: error ? "rgba(201,29,103,0.55)" : "rgba(141,180,255,0.9)" }}>
+    <div className="rounded-[32px] bg-white/40 p-5 ring-1" style={{ borderColor: error ? "rgba(201,29,103,0.55)" : "rgba(141,180,255,0.9)" }}>
       <div className="flex flex-wrap gap-2">
         {options.map((o) => {
           const active = selected.includes(o);
@@ -927,7 +950,7 @@ function MultiSelect({ options, selected, onToggle, error = false }) {
               key={o}
               type="button"
               onClick={() => onToggle(o)}
-              className="rounded-full px-4 py-2 text-sm font-semibold ring-1 transition"
+              className="rounded-full px-4 py-2 text-left text-[16px] font-semibold ring-1 transition"
               style={{
                 background: active ? "rgba(201,29,103,0.14)" : "rgba(11,18,32,0.03)",
                 color: active ? "#A52666" : "rgba(11,18,32,0.70)",
