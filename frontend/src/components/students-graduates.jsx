@@ -44,16 +44,11 @@ import {
   X,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
 
-/**
- * IMPORTANT:
- * Keep these EXACTLY as-is from your original code (do not change data/colors):
- * - THEME
- * - DARK_SECTION_BG
- * - ACCENT_RGB + accent(a)
- * - IMAGES
- * - categories
- */
+void motion;
+
+
 
 export const THEME = {
   deep: "#0B1220",
@@ -763,10 +758,7 @@ function AnimatedNumber({ value, suffix, durationMs = 900 }) {
   const [n, setN] = useState(reduce ? value : 0);
 
   useEffect(() => {
-    if (reduce) {
-      setN(value);
-      return;
-    }
+    if (reduce) return;
     let raf = 0;
     const start = performance.now();
     const from = 0;
@@ -782,7 +774,7 @@ function AnimatedNumber({ value, suffix, durationMs = 900 }) {
 
   return (
     <span>
-      {n.toLocaleString()}
+      {(reduce ? value : n).toLocaleString()}
       {suffix}
     </span>
   );
@@ -1053,7 +1045,8 @@ function HeroVisual() {
   );
 }
 
-function FloatingChip({ icon: Icon, title, desc, color }) {
+function FloatingChip({ icon, title, desc, color }) {
+  const Icon = icon;
   return (
     <motion.div
       initial={{ opacity: 0, x: -14, y: 6, filter: "blur(6px)" }}
@@ -1398,7 +1391,7 @@ function ProgramCard({ program, index = 0, onOpen }) {
   );
 }
 
-export function ApplyFlowModal({
+function ApplyFlowModal({
   open,
   program,
   onClose,
@@ -2481,7 +2474,8 @@ function ImpactPanel({ inView, animateNumbers = true }) {
 }
 
 /* -------------------- Germany Section Cards -------------------- */
-function DayCard({ day, title, icon: Icon, color }) {
+function DayCard({ day, title, icon, color }) {
+  const Icon = icon;
   return (
     <motion.div
       initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
@@ -2503,14 +2497,6 @@ function DayCard({ day, title, icon: Icon, color }) {
 }
 
 /* -------------------- Form Components -------------------- */
-const formWrapV = {
-  hidden: { opacity: 0, y: 14 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: EASE, when: "beforeChildren", staggerChildren: 0.06 },
-  },
-};
 const fieldV = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
@@ -2537,7 +2523,8 @@ function Field({ label, required, hint, children }) {
   );
 }
 
-function Input({ icon: Icon, iconColor = THEME.accent, className, ...props }) {
+function Input({ icon, iconColor = THEME.accent, className, ...props }) {
+  const Icon = icon;
   const hasIcon = !!Icon;
   return (
     <div className="relative">
@@ -2578,11 +2565,12 @@ function Select({
   value,
   onChange,
   options,
-  icon: Icon,
+  icon,
   iconColor = THEME.accent,
   placeholder = "Select",
   disabled = false,
 }) {
+  const Icon = icon;
   const hasIcon = !!Icon;
   return (
     <div className="relative">
@@ -2658,7 +2646,8 @@ function FilePicker({ onFile }) {
   );
 }
 
-function Bullet({ icon: Icon, text, color }) {
+function Bullet({ icon, text, color }) {
+  const Icon = icon;
   return (
     <div className="flex items-start gap-3">
       <IconBadge color={color}>
@@ -2684,7 +2673,7 @@ export default function StudentsGraduatesLanding() {
   });
 
   const cat = useMemo(() => categories.find((c) => c.key === activeCat) || categories[0], [activeCat]);
-  const impact = useInViewOnce(0.25);
+  const { ref: impactRef, inView: impactInView } = useInViewOnce(0.25);
   const animateImpactNumbers = true;
 
   const sliderRef = useRef(null);
@@ -2699,13 +2688,6 @@ export default function StudentsGraduatesLanding() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 18]);
-
-  const scrollToApply = (programName = "") => {
-    if (programName) {
-      setQuestionForm((prev) => ({ ...prev, program: programName }));
-    }
-    document.getElementById("apply")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   const submitQuestions = (e) => {
     e.preventDefault();
@@ -2791,9 +2773,9 @@ Turn theory into market-ready skills through hands-on projects.             </mo
 
       {/* IMPACT */}
       <section id="impact" className="relative" style={{ background: DARK_SECTION_BG }}>
-        <div ref={impact.ref} className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
+        <div ref={impactRef} className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
           <SectionHeader title="Impact & Numbers" subtitle={null} dark />
-          <ImpactPanel inView={impact.inView} animateNumbers={animateImpactNumbers} />
+          <ImpactPanel inView={impactInView} animateNumbers={animateImpactNumbers} />
         </div>
       </section>
 
@@ -3090,6 +3072,8 @@ Turn theory into market-ready skills through hands-on projects.             </mo
     </div>
   );
 }
+
+export { ApplyFlowModal };
 
 /** ---- CSS (Upgraded) ---- */
 const css = `

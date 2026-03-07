@@ -118,7 +118,8 @@ function BulletList({ items }) {
   );
 }
 
-function Benefit({ icon: IconComp, title, desc, bullets }) {
+function Benefit({ icon, title, desc, bullets }) {
+  const IconComp = icon;
   return (
     <div className="flex h-full flex-col rounded-[24px] bg-[linear-gradient(180deg,rgba(15,29,61,0.98),rgba(10,20,42,0.96))] p-7 ring-1 ring-white/10 shadow-[0_24px_55px_rgba(5,10,25,0.34)] transition duration-300 hover:-translate-y-1.5 hover:ring-[#C91D67]/30">
       <div className="flex items-start gap-4">
@@ -575,13 +576,6 @@ export default function PraktixInternshipProgramPage() {
     setOpenSection((prev) => (prev === id ? null : id));
   };
 
-  const snapshotTints = [
-    "rgba(34,211,238,0.22)",
-    "rgba(167,139,250,0.20)",
-    "rgba(245,158,11,0.18)",
-    "rgba(52,211,153,0.18)",
-  ];
-
   const overviewCardTints = [
     "linear-gradient(145deg, rgba(34,211,238,0.14) 0%, rgba(255,255,255,0.03) 100%)",
     "linear-gradient(145deg, rgba(167,139,250,0.14) 0%, rgba(255,255,255,0.03) 100%)",
@@ -796,7 +790,7 @@ export default function PraktixInternshipProgramPage() {
                     </div>
                     <div className="mt-4 h-px w-full bg-gradient-to-r from-[#163D8F]/80 via-white/10 to-transparent" />
                     <div className="mt-4 flex flex-wrap gap-3">
-                      {["React", "Node.js", "Python", "PostgreSQL", "Docker", "Git"].map((t, index) => (
+                      {["React", "Node.js", "Python", "PostgreSQL", "Docker", "Git"].map((t) => (
                         <span
                           key={t}
                           className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 shadow-[0_10px_24px_rgba(14,42,102,0.18)] transition duration-300 hover:-translate-y-0.5"
