@@ -972,17 +972,17 @@ function FileBox({ label, note, fileName, onChange, error = false }) {
   return (
     <label className="rounded-3xl bg-white/40 p-4 ring-1" style={{ borderColor: error ? "rgba(201,29,103,0.55)" : "rgba(141,180,255,0.9)" }}>
       <input type="file" className="hidden" onChange={(e) => onChange(e.target.files?.[0] || null)} />
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 ring-1 ring-[#8DB4FF]">
             <Upload className="h-5 w-5 text-[#34D399]" />
           </span>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-base font-semibold text-[#1A2230]">{label}</p>
-            <p className="text-sm text-[#0B1220]/55">{fileName || note}</p>
+            <p className="break-words text-sm text-[#0B1220]/55">{fileName || note}</p>
           </div>
         </div>
-        <span className="rounded-full bg-white/60 px-4 py-1.5 text-sm font-semibold text-[#0B1220]/70 ring-1 ring-[#8DB4FF]">
+        <span className="inline-flex self-start rounded-full bg-white/60 px-4 py-1.5 text-sm font-semibold text-[#0B1220]/70 ring-1 ring-[#8DB4FF] sm:shrink-0">
           Choose
         </span>
       </div>

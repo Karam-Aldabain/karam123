@@ -1,15 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   ArrowRight,
-  BadgeCheck,
   Briefcase,
-  Calculator,
-  CheckCircle2,
+  BadgeCheck,
   FileCheck2,
   Globe2,
   Landmark,
   ShieldCheck,
   Sparkles,
+  ChevronDown,
   Wallet,
   Layers3,
   Crown,
@@ -66,16 +65,48 @@ const SOCIAL_PROOF = [
 
 const FAQ = [
   {
-    q: "Who owns my intellectual property?",
-    a: "You retain ownership of your original content. Platform rights are limited to delivery and agreed distribution scope.",
+    q: "Who can become an expert on Praktix?",
+    a: "Praktix collaborates with experienced professionals, researchers, university faculty, and industry practitioners who want to translate real-world expertise into structured professional programs.",
   },
   {
-    q: "When do payouts happen?",
-    a: "Payouts follow the configured schedule with transparent gross, fee, tax, and net breakdown in your dashboard.",
+    q: "What types of programs can experts lead?",
+    a: "Experts can lead professional courses, applied AI workshops, mentorship programs, industry projects, internship supervision, and corporate training sessions.",
   },
   {
-    q: "Can I define different pricing for corporate and public cohorts?",
-    a: "Yes. Registration includes separate corporate/public pricing controls and additional pricing logic options.",
+    q: "Why should experts join Praktix?",
+    a: "Praktix provides a structured ecosystem that connects experts with universities, organizations, and global learners — enabling experts to deliver impactful programs and scale their professional influence.",
+  },
+  {
+    q: "Do experts keep ownership of their content?",
+    a: "Yes. Experts retain full ownership of their intellectual property. Praktix only uses the content within the agreed delivery and distribution scope.",
+  },
+  {
+    q: "How do experts earn through Praktix?",
+    a: "Experts can generate revenue through program delivery, mentorship sessions, institutional partnerships, and corporate training engagements.",
+  },
+  {
+    q: "Can I work with universities or companies through Praktix?",
+    a: "Yes. Praktix connects experts with universities, institutions, and organizations seeking industry-led learning programs and professional development initiatives.",
+  },
+  {
+    q: "Do I need a fully developed course to join?",
+    a: "No. Experts can bring existing material or co-develop structured programs using the Praktix framework.",
+  },
+  {
+    q: "How flexible is the time commitment?",
+    a: "Experts can choose their level of engagement — from short workshops and mentorship sessions to multi-week structured programs.",
+  },
+  {
+    q: "How are programs delivered?",
+    a: "Programs combine structured sessions, guided projects, mentorship interactions, and real-world applications aligned with industry needs.",
+  },
+  {
+    q: "How does Praktix support expert credibility?",
+    a: "Experts become part of a professional ecosystem that connects education, industry, and measurable outcomes — strengthening their visibility, authority, and professional impact.",
+  },
+  {
+    q: "How do I become an expert on Praktix?",
+    a: "Simply apply through the expert registration process. Our team reviews your profile, experience, and proposed program ideas, then works with you to structure your offering within the Praktix ecosystem.",
   },
 ];
 
@@ -207,42 +238,6 @@ function Divider() {
   );
 }
 
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(Number.isFinite(value) ? value : 0);
-}
-
-function InputNumber({ label, value, onChange }) {
-  return (
-    <label className="text-xs font-semibold text-[#0B1220]/65">
-      {label}
-      <div className="mt-1 flex items-center gap-2 rounded-2xl border border-[#0B1220]/10 bg-white/80 px-3 py-2 shadow-[0_10px_25px_rgba(0,0,0,0.05)] focus-within:border-[#0B1220]/25">
-        <input
-          type="number"
-          min="0"
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full bg-transparent text-sm text-[#0B1220] outline-none"
-        />
-      </div>
-    </label>
-  );
-}
-
-function Row({ label, value, bold = false }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-[#0B1220]/72">{label}</span>
-      <span className={cn(bold ? "font-semibold" : "", "text-[#0B1220]")}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
 function FancyButton({ href, children }) {
   return (
     <a
@@ -272,18 +267,7 @@ function FancyButton({ href, children }) {
 }
 
 export default function ExpertsValuePropositionPage() {
-  const [programPrice, setProgramPrice] = useState(1000);
-  const [learners, setLearners] = useState(30);
-  const [commission, setCommission] = useState(15);
-
-  const numbers = useMemo(() => {
-    const gross =
-      Math.max(0, Number(programPrice || 0)) *
-      Math.max(0, Number(learners || 0));
-    const fee = gross * (Math.max(0, Number(commission || 0)) / 100);
-    const net = gross - fee;
-    return { gross, fee, net };
-  }, [programPrice, learners, commission]);
+  const [openFaq, setOpenFaq] = useState(null);
 
   // Same palette (unchanged), but now used as gradients for cohesive icon styling
   const gradients = [
@@ -361,9 +345,6 @@ export default function ExpertsValuePropositionPage() {
                           <div className="font-semibold text-[#E9E7DF] leading-snug">
                             {label}
                           </div>
-                          <div className="text-xs text-white/55">
-                            Layer {idx + 1}
-                          </div>
                         </div>
                       </div>
 
@@ -385,90 +366,6 @@ export default function ExpertsValuePropositionPage() {
       {/* BODY */}
       <section className="px-5 py-12">
         <div className="mx-auto max-w-6xl">
-          <SectionHeader
-            title="Model earnings with transparent inputs"
-            tone="light"
-          />
-
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Card className="p-6" tone="light">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#0B1220]">
-                <span
-                  className="grid h-8 w-8 place-items-center rounded-2xl ring-1 ring-[#0B1220]/10"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(167,139,250,0.25), rgba(34,211,238,0.18))",
-                  }}
-                >
-                  <Calculator className="h-4 w-4" style={{ color: THEME.accent2 }} />
-                </span>
-                ex earnings calculator
-              </div>
-
-              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <InputNumber label="Program Price" value={programPrice} onChange={setProgramPrice} />
-                <InputNumber label="Learners" value={learners} onChange={setLearners} />
-                <InputNumber label="Platform Fee %" value={commission} onChange={setCommission} />
-              </div>
-
-              <div className="mt-6 rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
-                <div className="space-y-2 text-sm">
-                  <Row label="Gross revenue" value={formatCurrency(numbers.gross)} />
-                  <Row label="Platform fee" value={formatCurrency(numbers.fee)} />
-                  <div className="h-px w-full bg-[#0B1220]/10" />
-                  <Row label="Net payout" value={formatCurrency(numbers.net)} bold />
-                </div>
-              </div>
-
-            </Card>
-
-            <Card className="p-6" tone="light">
-              <h3 className="text-lg font-semibold text-[#0B1220]">
-                Reference Scenario
-              </h3>
-              <p className="mt-3 text-sm text-[#0B1220]/70">
-                If you sell a EUR 1,000 program to 30 learners:
-              </p>
-
-              <ul className="mt-4 space-y-3 text-sm text-[#0B1220]/90">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4" style={{ color: THEME.accent3 }} />
-                  Gross revenue: EUR 30,000
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4" style={{ color: THEME.accent2 }} />
-                  Platform fee: X% (configurable)
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4" style={{ color: THEME.accent4 }} />
-                  Net payout: transparent before publishing
-                </li>
-              </ul>
-
-              <div className="mt-6 rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
-                <div className="flex items-center gap-3">
-                  <span
-                    className="grid h-10 w-10 place-items-center rounded-2xl ring-1 ring-[#0B1220]/10"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, rgba(201,29,103,0.18), rgba(34,211,238,0.14))",
-                    }}
-                  >
-                    <BadgeCheck className="h-5 w-5" style={{ color: THEME.pink }} />
-                  </span>
-                  <div>
-                    <div className="text-sm font-semibold text-[#0B1220]">
-                      Publish with confidence
-                    </div>
-                    <div className="text-xs text-[#0B1220]/65">
-                      Clear fees + predictable payout math.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
           <Divider />
 
           <SectionHeader
@@ -545,33 +442,50 @@ export default function ExpertsValuePropositionPage() {
 
           <Divider />
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <Card className="p-6" tone="light">
-              <h3 className="text-lg font-semibold text-[#0B1220]">
-                Why experts choose this model
-              </h3>
-              <ul className="mt-4 space-y-3 text-sm text-[#0B1220]/80">
-                {SOCIAL_PROOF.map((item, idx) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <BadgeCheck
-                      className="mt-0.5 h-4 w-4"
-                      style={{
-                        color: [THEME.accent, THEME.accent2, THEME.accent3][idx % 3],
-                      }}
-                    />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </Card>
+          <Card className="p-6" tone="light">
+            <h3 className="text-lg font-semibold text-[#0B1220]">
+              Why experts choose this model
+            </h3>
+            <ul className="mt-4 space-y-3 text-sm text-[#0B1220]/80">
+              {SOCIAL_PROOF.map((item, idx) => (
+                <li key={item} className="flex items-start gap-2">
+                  <BadgeCheck
+                    className="mt-0.5 h-4 w-4"
+                    style={{
+                      color: [THEME.accent, THEME.accent2, THEME.accent3][idx % 3],
+                    }}
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Card>
 
+          <div className="mt-5">
             <Card className="p-6" tone="light">
               <h3 className="text-lg font-semibold text-[#0B1220]">FAQ</h3>
-              <div className="mt-4 space-y-4">
-                {FAQ.map((item) => (
-                  <article key={item.q} className="rounded-2xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
-                    <p className="text-sm font-semibold text-[#0B1220]/90">{item.q}</p>
-                    <p className="mt-1 text-sm text-[#0B1220]/72">{item.a}</p>
+              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+                {FAQ.map((item, idx) => (
+                  <article key={item.q} className="overflow-hidden rounded-2xl bg-white/60 ring-1 ring-[#0B1220]/10">
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaq((current) => (current === idx ? null : idx))}
+                      className="flex w-full items-center justify-between gap-3 p-4 text-left"
+                      aria-expanded={openFaq === idx}
+                    >
+                      <span className="text-sm font-semibold text-[#0B1220]/90">{item.q}</span>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 shrink-0 text-[#0B1220]/65 transition-transform duration-200",
+                          openFaq === idx ? "rotate-180" : ""
+                        )}
+                      />
+                    </button>
+                    {openFaq === idx ? (
+                      <div className="border-t border-[#0B1220]/10 px-4 py-3">
+                        <p className="text-sm text-[#0B1220]/72">{item.a}</p>
+                      </div>
+                    ) : null}
                   </article>
                 ))}
               </div>
