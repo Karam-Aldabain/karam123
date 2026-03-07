@@ -959,12 +959,7 @@ export default function PraktixInternshipProgramPage() {
                       <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">
                         Career Assets
                       </span>
-                      <span
-                        className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold text-white"
-                        style={{ background: "linear-gradient(135deg, rgba(201,29,103,0.95) 0%, rgba(233,76,144,0.95) 100%)" }}
-                      >
-                        Outcomes
-                      </span>
+                      
                     </div>
                     <div className="h-px w-full bg-gradient-to-r from-[#C91D67]/60 via-white/10 to-transparent" />
                     <BulletList
