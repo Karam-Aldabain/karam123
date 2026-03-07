@@ -289,10 +289,10 @@ export default function Navbar({ dir = "ltr" }) {
   const navRef = useRef(null);
   const closeTimer = useRef(null);
   const navItems = useMemo(() => NAV, []);
-  const forceLightTheme =
+  const forceDarkTheme =
     location.pathname.startsWith("/students-graduates") ||
     location.pathname.startsWith("/for-individuals/students-graduates");
-  const headerTheme = forceLightTheme ? "light" : theme;
+  const headerTheme = forceDarkTheme ? "dark" : theme;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
