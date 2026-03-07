@@ -1,37 +1,38 @@
 ﻿import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
-  motion,
-  AnimatePresence,
-  useReducedMotion,
+    motion,
+    AnimatePresence,
+    useReducedMotion,
 } from "framer-motion";
 import {
-  ArrowRight,
-  BadgeCheck,
-  Building2,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  ClipboardCheck,
-  Compass,
-  FileCheck2,
-  Globe2,
-  GraduationCap,
-  Handshake,
-  MapPin,
-  Shield,
-  Sparkles,
-  Star,
-  Target,
-  Zap,
-  Briefcase,
-  Users,
-  Network,
-  Landmark,
-  Mail,
-  Phone,
-  Link as LinkIcon,
-  Upload,
-  CheckCircle2,
+    ArrowRight,
+    BadgeCheck,
+    Building2,
+    Calendar,
+    ChevronLeft,
+    ChevronRight,
+    ClipboardCheck,
+    Compass,
+    FileCheck2,
+    Globe2,
+    GraduationCap,
+    Handshake,
+    MapPin,
+    Shield,
+    Sparkles,
+    Star,
+    Target,
+    Zap,
+    Briefcase,
+    Users,
+    Network,
+    Landmark,
+    Mail,
+    Phone,
+    Link as LinkIcon,
+    Upload,
+    CheckCircle2,
+    AlertCircle,
 } from "lucide-react";
 import apiClient from "../api/api.tsx";
 
@@ -53,360 +54,334 @@ const THEME = {
 const DARK_SECTION_BG = "linear-gradient(90deg, #050B1F 0%, #071A3E 100%)";
 const ACCENT_RGB = "201,29,103";
 const accent = (a) => `rgba(${ACCENT_RGB}, ${a})`;
-void motion;
 
 const POWER_ICON_SHELL = {
-  background:
-    "linear-gradient(145deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.07) 100%)",
-  border: "1px solid rgba(255,255,255,0.22)",
-  boxShadow:
-    "0 10px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.20)",
+    background:
+        "linear-gradient(145deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.07) 100%)",
+    border: "1px solid rgba(255,255,255,0.22)",
+    boxShadow:
+        "0 10px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.20)",
 };
 
 const iconStrongProps = { strokeWidth: 2.4 };
 
 function cx(...classes) {
-  return classes.filter(Boolean).join(" ");
+    return classes.filter(Boolean).join(" ");
 }
 
 function clampStyle(lines) {
-  return {
-    display: "-webkit-box",
-    WebkitBoxOrient: "vertical",
-    WebkitLineClamp: lines,
-    overflow: "hidden",
-  };
-}
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ""));
-    reader.onerror = () => reject(new Error("Failed to read file."));
-    reader.readAsDataURL(file);
-  });
+    return {
+        display: "-webkit-box",
+        WebkitBoxOrient: "vertical",
+        WebkitLineClamp: lines,
+        overflow: "hidden",
+    };
 }
 
 /** ---------------- VIEWPORT HOOK ---------------- */
 function useInViewOnce(threshold = 0.2) {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
+    const ref = useRef(null);
+    const [inView, setInView] = useState(false);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
+            (entries) => {
+                for (const e of entries) {
+                    if (e.isIntersecting) {
+                        setInView(true);
+                        obs.disconnect();
+                        break;
+                    }
+                }
+            },
+            { threshold }
+        );
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, [threshold]);
 
-    const obs = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setInView(true);
-            obs.disconnect();
-            break;
-          }
-        }
-      },
-      { threshold }
-    );
-
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-
-  return { ref, inView };
+    return { ref, inView };
 }
 
 /** ---------------- ANIMATED NUMBER ---------------- */
 function AnimatedNumber({ value, suffix = "", durationMs = 900 }) {
-  const reduce = useReducedMotion();
-  const [n, setN] = useState(reduce ? value : 0);
+    const reduce = useReducedMotion();
+    const [n, setN] = useState(reduce ? value : 0);
 
-  useEffect(() => {
-    if (reduce) return;
-    let raf = 0;
-    const start = performance.now();
-    const from = 0;
+    useEffect(() => {
+        if (reduce) return;
+        let raf = 0;
+        const start = performance.now();
+        const from = 0;
+        const tick = (t) => {
+            const p = Math.min(1, (t - start) / durationMs);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setN(Math.round(from + (value - from) * eased));
+            if (p < 1) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
+    }, [value, durationMs, reduce]);
 
-    const tick = (t) => {
-      const p = Math.min(1, (t - start) / durationMs);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setN(Math.round(from + (value - from) * eased));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [value, durationMs, reduce]);
-
-  return (
-    <span>
-      {n.toLocaleString()}
-      {suffix}
-    </span>
-  );
+    return (
+        <span>
+            {n.toLocaleString()}
+            {suffix}
+        </span>
+    );
 }
 
 /** ---------------- UI ATOMS ---------------- */
 function IconBadge({ color, children }) {
-  return (
-    <span
-      className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1"
-      style={{ ...POWER_ICON_SHELL }}
-    >
-      <span style={{ color }}>{children}</span>
-    </span>
-  );
+    return (
+        <span
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1"
+            style={{ ...POWER_ICON_SHELL }}
+        >
+            <span style={{ color }}>{children}</span>
+        </span>
+    );
 }
 
 function Pill({ label, tone = "dark" }) {
-  const dark = tone === "dark";
-  return (
-    <span
-      className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
-      style={{
-        background: dark ? "rgba(255,255,255,0.08)" : "rgba(11,18,32,0.06)",
-        color: dark ? "rgba(255,255,255,0.84)" : "rgba(11,18,32,0.75)",
-        border: dark
-          ? "1px solid rgba(255,255,255,0.12)"
-          : "1px solid rgba(11,18,32,0.12)",
-      }}
-    >
-      {label}
-    </span>
-  );
+    const dark = tone === "dark";
+    return (
+        <span
+            className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+            style={{
+                background: dark ? "rgba(255,255,255,0.08)" : "rgba(11,18,32,0.06)",
+                color: dark ? "rgba(255,255,255,0.84)" : "rgba(11,18,32,0.75)",
+                border: dark
+                    ? "1px solid rgba(255,255,255,0.12)"
+                    : "1px solid rgba(11,18,32,0.12)",
+            }}
+        >
+            {label}
+        </span>
+    );
 }
 
 function SectionTitle({ eyebrow, title, accentText, subtitle, dark = false }) {
-  return (
-    <div className={cx("mx-auto max-w-6xl", dark ? "text-white" : "text-[#0B1220]")}>
-      {eyebrow ? (
-        <div
-          className={cx(
-            "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold tracking-widest",
-            dark
-              ? "bg-white/10 text-white/80 ring-1 ring-white/10"
-              : "bg-[#0B1220]/5 text-[#0B1220]/70 ring-1 ring-[#0B1220]/10"
-          )}
-        >
-          <Sparkles className="h-4 w-4" style={{ color: THEME.accent }} {...iconStrongProps} />
-          <span>{eyebrow}</span>
+    return (
+        <div className={cx("mx-auto max-w-6xl", dark ? "text-white" : "text-[#0B1220]")}>
+            {eyebrow ? (
+                <div
+                    className={cx(
+                        "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold tracking-widest",
+                        dark
+                            ? "bg-white/10 text-white/80 ring-1 ring-white/10"
+                            : "bg-[#0B1220]/5 text-[#0B1220]/70 ring-1 ring-[#0B1220]/10"
+                    )}
+                >
+                    <Sparkles className="h-4 w-4" style={{ color: THEME.accent }} {...iconStrongProps} />
+                    <span>{eyebrow}</span>
+                </div>
+            ) : null}
+            <h2
+                className={cx(
+                    eyebrow ? "mt-5 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl" : "mt-0 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl",
+                    dark ? "text-white" : "text-[#0B1220]"
+                )}
+            >
+                {title}{" "}
+                {accentText ? (
+                    <span style={{ color: THEME.pink }}>{accentText}</span>
+                ) : null}
+            </h2>
+            {subtitle ? (
+                <p
+                    className={cx(
+                        "mt-3 max-w-5xl text-balance text-base sm:text-lg",
+                        dark ? "text-white/70" : "text-[#0B1220]/70"
+                    )}
+                >
+                    {subtitle}
+                </p>
+            ) : null}
         </div>
-      ) : null}
-
-      <h2
-        className={cx(
-          eyebrow ? "mt-5 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl" : "mt-0 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl",
-          dark ? "text-white" : "text-[#0B1220]"
-        )}
-      >
-        {title}{" "}
-        {accentText ? (
-          <span style={{ color: THEME.pink }}>{accentText}</span>
-        ) : null}
-      </h2>
-
-      {subtitle ? (
-        <p
-          className={cx(
-            "mt-3 max-w-5xl text-balance text-base sm:text-lg",
-            dark ? "text-white/70" : "text-[#0B1220]/70"
-          )}
-        >
-          {subtitle}
-        </p>
-      ) : null}
-    </div>
-  );
+    );
 }
 
 function MagneticButton({ children, href, onClick, variant = "primary" }) {
-  const ref = useRef(null);
-  const reduce = useReducedMotion();
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+    const ref = useRef(null);
+    const reduce = useReducedMotion();
+    const [pos, setPos] = useState({ x: 0, y: 0 });
 
-  const base =
-    "relative inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
-  const primary =
-    "text-white shadow-[0_16px_40px_rgba(34,211,238,0.16)] hover:translate-y-[-1px] active:translate-y-[0px]";
-  const secondary =
-    "bg-transparent text-white ring-1 ring-white/20 hover:bg-white/5";
+    const base =
+        "relative inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
+    const primary =
+        "text-white shadow-[0_16px_40px_rgba(34,211,238,0.16)] hover:translate-y-[-1px] active:translate-y-[0px]";
+    const secondary =
+        "bg-transparent text-white ring-1 ring-white/20 hover:bg-white/5";
 
-  const stylePrimary = {
-    background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.84)} 55%, ${accent(
-      0.60
-    )} 120%)`,
-  };
+    const stylePrimary = {
+        background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.84)} 55%, ${accent(0.60)} 120%)`,
+    };
 
-  const Comp = href ? "a" : "button";
-  const props = href ? { href } : { type: "button" };
+    const Comp = href ? "a" : "button";
+    const props = href ? { href } : { type: "button" };
 
-  function onMove(e) {
-    if (reduce) return;
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const x = e.clientX - (r.left + r.width / 2);
-    const y = e.clientY - (r.top + r.height / 2);
-    setPos({ x: x * 0.18, y: y * 0.18 });
-  }
+    function onMove(e) {
+        if (reduce) return;
+        const el = ref.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const x = e.clientX - (r.left + r.width / 2);
+        const y = e.clientY - (r.top + r.height / 2);
+        setPos({ x: x * 0.18, y: y * 0.18 });
+    }
 
-  function onLeave() {
-    setPos({ x: 0, y: 0 });
-  }
+    function onLeave() {
+        setPos({ x: 0, y: 0 });
+    }
 
-  return (
-    <Comp
-      {...props}
-      onClick={onClick}
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className={cx(base, variant === "primary" ? primary : secondary)}
-      style={variant === "primary" ? stylePrimary : undefined}
-    >
-      <motion.span
-        animate={reduce ? undefined : { x: pos.x, y: pos.y }}
-        transition={{ type: "spring", stiffness: 240, damping: 18 }}
-        className="inline-flex items-center gap-2"
-      >
-        {children}
-        <ArrowRight className="h-4 w-4" {...iconStrongProps} />
-      </motion.span>
-      <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
-        <span className="shine" />
-      </span>
-    </Comp>
-  );
+    return (
+        <Comp
+            {...props}
+            onClick={onClick}
+            ref={ref}
+            onMouseMove={onMove}
+            onMouseLeave={onLeave}
+            className={cx(base, variant === "primary" ? primary : secondary)}
+            style={variant === "primary" ? stylePrimary : undefined}
+        >
+            <motion.span
+                animate={reduce ? undefined : { x: pos.x, y: pos.y }}
+                transition={{ type: "spring", stiffness: 240, damping: 18 }}
+                className="inline-flex items-center gap-2"
+            >
+                {children}
+                <ArrowRight className="h-4 w-4" {...iconStrongProps} />
+            </motion.span>
+            <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
+                <span className="shine" />
+            </span>
+        </Comp>
+    );
 }
 
-/** ---------------- PAGE DATA (from PDF content) ---------------- */
+/** ---------------- PAGE DATA ---------------- */
 const ARCHITECTURE = [
-  {
-    title: "University Partnerships",
-    desc: "Integrate real industry experience into academic frameworks through structured internships, industrial courses, and co-hosted initiatives.",
-    icon: GraduationCap,
-    accent: THEME.accent2,
-    photo:
-      "/images/uni-partnership.jpg",
-    bullets: [
-      "Industry-integrated internships (3–6 months)",
-      "Industrial courses aligned with curricula",
-      "Co-hosted global programs",
-      "Portfolio-driven outcomes",
-      "Academic–industry integration",
-    ],
-  },
-  {
-    title: "Industry & Corporate Partnerships",
-    desc: "Workforce development, innovation acceleration, and future skills adoption through tailored programs and execution models.",
-    icon: Building2,
-    accent: THEME.accent,
-    photo:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80",
-    bullets: [
-      "AI & emerging tech upskilling",
-      "Tailored executive programs",
-      "Workshops & masterclasses",
-      "Employee development tracks",
-      "Innovation labs collaboration",
-    ],
-  },
-  {
-    title: "Strategic Alliances",
-    desc: "Long-term institutional collaboration designed to create ecosystem-level impact across regions and sectors.",
-    icon: Landmark,
-    accent: THEME.accent4,
-    photo:
-      "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1400&q=80",
-    bullets: [
-      "Government collaboration",
-      "Innovation ecosystem development",
-      "Public-private partnerships",
-      "Regional transformation initiatives",
-      "International program expansion",
-    ],
-  },
-  {
-    title: "Co-Hosted Programs",
-    desc: "Co-host programs leveraging our European expert network while enhancing institutional positioning and shared outcomes.",
-    icon: Handshake,
-    accent: THEME.accent3,
-    photo:
-      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1400&q=80",
-    bullets: [
-      "Joint certification",
-      "Shared academic branding",
-      "Onsite / hybrid implementation",
-      "Faculty collaboration",
-    ],
-  },
+    {
+        title: "University Partnerships",
+        desc: "Integrate real industry experience into academic frameworks through structured internships, industrial courses, and co-hosted initiatives.",
+        icon: GraduationCap,
+        accent: THEME.accent2,
+        photo: "/images/uni-partnership.jpg",
+        bullets: [
+            "Industry-integrated internships (3–6 months)",
+            "Industrial courses aligned with curricula",
+            "Co-hosted global programs",
+            "Portfolio-driven outcomes",
+            "Academic–industry integration",
+        ],
+    },
+    {
+        title: "Industry & Corporate Partnerships",
+        desc: "Workforce development, innovation acceleration, and future skills adoption through tailored programs and execution models.",
+        icon: Building2,
+        accent: THEME.accent,
+        photo: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80",
+        bullets: [
+            "AI & emerging tech upskilling",
+            "Tailored executive programs",
+            "Workshops & masterclasses",
+            "Employee development tracks",
+            "Innovation labs collaboration",
+        ],
+    },
+    {
+        title: "Strategic Alliances",
+        desc: "Long-term institutional collaboration designed to create ecosystem-level impact across regions and sectors.",
+        icon: Landmark,
+        accent: THEME.accent4,
+        photo: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1400&q=80",
+        bullets: [
+            "Government collaboration",
+            "Innovation ecosystem development",
+            "Public-private partnerships",
+            "Regional transformation initiatives",
+            "International program expansion",
+        ],
+    },
+    {
+        title: "Co-Hosted Programs",
+        desc: "Co-host programs leveraging our European expert network while enhancing institutional positioning and shared outcomes.",
+        icon: Handshake,
+        accent: THEME.accent3,
+        photo: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1400&q=80",
+        bullets: [
+            "Joint certification",
+            "Shared academic branding",
+            "Onsite / hybrid implementation",
+            "Faculty collaboration",
+        ],
+    },
 ];
 
 const EXPERT_OPPORTUNITIES = [
-  { label: "Internship supervision", icon: Briefcase, color: THEME.accent3 },
-  { label: "AI & executive workshops", icon: Sparkles, color: THEME.accent2 },
-  { label: "Curriculum co-design", icon: ClipboardCheck, color: THEME.accent4 },
-  { label: "Industry mentorship", icon: Users, color: THEME.accent },
-  { label: "Advisory boards", icon: Shield, color: THEME.accent3 },
+    { label: "Internship supervision", icon: Briefcase, color: THEME.accent3 },
+    { label: "AI & executive workshops", icon: Sparkles, color: THEME.accent2 },
+    { label: "Curriculum co-design", icon: ClipboardCheck, color: THEME.accent4 },
+    { label: "Industry mentorship", icon: Users, color: THEME.accent },
+    { label: "Advisory boards", icon: Shield, color: THEME.accent3 },
 ];
 
 const EXPERT_ELIGIBILITY = [
-  "Proven industry experience",
-  "Academic background (preferred but not mandatory)",
-  "Leadership or project ownership experience",
-  "Fluent professional communication",
+    "Proven industry experience",
+    "Academic background (preferred but not mandatory)",
+    "Leadership or project ownership experience",
+    "Fluent professional communication",
 ];
 
 const IMPACT_METRICS = [
-  { label: "Trainees engaged", value: 1000, suffix: "+", icon: GraduationCap, color: THEME.accent },
-  { label: "Institutional collaborations", value: 40, suffix: "+", icon: Network, color: THEME.accent2 },
-  { label: "Industry mentors", value: 20, suffix: "+", icon: BadgeCheck, color: THEME.accent3 },
-  { label: "Portfolio completion", value: 85, suffix: "%", icon: FileCheck2, color: THEME.accent4 },
-  { label: "Improved career readiness", value: 70, suffix: "%", icon: Target, color: THEME.accent },
+    { label: "Trainees engaged", value: 1000, suffix: "+", icon: GraduationCap, color: THEME.accent },
+    { label: "Institutional collaborations", value: 40, suffix: "+", icon: Network, color: THEME.accent2 },
+    { label: "Industry mentors", value: 20, suffix: "+", icon: BadgeCheck, color: THEME.accent3 },
+    { label: "Portfolio completion", value: 85, suffix: "%", icon: FileCheck2, color: THEME.accent4 },
+    { label: "Improved career readiness", value: 70, suffix: "%", icon: Target, color: THEME.accent },
 ];
 
 const WHY_PARTNER = [
-  "Structured delivery model",
-  "Real project-based execution",
-  "European academic & industry integration",
-  "AI-driven curriculum evolution",
-  "Measurable outcomes",
-  "Scalable deployment",
+    "Structured delivery model",
+    "Real project-based execution",
+    "European academic & industry integration",
+    "AI-driven curriculum evolution",
+    "Measurable outcomes",
+    "Scalable deployment",
 ];
 
 const PORTRAITS = [
-  {
-    name: "Prof. Elina M.",
-    role: "University Professor • AI Systems",
-    photo:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
-    bio: "Curriculum co-design + academic rigor for outcome-based programs.",
-    accent: THEME.accent2,
-  },
-  {
-    name: "David K.",
-    role: "Senior Consultant • Digital Transformation",
-    photo:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80",
-    bio: "Workforce transformation roadmaps and scalable delivery playbooks.",
-    accent: THEME.accent,
-  },
-  {
-    name: "Sara N.",
-    role: "Industry Mentor • Data & BI",
-    photo:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
-    bio: "Mentorship and evaluation loops to ship portfolio-grade dashboards.",
-    accent: THEME.accent4,
-  },
-  {
-    name: "Lukas R.",
-    role: "Engineering Lead • Cloud & DevOps",
-    photo:
-      "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80",
-    bio: "Hands-on supervision for real infra + CI/CD production outputs.",
-    accent: THEME.accent3,
-  },
+    {
+        name: "Prof. Elina M.",
+        role: "University Professor • AI Systems",
+        photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
+        bio: "Curriculum co-design + academic rigor for outcome-based programs.",
+        accent: THEME.accent2,
+    },
+    {
+        name: "David K.",
+        role: "Senior Consultant • Digital Transformation",
+        photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80",
+        bio: "Workforce transformation roadmaps and scalable delivery playbooks.",
+        accent: THEME.accent,
+    },
+    {
+        name: "Sara N.",
+        role: "Industry Mentor • Data & BI",
+        photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
+        bio: "Mentorship and evaluation loops to ship portfolio-grade dashboards.",
+        accent: THEME.accent4,
+    },
+    {
+        name: "Lukas R.",
+        role: "Engineering Lead • Cloud & DevOps",
+        photo: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80",
+        bio: "Hands-on supervision for real infra + CI/CD production outputs.",
+        accent: THEME.accent3,
+    },
 ];
 
 /** ---------------- FIELD-LEVEL ERROR ---------------- */
@@ -434,486 +409,440 @@ function FieldError({ error }) {
 
 /** ---------------- HERO: network glow background nodes ---------------- */
 function NetworkBackdrop() {
-  // purely decorative; different from your other hero
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* subtle photo layer */}
-      <div
-        className="absolute inset-0 opacity-[0.14]"
-        style={{
-          backgroundImage:
-            "radial-gradient(900px circle at 15% 20%, rgba(34,211,238,0.18), transparent 55%), radial-gradient(900px circle at 85% 35%, rgba(167,139,250,0.16), transparent 55%), radial-gradient(900px circle at 60% 90%, rgba(245,158,11,0.12), transparent 55%)",
-        }}
-      />
-      {/* grid */}
-      <div
-        className="absolute inset-0 opacity-[0.16]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(233,231,223,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(233,231,223,0.12) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-          maskImage: "radial-gradient(900px circle at 30% 25%, rgba(0,0,0,1), transparent 70%)",
-        }}
-      />
-      {/* animated constellation */}
-      <div className="absolute inset-0 opacity-80">
-        <div className="constellation" />
-      </div>
-    </div>
-  );
+    return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div
+                className="absolute inset-0 opacity-[0.14]"
+                style={{
+                    backgroundImage:
+                        "radial-gradient(900px circle at 15% 20%, rgba(34,211,238,0.18), transparent 55%), radial-gradient(900px circle at 85% 35%, rgba(167,139,250,0.16), transparent 55%), radial-gradient(900px circle at 60% 90%, rgba(245,158,11,0.12), transparent 55%)",
+                }}
+            />
+            <div
+                className="absolute inset-0 opacity-[0.16]"
+                style={{
+                    backgroundImage:
+                        "linear-gradient(rgba(233,231,223,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(233,231,223,0.12) 1px, transparent 1px)",
+                    backgroundSize: "64px 64px",
+                    maskImage: "radial-gradient(900px circle at 30% 25%, rgba(0,0,0,1), transparent 70%)",
+                }}
+            />
+            <div className="absolute inset-0 opacity-80">
+                <div className="constellation" />
+            </div>
+        </div>
+    );
 }
 
 /** ---------------- ARCHITECTURE CARD ---------------- */
 function ArchitectureCard({ item, index }) {
-  const Icon = item.icon;
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.55, ease: "easeOut", delay: Math.min(index * 0.06, 0.18) }}
-      whileHover={{ y: -8, scale: 1.01 }}
-      className="group relative overflow-hidden rounded-[36px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
-      style={{ boxShadow: "0 22px 80px rgba(0,0,0,0.35)" }}
-    >
-      {/* photo */}
-      <div className="absolute inset-0">
-        <img
-          src={item.photo}
-          alt={item.title}
-          className="h-full w-full object-cover opacity-[0.45] transition duration-500 group-hover:opacity-[0.58] group-hover:scale-[1.03]"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(11,18,32,0.42) 0%, rgba(11,18,32,0.72) 65%, rgba(11,18,32,0.84) 100%)",
-          }}
-        />
-      </div>
-
-      {/* top accent bar */}
-      <div
-        className="absolute inset-x-0 top-0 h-1 opacity-90"
-        style={{ background: `linear-gradient(90deg, ${item.accent} 0%, rgba(255,255,255,0) 80%)` }}
-      />
-
-      {/* hover shine */}
-      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <div className="shine" />
-      </div>
-
-      <div className="relative p-6 sm:p-7">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <motion.div
-              whileHover={{ rotate: 6 }}
-              className="relative"
-            >
-              <IconBadge color={item.accent}>
-                <Icon className="h-5 w-5" {...iconStrongProps} />
-              </IconBadge>
-              <span
-                className="pointer-events-none absolute -right-2 -top-2 h-3 w-3 rounded-full"
-                style={{ background: item.accent, boxShadow: `0 0 0 6px rgba(255,255,255,0.06)` }}
-              />
-            </motion.div>
-
-            <div>
-              <div className="text-lg font-semibold text-white" style={clampStyle(2)}>
-                {item.title}
-              </div>
+    const Icon = item.icon;
+    return (
+        <motion.article
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.55, ease: "easeOut", delay: Math.min(index * 0.06, 0.18) }}
+            whileHover={{ y: -8, scale: 1.01 }}
+            className="group relative overflow-hidden rounded-[36px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
+            style={{ boxShadow: "0 22px 80px rgba(0,0,0,0.35)" }}
+        >
+            <div className="absolute inset-0">
+                <img
+                    src={item.photo}
+                    alt={item.title}
+                    className="h-full w-full object-cover opacity-[0.45] transition duration-500 group-hover:opacity-[0.58] group-hover:scale-[1.03]"
+                />
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background:
+                            "linear-gradient(180deg, rgba(11,18,32,0.42) 0%, rgba(11,18,32,0.72) 65%, rgba(11,18,32,0.84) 100%)",
+                    }}
+                />
             </div>
-          </div>
-
-        </div>
-
-        <p className="mt-4 text-sm leading-relaxed text-white/70" style={clampStyle(3)}>
-          {item.desc}
-        </p>
-
-        <div className="mt-5 grid grid-cols-1 gap-2">
-          {item.bullets.slice(0, 5).map((b) => (
-            <div key={b} className="flex items-start gap-3">
-              <span
-                className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full ring-1"
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  borderColor: "rgba(255,255,255,0.10)",
-                }}
-              >
-                <span className="h-2 w-2 rounded-full" style={{ background: item.accent }} />
-              </span>
-              <div className="text-sm text-white/80">{b}</div>
+            <div
+                className="absolute inset-x-0 top-0 h-1 opacity-90"
+                style={{ background: `linear-gradient(90deg, ${item.accent} 0%, rgba(255,255,255,0) 80%)` }}
+            />
+            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <div className="shine" />
             </div>
-          ))}
-        </div>
-
-      </div>
-    </motion.article>
-  );
+            <div className="relative p-6 sm:p-7">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <motion.div whileHover={{ rotate: 6 }} className="relative">
+                            <IconBadge color={item.accent}>
+                                <Icon className="h-5 w-5" {...iconStrongProps} />
+                            </IconBadge>
+                            <span
+                                className="pointer-events-none absolute -right-2 -top-2 h-3 w-3 rounded-full"
+                                style={{ background: item.accent, boxShadow: `0 0 0 6px rgba(255,255,255,0.06)` }}
+                            />
+                        </motion.div>
+                        <div>
+                            <div className="text-lg font-semibold text-white" style={clampStyle(2)}>
+                                {item.title}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-white/70" style={clampStyle(3)}>
+                    {item.desc}
+                </p>
+                <div className="mt-5 grid grid-cols-1 gap-2">
+                    {item.bullets.slice(0, 5).map((b) => (
+                        <div key={b} className="flex items-start gap-3">
+                            <span
+                                className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full ring-1"
+                                style={{
+                                    background: "rgba(255,255,255,0.06)",
+                                    borderColor: "rgba(255,255,255,0.10)",
+                                }}
+                            >
+                                <span className="h-2 w-2 rounded-full" style={{ background: item.accent }} />
+                            </span>
+                            <div className="text-sm text-white/80">{b}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </motion.article>
+    );
 }
 
 /** ---------------- EXPERT PORTRAIT TILE ---------------- */
 function PortraitTile({ p, idx }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
-      whileHover={{ y: -6 }}
-      className="group relative overflow-hidden rounded-[32px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
-      style={{ boxShadow: "0 20px 70px rgba(0,0,0,0.32)" }}
-    >
-      <div className="absolute inset-0">
-        <img
-          src={p.photo}
-          alt={p.name}
-          className="h-full w-full object-cover opacity-[0.95] transition duration-500 group-hover:scale-[1.04]"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(11,18,32,0.06) 0%, rgba(11,18,32,0.88) 70%, rgba(11,18,32,0.98) 100%)",
-          }}
-        />
-      </div>
-
-      <div
-        className="absolute inset-x-0 top-0 h-1 opacity-90"
-        style={{ background: `linear-gradient(90deg, ${p.accent} 0%, rgba(255,255,255,0) 80%)` }}
-      />
-
-      <div className="relative p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="text-base font-semibold text-white">{p.name}</div>
-            <div className="mt-1 text-sm text-white/70">{p.role}</div>
-          </div>
-
-          <div className="hidden sm:block">
-            <IconBadge color={p.accent}>
-              <BadgeCheck className="h-5 w-5" {...iconStrongProps} />
-            </IconBadge>
-          </div>
-        </div>
-
+    return (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileHover={{ opacity: 1, y: 0 }}
-          className="mt-4 rounded-2xl p-4 ring-1"
-          style={{
-            background: "rgba(255,255,255,0.06)",
-            borderColor: "rgba(255,255,255,0.10)",
-          }}
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
+            whileHover={{ y: -6 }}
+            className="group relative overflow-hidden rounded-[32px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
+            style={{ boxShadow: "0 20px 70px rgba(0,0,0,0.32)" }}
         >
-          <div className="text-xs font-semibold tracking-widest text-white/60">BIO</div>
-          <div className="mt-2 text-sm text-white/80" style={clampStyle(3)}>
-            {p.bio}
-          </div>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-}
-
-function ReachMap() {
-  const reduce = useReducedMotion();
-
-  const points = [
-    { id: "hub", x: 49, y: 32, label: "Europe Hub", color: THEME.accent2 },
-    { id: "universities", x: 62, y: 26, label: "Universities", color: THEME.accent },
-    { id: "industry", x: 43, y: 42, label: "Industry", color: THEME.accent3 },
-    { id: "mena", x: 70, y: 56, label: "MENA Expansion", color: THEME.accent4 },
-  ];
-
-  const paths = [
-    { from: "universities", to: "hub", color: THEME.accent, bend: 10 },
-    { from: "industry", to: "hub", color: THEME.accent3, bend: 8 },
-    { from: "industry", to: "universities", color: "rgba(255,255,255,0.45)", bend: 12 },
-    { from: "hub", to: "mena", color: THEME.accent2, bend: 14 },
-  ];
-
-  const byId = Object.fromEntries(points.map((p) => [p.id, p]));
-
-  return (
-    <div
-      className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
-      style={{
-        background:
-          "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
-        boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
-      }}
-    >
-      <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.14)" }} />
-      <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(167,139,250,0.12)" }} />
-
-      {/* photo removed: clean layered background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(11,18,32,0.55) 0%, rgba(11,18,32,0.82) 100%)",
-        }}
-      />
-
-      <div className="relative p-6 sm:p-8">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold tracking-widest text-white/60">GLOBAL REACH</div>
-            <div className="mt-2 text-2xl font-semibold text-white">
-              A European-rooted network with international expansion
+            <div className="absolute inset-0">
+                <img
+                    src={p.photo}
+                    alt={p.name}
+                    className="h-full w-full object-cover opacity-[0.95] transition duration-500 group-hover:scale-[1.04]"
+                />
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background:
+                            "linear-gradient(180deg, rgba(11,18,32,0.06) 0%, rgba(11,18,32,0.88) 70%, rgba(11,18,32,0.98) 100%)",
+                    }}
+                />
             </div>
-            <p className="mt-2 max-w-xl text-sm text-white/70">
-              Universities, corporations, and ecosystems across Europe — with growing momentum in MENA and global markets.
-            </p>
-          </div>
-
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-5">
-          <div className="lg:col-span-3">
-            <div className="relative overflow-hidden rounded-[32px] ring-1 ring-white/10 bg-white/5 backdrop-blur">
-              <svg viewBox="0 0 100 70" className="h-[250px] w-full sm:h-[320px]">
-                {/* subtle "continent" blob */}
-                <defs>
-                  <filter id="glow">
-                    <feGaussianBlur stdDeviation="1.4" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                  <linearGradient id="ocean" x1="0" x2="1">
-                    <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
-                    <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
-                  </linearGradient>
-                </defs>
-
-                <rect x="0" y="0" width="100" height="70" fill="url(#ocean)" />
-
-                <g transform="translate(0,-8)">
-                  {/* abstract land */}
-                  <path
-                    d="M20,50 C27,33 36,21 50,18 C58,16 64,20 69,25 C75,30 82,30 84,37 C86,47 78,55 64,60 C49,65 32,62 20,50 Z"
-                    fill="rgba(255,255,255,0.06)"
-                    stroke="rgba(255,255,255,0.10)"
-                    strokeWidth="0.5"
-                  />
-
-                  {/* connections */}
-                  {paths.map((p, i) => {
-                    const a = byId[p.from];
-                    const b = byId[p.to];
-                    const midX = (a.x + b.x) / 2;
-                    const bend = p.bend ?? 10;
-                    const d = `M ${a.x} ${a.y} C ${midX - 3} ${a.y - bend}, ${midX + 4} ${b.y + bend * 0.35}, ${b.x} ${b.y}`;
-                    return (
-                      <motion.path
-                        key={i}
-                        d={d}
-                        fill="none"
-                        stroke={p.color}
-                        strokeOpacity="0.75"
-                        strokeWidth="0.8"
-                        filter="url(#glow)"
-                        initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-                        animate={reduce ? false : { pathLength: 1, opacity: 1 }}
-                        transition={{ duration: 1.1, ease: "easeInOut", delay: 0.15 + i * 0.12 }}
-                        strokeDasharray="1 1"
-                      />
-                    );
-                  })}
-
-                  {/* points */}
-                  {points.map((pt, i) => (
-                    <g key={pt.id}>
-                      <motion.circle
-                        cx={pt.x}
-                        cy={pt.y}
-                        r="2.1"
-                        fill={pt.color}
-                        filter="url(#glow)"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6, ease: "easeOut", delay: 0.12 + i * 0.08 }}
-                      />
-                      {!reduce ? (
-                        <motion.circle
-                          cx={pt.x}
-                          cy={pt.y}
-                          r="5.2"
-                          fill="transparent"
-                          stroke={pt.color}
-                          strokeOpacity="0.35"
-                          strokeWidth="0.7"
-                          animate={{ scale: [1, 1.25, 1], opacity: [0.25, 0.5, 0.25] }}
-                          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                        />
-                      ) : null}
-                    </g>
-                  ))}
-                </g>
-              </svg>
-
-              {/* legend */}
-              <div className="px-3 pb-3 pt-1 sm:absolute sm:left-4 sm:bottom-4 sm:p-0">
-                <div className="flex flex-col gap-2">
-                  {points.map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex items-center gap-2 rounded-2xl px-3 py-2 ring-1 sm:gap-3 sm:px-4 sm:py-2.5"
-                      style={{
+            <div
+                className="absolute inset-x-0 top-0 h-1 opacity-90"
+                style={{ background: `linear-gradient(90deg, ${p.accent} 0%, rgba(255,255,255,0) 80%)` }}
+            />
+            <div className="relative p-6">
+                <div className="flex items-start justify-between gap-3">
+                    <div>
+                        <div className="text-base font-semibold text-white">{p.name}</div>
+                        <div className="mt-1 text-sm text-white/70">{p.role}</div>
+                    </div>
+                    <div className="hidden sm:block">
+                        <IconBadge color={p.accent}>
+                            <BadgeCheck className="h-5 w-5" {...iconStrongProps} />
+                        </IconBadge>
+                    </div>
+                </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    whileHover={{ opacity: 1, y: 0 }}
+                    className="mt-4 rounded-2xl p-4 ring-1"
+                    style={{
                         background: "rgba(255,255,255,0.06)",
                         borderColor: "rgba(255,255,255,0.10)",
-                      }}
-                    >
-                      <span
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ background: p.color, boxShadow: `0 0 0 6px rgba(255,255,255,0.05)` }}
-                      />
-                      <div className="text-xs font-semibold text-white sm:text-sm">{p.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* side highlights */}
-          <div className="lg:col-span-2 space-y-3">
-            {[
-              { icon: GraduationCap, title: "European professors", desc: "Outcome-first academic integration.", color: THEME.accent2 },
-              { icon: Building2, title: "Leading companies", desc: "Mentors & partners across sectors.", color: THEME.accent3 },
-              { icon: Globe2, title: "Cross-border delivery", desc: "Hybrid, onsite, and remote pathways.", color: THEME.accent },
-            ].map((h, idx) => {
-              const Icon = h.icon;
-              return (
-                <motion.div
-                  key={h.title}
-                  initial={{ opacity: 0, x: 12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.25 }}
-                  transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
-                  className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
+                    }}
                 >
-                  <div className="flex items-start gap-3">
-                    <IconBadge color={h.color}>
-                      <Icon className="h-5 w-5" {...iconStrongProps} />
-                    </IconBadge>
-                    <div>
-                      <div className="text-sm font-semibold text-white">{h.title}</div>
-                      <div className="mt-1 text-sm text-white/70">{h.desc}</div>
+                    <div className="text-xs font-semibold tracking-widest text-white/60">BIO</div>
+                    <div className="mt-2 text-sm text-white/80" style={clampStyle(3)}>
+                        {p.bio}
                     </div>
-                  </div>
                 </motion.div>
-              );
-            })}
-          </div>
+            </div>
+        </motion.div>
+    );
+}
+
+/** ---------------- MAP PANEL ---------------- */
+function ReachMap() {
+    const reduce = useReducedMotion();
+
+    const points = [
+        { id: "hub", x: 49, y: 32, label: "Europe Hub", color: THEME.accent2 },
+        { id: "universities", x: 62, y: 26, label: "Universities", color: THEME.accent },
+        { id: "industry", x: 43, y: 42, label: "Industry", color: THEME.accent3 },
+        { id: "mena", x: 70, y: 56, label: "MENA Expansion", color: THEME.accent4 },
+    ];
+
+    const paths = [
+        { from: "universities", to: "hub", color: THEME.accent, bend: 10 },
+        { from: "industry", to: "hub", color: THEME.accent3, bend: 8 },
+        { from: "industry", to: "universities", color: "rgba(255,255,255,0.45)", bend: 12 },
+        { from: "hub", to: "mena", color: THEME.accent2, bend: 14 },
+    ];
+
+    const byId = Object.fromEntries(points.map((p) => [p.id, p]));
+
+    return (
+        <div
+            className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
+            style={{
+                background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
+                boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
+            }}
+        >
+            <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.14)" }} />
+            <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(167,139,250,0.12)" }} />
+            <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(180deg, rgba(11,18,32,0.55) 0%, rgba(11,18,32,0.82) 100%)" }}
+            />
+            <div className="relative p-6 sm:p-8">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <div className="text-xs font-semibold tracking-widest text-white/60">GLOBAL REACH</div>
+                        <div className="mt-2 text-2xl font-semibold text-white">
+                            A European-rooted network with international expansion
+                        </div>
+                        <p className="mt-2 max-w-xl text-sm text-white/70">
+                            Universities, corporations, and ecosystems across Europe — with growing momentum in MENA and global markets.
+                        </p>
+                    </div>
+                </div>
+                <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-5">
+                    <div className="lg:col-span-3">
+                        <div className="relative overflow-hidden rounded-[32px] ring-1 ring-white/10 bg-white/5 backdrop-blur">
+                            <svg viewBox="0 0 100 70" className="h-[250px] w-full sm:h-[320px]">
+                                <defs>
+                                    <filter id="glow">
+                                        <feGaussianBlur stdDeviation="1.4" result="blur" />
+                                        <feMerge>
+                                            <feMergeNode in="blur" />
+                                            <feMergeNode in="SourceGraphic" />
+                                        </feMerge>
+                                    </filter>
+                                    <linearGradient id="ocean" x1="0" x2="1">
+                                        <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
+                                        <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
+                                    </linearGradient>
+                                </defs>
+                                <rect x="0" y="0" width="100" height="70" fill="url(#ocean)" />
+                                <g transform="translate(0,-8)">
+                                    <path
+                                        d="M20,50 C27,33 36,21 50,18 C58,16 64,20 69,25 C75,30 82,30 84,37 C86,47 78,55 64,60 C49,65 32,62 20,50 Z"
+                                        fill="rgba(255,255,255,0.06)"
+                                        stroke="rgba(255,255,255,0.10)"
+                                        strokeWidth="0.5"
+                                    />
+                                    {paths.map((p, i) => {
+                                        const a = byId[p.from];
+                                        const b = byId[p.to];
+                                        const midX = (a.x + b.x) / 2;
+                                        const bend = p.bend ?? 10;
+                                        const d = `M ${a.x} ${a.y} C ${midX - 3} ${a.y - bend}, ${midX + 4} ${b.y + bend * 0.35}, ${b.x} ${b.y}`;
+                                        return (
+                                            <motion.path
+                                                key={i}
+                                                d={d}
+                                                fill="none"
+                                                stroke={p.color}
+                                                strokeOpacity="0.75"
+                                                strokeWidth="0.8"
+                                                filter="url(#glow)"
+                                                initial={reduce ? false : { pathLength: 0, opacity: 0 }}
+                                                animate={reduce ? false : { pathLength: 1, opacity: 1 }}
+                                                transition={{ duration: 1.1, ease: "easeInOut", delay: 0.15 + i * 0.12 }}
+                                                strokeDasharray="1 1"
+                                            />
+                                        );
+                                    })}
+                                    {points.map((pt, i) => (
+                                        <g key={pt.id}>
+                                            <motion.circle
+                                                cx={pt.x}
+                                                cy={pt.y}
+                                                r="2.1"
+                                                fill={pt.color}
+                                                filter="url(#glow)"
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ duration: 0.6, ease: "easeOut", delay: 0.12 + i * 0.08 }}
+                                            />
+                                            {!reduce ? (
+                                                <motion.circle
+                                                    cx={pt.x}
+                                                    cy={pt.y}
+                                                    r="5.2"
+                                                    fill="transparent"
+                                                    stroke={pt.color}
+                                                    strokeOpacity="0.35"
+                                                    strokeWidth="0.7"
+                                                    animate={{ scale: [1, 1.25, 1], opacity: [0.25, 0.5, 0.25] }}
+                                                    transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+                                                />
+                                            ) : null}
+                                        </g>
+                                    ))}
+                                </g>
+                            </svg>
+                            <div className="absolute left-3 bottom-3 sm:left-4 sm:bottom-4">
+                                <div className="flex flex-col gap-2">
+                                    {points.map((p) => (
+                                        <div
+                                            key={p.id}
+                                            className="flex items-center gap-2 rounded-2xl px-3 py-2 ring-1 sm:gap-3 sm:px-4 sm:py-2.5"
+                                            style={{
+                                                background: "rgba(255,255,255,0.06)",
+                                                borderColor: "rgba(255,255,255,0.10)",
+                                            }}
+                                        >
+                                            <span
+                                                className="h-2.5 w-2.5 rounded-full"
+                                                style={{ background: p.color, boxShadow: `0 0 0 6px rgba(255,255,255,0.05)` }}
+                                            />
+                                            <div className="text-xs font-semibold text-white sm:text-sm">{p.label}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="lg:col-span-2 space-y-3">
+                        {[
+                            { icon: GraduationCap, title: "European professors", desc: "Outcome-first academic integration.", color: THEME.accent2 },
+                            { icon: Building2, title: "Leading companies", desc: "Mentors & partners across sectors.", color: THEME.accent3 },
+                            { icon: Globe2, title: "Cross-border delivery", desc: "Hybrid, onsite, and remote pathways.", color: THEME.accent },
+                        ].map((h, idx) => {
+                            const Icon = h.icon;
+                            return (
+                                <motion.div
+                                    key={h.title}
+                                    initial={{ opacity: 0, x: 12 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true, amount: 0.25 }}
+                                    transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
+                                    className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <IconBadge color={h.color}>
+                                            <Icon className="h-5 w-5" {...iconStrongProps} />
+                                        </IconBadge>
+                                        <div>
+                                            <div className="text-sm font-semibold text-white">{h.title}</div>
+                                            <div className="mt-1 text-sm text-white/70">{h.desc}</div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 /** ---------------- METRICS STRIP ---------------- */
 function MetricsStrip() {
-  const { ref: impactRef, inView: isImpactInView } = useInViewOnce(0.25);
-  return (
-    <div ref={impactRef} className="mt-10">
-      <div
-        className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
-          boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
-        }}
-      >
-        <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(245,158,11,0.10)" }} />
-        <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.12)" }} />
-
-        <div className="relative p-6 sm:p-8">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-semibold tracking-widest text-white/60">PARTNERSHIP IMPACT</div>
-              <div className="mt-2 text-2xl font-semibold text-white">Measured outcomes — not theoretical engagement</div>
+    const { ref: impactRef, inView: isImpactInView } = useInViewOnce(0.25);
+    return (
+        <div ref={impactRef} className="mt-10">
+            <div
+                className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
+                style={{
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
+                    boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
+                }}
+            >
+                <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(245,158,11,0.10)" }} />
+                <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.12)" }} />
+                <div className="relative p-6 sm:p-8">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <div className="text-xs font-semibold tracking-widest text-white/60">PARTNERSHIP IMPACT</div>
+                            <div className="mt-2 text-2xl font-semibold text-white">Measured outcomes — not theoretical engagement</div>
+                        </div>
+                    </div>
+                    <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                        {IMPACT_METRICS.map((m, idx) => {
+                            const Icon = m.icon;
+                            return (
+                                <motion.div
+                                    key={m.label}
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={isImpactInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                                    transition={{ duration: 0.5, ease: "easeOut", delay: idx * 0.05 }}
+                                    whileHover={{ y: -4 }}
+                                    className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <IconBadge color={m.color}>
+                                            <Icon className="h-5 w-5" {...iconStrongProps} />
+                                        </IconBadge>
+                                        <div className="h-10 w-1 rounded-full" style={{ background: m.color, opacity: 0.55 }} />
+                                    </div>
+                                    <div className="mt-4 text-3xl font-semibold text-white">
+                                        {isImpactInView ? <AnimatedNumber value={m.value} suffix={m.suffix} /> : "0"}
+                                    </div>
+                                    <div className="mt-1 text-sm text-white/70">{m.label}</div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {IMPACT_METRICS.map((m, idx) => {
-              const Icon = m.icon;
-              return (
-                <motion.div
-                  key={m.label}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={isImpactInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-                  transition={{ duration: 0.5, ease: "easeOut", delay: idx * 0.05 }}
-                  whileHover={{ y: -4 }}
-                  className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <IconBadge color={m.color}>
-                      <Icon className="h-5 w-5" {...iconStrongProps} />
-                    </IconBadge>
-                    <div className="h-10 w-1 rounded-full" style={{ background: m.color, opacity: 0.55 }} />
-                  </div>
-                  <div className="mt-4 text-3xl font-semibold text-white">
-                    {isImpactInView ? <AnimatedNumber value={m.value} suffix={m.suffix} /> : "0"}
-                  </div>
-                  <div className="mt-1 text-sm text-white/70">{m.label}</div>
-                </motion.div>
-              );
-            })}
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 /** ---------------- WHY PARTNER ---------------- */
 function WhyPartner() {
-  return (
-    <div className="mt-10">
-      <div className="rounded-[40px] bg-white/55 p-7 ring-1 ring-[#0B1220]/10 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <IconBadge color={THEME.accent}>
-            <Star className="h-5 w-5" style={{ color: THEME.star, fill: THEME.star }} strokeWidth={2.2} />
-          </IconBadge>
-          <div>
-            <div className="mt-1 text-lg font-semibold text-[#0B1220]">Why Institutions Choose Praktix</div>
-          </div>
+    return (
+        <div className="mt-10">
+            <div className="rounded-[40px] bg-white/55 p-7 ring-1 ring-[#0B1220]/10 backdrop-blur">
+                <div className="flex items-center gap-3">
+                    <IconBadge color={THEME.accent}>
+                        <Star className="h-5 w-5" style={{ color: THEME.star, fill: THEME.star }} strokeWidth={2.2} />
+                    </IconBadge>
+                    <div>
+                        <div className="mt-1 text-lg font-semibold text-[#0B1220]">Why Institutions Choose Praktix</div>
+                    </div>
+                </div>
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {WHY_PARTNER.map((b, i) => (
+                        <motion.div
+                            key={b}
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.25 }}
+                            transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.05 }}
+                            className="flex items-start gap-3 rounded-3xl bg-white/60 p-5 ring-1 ring-[#0B1220]/10"
+                        >
+                            <span
+                                className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl ring-1"
+                                style={{
+                                    background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.25)} 120%)`,
+                                    borderColor: "rgba(11,18,32,0.10)",
+                                }}
+                            >
+                                <CheckCircle2 className="h-4 w-4 text-white" {...iconStrongProps} />
+                            </span>
+                            <div className="text-sm font-semibold text-[#0B1220]/80">{b}</div>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
         </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {WHY_PARTNER.map((b, i) => (
-            <motion.div
-              key={b}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.05 }}
-              className="flex items-start gap-3 rounded-3xl bg-white/60 p-5 ring-1 ring-[#0B1220]/10"
-            >
-              <span
-                className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl ring-1"
-                style={{
-                  background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.25)} 120%)`,
-                  borderColor: "rgba(11,18,32,0.10)",
-                }}
-              >
-                <CheckCircle2 className="h-4 w-4 text-white" {...iconStrongProps} />
-              </span>
-              <div className="text-sm font-semibold text-[#0B1220]/80">{b}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 /** ---------------- FILE UPLOAD COMPONENTS ---------------- */
@@ -1303,8 +1232,14 @@ function MultiSelect({
 function FormWizard() {
     const [step, setStep] = useState(0);
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [applicationId, setApplicationId] = useState(null);
 
-  const [applicantType, setApplicantType] = useState("University / Educational Institution");
+    const [profileImageFile, setProfileImageFile] = useState(null);
+    const [cvFile, setCvFile] = useState(null);
+
+    const [applicantType, setApplicantType] = useState("University / Educational Institution");
 
     const [basic, setBasic] = useState({
         fullName: "",
@@ -2434,38 +2369,36 @@ export default function PartnershipsPage() {
                 </div>
             </section>
 
-      {/* ARCHITECTURE */}
-      <section id="architecture" className="relative" style={{ background: DARK_SECTION_BG }}>
-        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-          <SectionTitle
-            title="Structured collaboration models"
-            accentText="aligned with outcomes"
-            subtitle="We design partnerships aligned with institutional goals, workforce transformation, and long-term impact."
-            dark
-          />
+            {/* ARCHITECTURE */}
+            <section id="architecture" className="relative" style={{ background: DARK_SECTION_BG }}>
+                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+                    <SectionTitle
+                        title="Structured collaboration models"
+                        accentText="aligned with outcomes"
+                        subtitle="We design partnerships aligned with institutional goals, workforce transformation, and long-term impact."
+                        dark
+                    />
+                    <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                        {ARCHITECTURE.map((item, idx) => (
+                            <ArchitectureCard key={item.title} item={item} index={idx} />
+                        ))}
+                    </div>
+                </div>
+            </section>
 
-          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {ARCHITECTURE.map((item, idx) => (
-              <ArchitectureCard key={item.title} item={item} index={idx} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* REACH */}
-      <section id="reach" className="relative" style={{ background: DARK_SECTION_BG }}>
-        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-          <SectionTitle
-            title="A European-Rooted, Global Network"
-            subtitle="Our partnerships span universities, corporations, and ecosystems across Europe — with expansion in MENA and international markets."
-            dark
-          />
-          <div className="mt-10">
-            <ReachMap />
-          </div>
-        </div>
-      </section>
+            {/* REACH */}
+            <section id="reach" className="relative" style={{ background: DARK_SECTION_BG }}>
+                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+                    <SectionTitle
+                        title="A European-Rooted, Global Network"
+                        subtitle="Our partnerships span universities, corporations, and ecosystems across Europe — with expansion in MENA and international markets."
+                        dark
+                    />
+                    <div className="mt-10">
+                        <ReachMap />
+                    </div>
+                </div>
+            </section>
 
             {/* IMPACT */}
             <section id="impact" className="relative" style={{ background: DARK_SECTION_BG }}>
@@ -2480,12 +2413,12 @@ export default function PartnershipsPage() {
                 </div>
             </section>
 
-      {/* WHY */}
-      <section id="why" className="relative" style={{ background: THEME.sand, color: THEME.deep }}>
-        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-          <WhyPartner />
-        </div>
-      </section>
+            {/* WHY */}
+            <section id="why" className="relative" style={{ background: THEME.sand, color: THEME.deep }}>
+                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+                    <WhyPartner />
+                </div>
+            </section>
 
             {/* APPLICATION FORM */}
             <section id="apply" className="relative" style={{ background: "rgba(233,231,223,1)", color: THEME.deep }}>
@@ -2500,44 +2433,18 @@ export default function PartnershipsPage() {
                 </div>
             </section>
 
-      {/* floating action */}
-      <a
-        href="#apply"
-        className="fixed bottom-6 right-6 z-50 hidden items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:inline-flex"
-        style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.74)} 90%)` }}
-      >
-        <Handshake className="h-4 w-4" {...iconStrongProps} />
-        Partner / Expert Apply
-      </a>
+            <a
+                href="#apply"
+                className="fixed bottom-6 right-6 z-50 hidden items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:inline-flex"
+                style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.74)} 90%)` }}
+            >
+                <Handshake className="h-4 w-4" {...iconStrongProps} />
+                Partner / Expert Apply
+            </a>
 
-      <style>{css}</style>
-    </div>
-  );
-}
-
-/** ---------------- HERO CHIP ---------------- */
-function HeroChip({ icon: Icon, title, desc, color }) {
-  void Icon;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      whileHover={{ y: -4 }}
-      className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur"
-      style={{ boxShadow: "0 18px 60px rgba(0,0,0,0.28)" }}
-    >
-      <div className="flex items-start gap-3">
-        <IconBadge color={color}>
-          <Icon className="h-5 w-5" {...iconStrongProps} />
-        </IconBadge>
-        <div>
-          <div className="text-sm font-semibold text-white">{title}</div>
-          <div className="mt-1 text-xs text-white/65">{desc}</div>
+            <style>{css}</style>
         </div>
-      </div>
-    </motion.div>
-  );
+    );
 }
 
 /** ---------------- CSS ---------------- */
@@ -2557,7 +2464,6 @@ const css = `
   100%{ transform: translateX(-35%) rotate(-10deg); }
 }
 
-/* global shine */
 .shine{
   position:absolute;
   inset:-30% -30%;
@@ -2573,7 +2479,6 @@ const css = `
   100%{ transform: translateX(-30%) rotate(-10deg); }
 }
 
-/* hero grid texture */
 .heroGrid{
   position:absolute;
   inset:0;
@@ -2588,7 +2493,6 @@ const css = `
   mask-image: radial-gradient(900px circle at 55% 30%, rgba(0,0,0,1), transparent 70%);
 }
 
-/* constellation */
 .constellation{
   position:absolute;
   inset:0;
@@ -2612,7 +2516,6 @@ const css = `
   100%{ transform: translateY(0px); opacity: 0.35; }
 }
 
-/* hero nodes overlay: animated "network" */
 .nodesOverlay{
   position:absolute;
   inset:0;
