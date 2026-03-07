@@ -32,7 +32,6 @@ import {
   Wrench,
 } from "lucide-react";
 import { useLocalTheme } from "../hooks/use-local-theme";
-import { useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 const COLORS = {
@@ -283,16 +282,12 @@ export default function Navbar({ dir = "ltr" }) {
   const [openId, setOpenId] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const { theme } = useLocalTheme();
-  const location = useLocation();
+  useLocalTheme();
   const brandLogoSrc = "/navbar-logo-dark.png";
   const navRef = useRef(null);
   const closeTimer = useRef(null);
   const navItems = useMemo(() => NAV, []);
-  const forceDarkTheme =
-    location.pathname.startsWith("/students-graduates") ||
-    location.pathname.startsWith("/for-individuals/students-graduates");
-  const headerTheme = forceDarkTheme ? "dark" : theme;
+  const headerTheme = "dark";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
