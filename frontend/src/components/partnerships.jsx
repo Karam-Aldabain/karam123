@@ -384,50 +384,6 @@ const PORTRAITS = [
     },
 ];
 
-/** ---------------- ERROR DISPLAY ---------------- */
-function ErrorDisplay({ errors, onClose }) {
-    if (!errors || Object.keys(errors).length === 0) return null;
-
-    const errorList = Object.values(errors).flat().filter(Boolean);
-    if (!errorList.length) return null;
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="mb-6 flex items-start gap-3 rounded-2xl px-4 py-3.5 ring-1"
-            style={{
-                background: "rgba(239,68,68,0.06)",
-                borderColor: "rgba(239,68,68,0.25)",
-            }}
-        >
-            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" style={{ color: THEME.error }} />
-            <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold" style={{ color: THEME.error }}>
-                    {errorList.length === 1
-                        ? "1 field needs attention"
-                        : `${errorList.length} fields need attention`}
-                </p>
-                <ul className="mt-1 space-y-0.5">
-                    {errorList.map((msg, i) => (
-                        <li key={i} className="text-xs" style={{ color: "rgba(239,68,68,0.8)" }}>
-                            {msg}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <button
-                onClick={onClose}
-                className="text-red-400 hover:text-red-600 text-lg font-bold leading-none mt-0.5"
-            >
-                ×
-            </button>
-        </motion.div>
-    );
-}
-
 /** ---------------- FIELD-LEVEL ERROR ---------------- */
 function FieldError({ error }) {
     if (!error) return null;
@@ -890,7 +846,7 @@ function WhyPartner() {
 }
 
 /** ---------------- FILE UPLOAD COMPONENTS ---------------- */
-function FileRow({ onProfileImageChange, onCvFileChange }) {
+function FileRow({ onProfileImageChange, onCvFileChange, profileImageError }) {
     const [profileImageName, setProfileImageName] = useState('');
     const [cvFileName, setCvFileName] = useState('');
 
@@ -912,14 +868,21 @@ function FileRow({ onProfileImageChange, onCvFileChange }) {
 
     return (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <FilePicker
-                label="Upload Professional Photo"
-                id="profile_image_upload"
-                fileName={profileImageName}
-                onChange={handleProfileImageChange}
-                accept="image/jpeg,image/png,image/jpg,image/gif"
-                maxSize="5MB"
-            />
+            <div>
+                <FilePicker
+                    label="Upload Professional Photo"
+                    id="profile_image_upload"
+                    fileName={profileImageName}
+                    onChange={handleProfileImageChange}
+                    accept="image/jpeg,image/png,image/jpg,image/gif"
+                    maxSize="5MB"
+                    required
+                    error={!!profileImageError}
+                />
+                <AnimatePresence>
+                    {profileImageError && <FieldError error={profileImageError} />}
+                </AnimatePresence>
+            </div>
             <FilePicker
                 label="Upload CV (PDF)"
                 id="cv_file_upload"
@@ -932,7 +895,7 @@ function FileRow({ onProfileImageChange, onCvFileChange }) {
     );
 }
 
-function FilePicker({ label, id, fileName, onChange, accept, maxSize }) {
+function FilePicker({ label, id, fileName, onChange, accept, maxSize, required, error }) {
     return (
         <div className="relative">
             <input
@@ -944,7 +907,11 @@ function FilePicker({ label, id, fileName, onChange, accept, maxSize }) {
             />
             <label
                 htmlFor={id}
-                className="group relative flex min-h-[132px] cursor-pointer flex-col items-start justify-between rounded-2xl bg-white/60 px-4 py-4 ring-1 ring-[#0B1220]/10 transition hover:ring-[#0B1220]/20"
+                className="group relative flex min-h-[132px] cursor-pointer flex-col items-start justify-between rounded-2xl px-4 py-4 ring-1 transition"
+                style={{
+                    background: error ? "rgba(239,68,68,0.04)" : "rgba(255,255,255,0.60)",
+                    borderColor: error ? "rgba(239,68,68,0.30)" : "rgba(11,18,32,0.10)",
+                }}
             >
                 <div className="flex items-start gap-3 w-full">
                     <span
@@ -954,17 +921,19 @@ function FilePicker({ label, id, fileName, onChange, accept, maxSize }) {
                             borderColor: "rgba(11,18,32,0.10)",
                         }}
                     >
-                        <Upload className="h-4 w-4" style={{ color: THEME.accent3 }} {...iconStrongProps} />
+                        <Upload className="h-4 w-4" style={{ color: error ? THEME.error : THEME.accent3 }} {...iconStrongProps} />
                     </span>
                     <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-[#0B1220]">{label}</div>
+                        <div className="text-sm font-semibold text-[#0B1220]">
+                            {label} {required && <span style={{ color: THEME.pink }}>*</span>}
+                        </div>
                         <div className="text-xs text-[#0B1220]/55">
                             {fileName ? (
                                 <span className="truncate block" title={fileName}>
                                     Selected: {fileName}
                                 </span>
                             ) : (
-                                `Optional - Max ${maxSize}`
+                                `${required ? "Required" : "Optional"} — Max ${maxSize}`
                             )}
                         </div>
                     </div>
@@ -1264,7 +1233,6 @@ function FormWizard() {
     const [step, setStep] = useState(0);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState(null);
     const [fieldErrors, setFieldErrors] = useState({});
     const [applicationId, setApplicationId] = useState(null);
 
@@ -1303,7 +1271,6 @@ function FormWizard() {
         delivery: "",
         travel: false,
         hasMaterial: "",
-        contentTypes: [],
         coDesign: true,
         ledProjects: true,
         projectsDesc: "",
@@ -1399,8 +1366,6 @@ function FormWizard() {
             errs.delivery = "Select a delivery preference";
         if (!expert.hasMaterial)
             errs.hasMaterial = "Indicate whether you have training material";
-        if (!expert.projectsDesc?.trim())
-            errs.projectsDesc = "Provide a short description of key projects";
         if (!expert.portfolio?.trim())
             errs.portfolio = "Portfolio or personal website URL is required";
         else if (!/^https?:\/\/.*\..*$/.test(expert.portfolio))
@@ -1423,34 +1388,8 @@ function FormWizard() {
         return errs;
     };
 
-    const validateCurrentStep = () => {
-        const key = steps[step].key;
-        let errs = {};
-        if (key === "basic") errs = validateBasic();
-        else if (key === "partnership") errs = validatePartnership();
-        else if (key === "expert") errs = validateExpert();
-        else if (key === "alignment") errs = validateAlignment();
-        setFieldErrors(errs);
-        if (Object.keys(errs).length > 0) {
-            // Build the errors object for the top-level ErrorDisplay
-            setErrors(errs);
-        }
-        return Object.keys(errs).length === 0;
-    };
-
-    /** Mark ALL fields in the current step as dirty so errors show immediately */
-    const touchAllForStep = (key) => {
-        const fieldMap = {
-            basic: ["basic.fullName","basic.email","basic.phone","basic.country","basic.orgName","basic.position","basic.linkedin","basic.website"],
-            partnership: ["partnership.collab","partnership.deliveryMode","partnership.participants","partnership.startTimeline"],
-            expert: ["expert.expertise","expert.engagement","expert.years","expert.roleType","expert.availability","expert.delivery","expert.hasMaterial","expert.projectsDesc","expert.portfolio","expert.compensation"],
-            alignment: ["alignment.confirm","alignment.contact","alignment.consent"],
-        };
-        // Not used with the simplified approach below — fieldErrors drives display directly
-    };
-
+    /** ---------------- NAVIGATION — block if errors ---------------- */
     function next() {
-        // Run validation — this populates fieldErrors immediately
         const key = steps[step].key;
         let errs = {};
         if (key === "basic") errs = validateBasic();
@@ -1458,21 +1397,22 @@ function FormWizard() {
         else if (key === "expert") errs = validateExpert();
         else if (key === "alignment") errs = validateAlignment();
 
-        setFieldErrors(errs);
-
         if (Object.keys(errs).length > 0) {
-            setErrors(errs);
+            setFieldErrors(errs);
+            // Scroll to first error
+            setTimeout(() => {
+                const firstError = document.querySelector('[data-error="true"]');
+                if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 50);
             return;
         }
 
-        setStep((s) => Math.min(steps.length - 1, s + 1));
-        setErrors(null);
         setFieldErrors({});
+        setStep((s) => Math.min(steps.length - 1, s + 1));
     }
 
     function back() {
         setStep((s) => Math.max(0, s - 1));
-        setErrors(null);
         setFieldErrors({});
     }
 
@@ -1483,11 +1423,10 @@ function FormWizard() {
         setPartnership({ collab: [], deliveryMode: "", participants: "", startTimeline: "", objectives: "" });
         setExpert({
             expertise: [], expertiseOther: "", years: "", organization: "", roleType: "", availability: "",
-            engagement: [], delivery: "", travel: false, hasMaterial: "", contentTypes: [], coDesign: true,
+            engagement: [], delivery: "", travel: false, hasMaterial: "", coDesign: true,
             ledProjects: true, projectsDesc: "", references: true, portfolio: "", scholar: "", compensation: "", longTerm: true,
         });
         setAlignment({ why: "", impact: "", confirm: false, contact: false, consent: false });
-        setErrors(null);
         setFieldErrors({});
         setApplicationId(null);
         setProfileImageFile(null);
@@ -1504,12 +1443,10 @@ function FormWizard() {
 
         if (Object.keys(allErrors).length > 0) {
             setFieldErrors(allErrors);
-            setErrors(allErrors);
             return;
         }
 
         setLoading(true);
-        setErrors(null);
 
         const formData = new FormData();
         formData.append('applicantType', applicantType);
@@ -1545,11 +1482,6 @@ function FormWizard() {
             formData.append('expert[delivery]', expert.delivery);
             formData.append('expert[travel]', expert.travel ? '1' : '0');
             formData.append('expert[hasMaterial]', expert.hasMaterial || '');
-            if (expert.contentTypes?.length) {
-                expert.contentTypes.forEach((item, index) => formData.append(`expert[contentTypes][${index}]`, item));
-            } else {
-                formData.append('expert[contentTypes]', JSON.stringify([]));
-            }
             formData.append('expert[coDesign]', expert.coDesign ? '1' : '0');
             formData.append('expert[ledProjects]', expert.ledProjects ? '1' : '0');
             formData.append('expert[projectsDesc]', expert.projectsDesc || '');
@@ -1587,16 +1519,7 @@ function FormWizard() {
             if (error.response) {
                 if (error.response.status === 422) {
                     setFieldErrors(error.response.data.errors || {});
-                    setErrors(error.response.data.errors || { form: 'Validation failed. Please review your entries.' });
-                } else if (error.response.status === 400) {
-                    setErrors({ form: error.response.data.message || 'Invalid request. Please check your entries.' });
-                } else {
-                    setErrors({ form: 'A server error occurred. Please try again in a moment.' });
                 }
-            } else if (error.request) {
-                setErrors({ form: 'Network error — please check your connection and try again.' });
-            } else {
-                setErrors({ form: 'An unexpected error occurred. Please try again.' });
             }
         } finally {
             setLoading(false);
@@ -1655,26 +1578,15 @@ function FormWizard() {
                         </div>
                     </div>
 
-                    {/* Error summary */}
-                    <AnimatePresence>
-                        {errors && Object.keys(errors).length > 0 && (
-                            <div className="mt-5">
-                                <ErrorDisplay errors={errors} onClose={() => setErrors(null)} />
-                            </div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Step tabs */}
+                    {/* Step indicators — display only, NOT clickable */}
                     <div className="mt-6 flex flex-wrap gap-2">
                         {steps.map((s, idx) => {
                             const active = idx === step;
                             const done = idx < step;
                             return (
-                                <button
+                                <div
                                     key={s.key}
-                                    type="button"
-                                    onClick={() => setStep(idx)}
-                                    className="rounded-full px-4 py-2 text-xs font-semibold ring-1 transition"
+                                    className="rounded-full px-4 py-2 text-xs font-semibold ring-1 select-none"
                                     style={{
                                         background: active
                                             ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.45)} 100%)`
@@ -1682,11 +1594,17 @@ function FormWizard() {
                                                 ? "rgba(52,211,153,0.14)"
                                                 : "rgba(11,18,32,0.06)",
                                         borderColor: active ? "rgba(11,18,32,0.10)" : "rgba(11,18,32,0.12)",
-                                        color: active ? "white" : "rgba(11,18,32,0.72)",
+                                        color: active ? "white" : done ? "rgba(52,211,153,0.9)" : "rgba(11,18,32,0.45)",
+                                        cursor: "default",
                                     }}
                                 >
-                                    {s.label}
-                                </button>
+                                    {done ? (
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <CheckCircle2 className="h-3 w-3" />
+                                            {s.label}
+                                        </span>
+                                    ) : s.label}
+                                </div>
                             );
                         })}
                     </div>
@@ -1738,8 +1656,12 @@ function FormWizard() {
                                                 iconColor={THEME.accent2}
                                                 placeholder="Your full name"
                                                 value={basic.fullName}
-                                                onChange={(e) => setBasic({ ...basic, fullName: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, fullName: e.target.value });
+                                                    if (fieldErrors.fullName) setFieldErrors(prev => ({ ...prev, fullName: null }));
+                                                }}
                                                 error={!!fieldErrors.fullName}
+                                                data-error={!!fieldErrors.fullName}
                                             />
                                         </Field>
 
@@ -1750,7 +1672,10 @@ function FormWizard() {
                                                 placeholder="name@email.com"
                                                 type="email"
                                                 value={basic.email}
-                                                onChange={(e) => setBasic({ ...basic, email: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, email: e.target.value });
+                                                    if (fieldErrors.email) setFieldErrors(prev => ({ ...prev, email: null }));
+                                                }}
                                                 error={!!fieldErrors.email}
                                             />
                                         </Field>
@@ -1761,7 +1686,10 @@ function FormWizard() {
                                                 iconColor={THEME.accent3}
                                                 placeholder="+(country code) ..."
                                                 value={basic.phone}
-                                                onChange={(e) => setBasic({ ...basic, phone: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, phone: e.target.value });
+                                                    if (fieldErrors.phone) setFieldErrors(prev => ({ ...prev, phone: null }));
+                                                }}
                                                 error={!!fieldErrors.phone}
                                             />
                                         </Field>
@@ -1772,7 +1700,10 @@ function FormWizard() {
                                                 iconColor={THEME.accent4}
                                                 placeholder="Country"
                                                 value={basic.country}
-                                                onChange={(e) => setBasic({ ...basic, country: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, country: e.target.value });
+                                                    if (fieldErrors.country) setFieldErrors(prev => ({ ...prev, country: null }));
+                                                }}
                                                 error={!!fieldErrors.country}
                                             />
                                         </Field>
@@ -1783,7 +1714,10 @@ function FormWizard() {
                                                 iconColor={THEME.accent}
                                                 placeholder={orgNamePlaceholder}
                                                 value={basic.orgName}
-                                                onChange={(e) => setBasic({ ...basic, orgName: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, orgName: e.target.value });
+                                                    if (fieldErrors.orgName) setFieldErrors(prev => ({ ...prev, orgName: null }));
+                                                }}
                                                 error={!!fieldErrors.orgName}
                                             />
                                         </Field>
@@ -1794,7 +1728,10 @@ function FormWizard() {
                                                 iconColor={THEME.accent3}
                                                 placeholder="Role / Title"
                                                 value={basic.position}
-                                                onChange={(e) => setBasic({ ...basic, position: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, position: e.target.value });
+                                                    if (fieldErrors.position) setFieldErrors(prev => ({ ...prev, position: null }));
+                                                }}
                                                 error={!!fieldErrors.position}
                                             />
                                         </Field>
@@ -1805,7 +1742,10 @@ function FormWizard() {
                                                 iconColor={THEME.accent2}
                                                 placeholder="https://linkedin.com/in/..."
                                                 value={basic.linkedin}
-                                                onChange={(e) => setBasic({ ...basic, linkedin: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, linkedin: e.target.value });
+                                                    if (fieldErrors.linkedin) setFieldErrors(prev => ({ ...prev, linkedin: null }));
+                                                }}
                                                 error={!!fieldErrors.linkedin}
                                             />
                                         </Field>
@@ -1816,7 +1756,10 @@ function FormWizard() {
                                                 iconColor={THEME.accent4}
                                                 placeholder="https://..."
                                                 value={basic.website}
-                                                onChange={(e) => setBasic({ ...basic, website: e.target.value })}
+                                                onChange={(e) => {
+                                                    setBasic({ ...basic, website: e.target.value });
+                                                    if (fieldErrors.website) setFieldErrors(prev => ({ ...prev, website: null }));
+                                                }}
                                                 error={!!fieldErrors.website}
                                             />
                                         </Field>
@@ -1843,7 +1786,10 @@ function FormWizard() {
                                         >
                                             <MultiSelect
                                                 value={partnership.collab}
-                                                onChange={(v) => setPartnership({ ...partnership, collab: v })}
+                                                onChange={(v) => {
+                                                    setPartnership({ ...partnership, collab: v });
+                                                    if (fieldErrors.collab) setFieldErrors(prev => ({ ...prev, collab: null }));
+                                                }}
                                                 error={!!fieldErrors.collab}
                                                 options={[
                                                     "Internship Programs (3–6 months)",
@@ -1862,7 +1808,10 @@ function FormWizard() {
                                         <Field label="Preferred delivery mode" required error={fieldErrors.deliveryMode || null}>
                                             <Select
                                                 value={partnership.deliveryMode}
-                                                onChange={(v) => setPartnership({ ...partnership, deliveryMode: v })}
+                                                onChange={(v) => {
+                                                    setPartnership({ ...partnership, deliveryMode: v });
+                                                    if (fieldErrors.deliveryMode) setFieldErrors(prev => ({ ...prev, deliveryMode: null }));
+                                                }}
                                                 options={["Online", "Hybrid", "Onsite"]}
                                                 icon={Compass}
                                                 iconColor={THEME.accent}
@@ -1873,7 +1822,10 @@ function FormWizard() {
                                         <Field label="Estimated number of participants" required error={fieldErrors.participants || null}>
                                             <Select
                                                 value={partnership.participants}
-                                                onChange={(v) => setPartnership({ ...partnership, participants: v })}
+                                                onChange={(v) => {
+                                                    setPartnership({ ...partnership, participants: v });
+                                                    if (fieldErrors.participants) setFieldErrors(prev => ({ ...prev, participants: null }));
+                                                }}
                                                 options={["10–25", "25–50", "50–100", "100+"]}
                                                 icon={Users}
                                                 iconColor={THEME.accent3}
@@ -1884,7 +1836,10 @@ function FormWizard() {
                                         <Field label="Expected start timeline" required error={fieldErrors.startTimeline || null}>
                                             <Select
                                                 value={partnership.startTimeline}
-                                                onChange={(v) => setPartnership({ ...partnership, startTimeline: v })}
+                                                onChange={(v) => {
+                                                    setPartnership({ ...partnership, startTimeline: v });
+                                                    if (fieldErrors.startTimeline) setFieldErrors(prev => ({ ...prev, startTimeline: null }));
+                                                }}
                                                 options={["Immediately", "Within 1 Month", "Within 3 Months", "Within 6 Months"]}
                                                 icon={Calendar}
                                                 iconColor={THEME.accent4}
@@ -1922,13 +1877,14 @@ function FormWizard() {
                                         >
                                             <MultiSelect
                                                 value={expert.expertise}
-                                                onChange={(v) =>
+                                                onChange={(v) => {
                                                     setExpert({
                                                         ...expert,
                                                         expertise: v,
                                                         expertiseOther: v.includes("Other (Specify)") ? expert.expertiseOther : "",
-                                                    })
-                                                }
+                                                    });
+                                                    if (fieldErrors.expertise) setFieldErrors(prev => ({ ...prev, expertise: null }));
+                                                }}
                                                 error={!!fieldErrors.expertise}
                                                 otherValue={expert.expertiseOther}
                                                 onOtherValueChange={(v) => setExpert({ ...expert, expertiseOther: v })}
@@ -1945,7 +1901,10 @@ function FormWizard() {
                                         <Field label="Years of professional experience" required error={fieldErrors.years || null}>
                                             <Select
                                                 value={expert.years}
-                                                onChange={(v) => setExpert({ ...expert, years: v })}
+                                                onChange={(v) => {
+                                                    setExpert({ ...expert, years: v });
+                                                    if (fieldErrors.years) setFieldErrors(prev => ({ ...prev, years: null }));
+                                                }}
                                                 options={["3–5", "5–10", "10–15", "15+"]}
                                                 icon={BadgeCheck}
                                                 iconColor={THEME.accent3}
@@ -1956,7 +1915,10 @@ function FormWizard() {
                                         <Field label="Role type" required error={fieldErrors.roleType || null}>
                                             <Select
                                                 value={expert.roleType}
-                                                onChange={(v) => setExpert({ ...expert, roleType: v })}
+                                                onChange={(v) => {
+                                                    setExpert({ ...expert, roleType: v });
+                                                    if (fieldErrors.roleType) setFieldErrors(prev => ({ ...prev, roleType: null }));
+                                                }}
                                                 options={["Industry Professional", "University Professor", "Consultant", "Executive", "Founder", "Other"]}
                                                 icon={Briefcase}
                                                 iconColor={THEME.accent4}
@@ -1967,7 +1929,10 @@ function FormWizard() {
                                         <Field label="Weekly availability (hours)" required error={fieldErrors.availability || null}>
                                             <Select
                                                 value={expert.availability}
-                                                onChange={(v) => setExpert({ ...expert, availability: v })}
+                                                onChange={(v) => {
+                                                    setExpert({ ...expert, availability: v });
+                                                    if (fieldErrors.availability) setFieldErrors(prev => ({ ...prev, availability: null }));
+                                                }}
                                                 options={["2–4 Hours", "4–8 Hours", "8–12 Hours", "12+ Hours"]}
                                                 icon={Calendar}
                                                 iconColor={THEME.accent2}
@@ -1984,7 +1949,10 @@ function FormWizard() {
                                         >
                                             <MultiSelect
                                                 value={expert.engagement}
-                                                onChange={(v) => setExpert({ ...expert, engagement: v })}
+                                                onChange={(v) => {
+                                                    setExpert({ ...expert, engagement: v });
+                                                    if (fieldErrors.engagement) setFieldErrors(prev => ({ ...prev, engagement: null }));
+                                                }}
                                                 error={!!fieldErrors.engagement}
                                                 options={[
                                                     "Internship Supervision", "1-to-1 Mentorship",
@@ -1997,7 +1965,10 @@ function FormWizard() {
                                         <Field label="Delivery preference" required error={fieldErrors.delivery || null}>
                                             <Select
                                                 value={expert.delivery}
-                                                onChange={(v) => setExpert({ ...expert, delivery: v })}
+                                                onChange={(v) => {
+                                                    setExpert({ ...expert, delivery: v });
+                                                    if (fieldErrors.delivery) setFieldErrors(prev => ({ ...prev, delivery: null }));
+                                                }}
                                                 options={["Online", "Hybrid", "Onsite (Europe)", "Onsite (MENA)"]}
                                                 icon={Compass}
                                                 iconColor={THEME.accent}
@@ -2008,7 +1979,10 @@ function FormWizard() {
                                         <Field label="Do you have existing training material?" required error={fieldErrors.hasMaterial || null}>
                                             <Select
                                                 value={expert.hasMaterial}
-                                                onChange={(v) => setExpert({ ...expert, hasMaterial: v })}
+                                                onChange={(v) => {
+                                                    setExpert({ ...expert, hasMaterial: v });
+                                                    if (fieldErrors.hasMaterial) setFieldErrors(prev => ({ ...prev, hasMaterial: null }));
+                                                }}
                                                 options={["Yes", "No", "Partially"]}
                                                 icon={FileCheck2}
                                                 iconColor={THEME.accent4}
@@ -2016,28 +1990,16 @@ function FormWizard() {
                                             />
                                         </Field>
 
-                                        <Field label="Type of content available" hint="Optional" className="sm:col-span-2">
-                                            <MultiSelect
-                                                value={expert.contentTypes}
-                                                onChange={(v) => setExpert({ ...expert, contentTypes: v })}
-                                                options={[
-                                                    "Course Curriculum", "Slides & Workshops", "Case Studies",
-                                                    "Real Industry Projects", "Recorded Sessions", "AI Labs / Technical Modules",
-                                                ]}
-                                            />
-                                        </Field>
-
+                                        {/* Key projects — NOT required */}
                                         <Field
                                             label="Key projects (short description)"
-                                            required
+                                            hint="Optional"
                                             className="sm:col-span-2"
-                                            error={fieldErrors.projectsDesc || null}
                                         >
                                             <Textarea
                                                 value={expert.projectsDesc}
                                                 onChange={(e) => setExpert({ ...expert, projectsDesc: e.target.value })}
-                                                placeholder="Short description of key projects"
-                                                error={!!fieldErrors.projectsDesc}
+                                                placeholder="Short description of key projects (optional)"
                                             />
                                         </Field>
 
@@ -2047,7 +2009,10 @@ function FormWizard() {
                                                 iconColor={THEME.accent3}
                                                 placeholder="https://..."
                                                 value={expert.portfolio}
-                                                onChange={(e) => setExpert({ ...expert, portfolio: e.target.value })}
+                                                onChange={(e) => {
+                                                    setExpert({ ...expert, portfolio: e.target.value });
+                                                    if (fieldErrors.portfolio) setFieldErrors(prev => ({ ...prev, portfolio: null }));
+                                                }}
                                                 error={!!fieldErrors.portfolio}
                                             />
                                         </Field>
@@ -2055,7 +2020,10 @@ function FormWizard() {
                                         <Field label="Preferred collaboration model" required error={fieldErrors.compensation || null}>
                                             <Select
                                                 value={expert.compensation}
-                                                onChange={(v) => setExpert({ ...expert, compensation: v })}
+                                                onChange={(v) => {
+                                                    setExpert({ ...expert, compensation: v });
+                                                    if (fieldErrors.compensation) setFieldErrors(prev => ({ ...prev, compensation: null }));
+                                                }}
                                                 options={["Per Program", "Per Hour"]}
                                                 icon={Handshake}
                                                 iconColor={THEME.accent4}
@@ -2067,11 +2035,14 @@ function FormWizard() {
                                             label="Uploads"
                                             required
                                             className="sm:col-span-2"
-                                            error={fieldErrors.profile_image || null}
                                         >
                                             <FileRow
-                                                onProfileImageChange={setProfileImageFile}
+                                                onProfileImageChange={(f) => {
+                                                    setProfileImageFile(f);
+                                                    if (fieldErrors.profile_image) setFieldErrors(prev => ({ ...prev, profile_image: null }));
+                                                }}
                                                 onCvFileChange={setCvFile}
+                                                profileImageError={fieldErrors.profile_image || null}
                                             />
                                         </Field>
                                     </div>
@@ -2109,7 +2080,10 @@ function FormWizard() {
                                         <Field label="Confirmation" required error={fieldErrors.confirm || null}>
                                             <Checkbox
                                                 checked={alignment.confirm}
-                                                onChange={(v) => setAlignment({ ...alignment, confirm: v })}
+                                                onChange={(v) => {
+                                                    setAlignment({ ...alignment, confirm: v });
+                                                    if (fieldErrors.confirm) setFieldErrors(prev => ({ ...prev, confirm: null }));
+                                                }}
                                                 label="I confirm the information provided is accurate."
                                                 error={!!fieldErrors.confirm}
                                             />
@@ -2118,7 +2092,10 @@ function FormWizard() {
                                         <Field label="Contact Agreement" required error={fieldErrors.contact || null}>
                                             <Checkbox
                                                 checked={alignment.contact}
-                                                onChange={(v) => setAlignment({ ...alignment, contact: v })}
+                                                onChange={(v) => {
+                                                    setAlignment({ ...alignment, contact: v });
+                                                    if (fieldErrors.contact) setFieldErrors(prev => ({ ...prev, contact: null }));
+                                                }}
                                                 label="I agree to be contacted regarding partnership opportunities."
                                                 error={!!fieldErrors.contact}
                                             />
@@ -2127,7 +2104,10 @@ function FormWizard() {
                                         <Field label="Data Processing Consent" required error={fieldErrors.consent || null}>
                                             <Checkbox
                                                 checked={alignment.consent}
-                                                onChange={(v) => setAlignment({ ...alignment, consent: v })}
+                                                onChange={(v) => {
+                                                    setAlignment({ ...alignment, consent: v });
+                                                    if (fieldErrors.consent) setFieldErrors(prev => ({ ...prev, consent: null }));
+                                                }}
                                                 label="I consent to data processing in accordance with the privacy policy."
                                                 error={!!fieldErrors.consent}
                                             />
