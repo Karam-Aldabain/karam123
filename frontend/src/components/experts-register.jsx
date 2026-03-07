@@ -120,6 +120,249 @@ const COUNTRIES = (() => {
   }
 })();
 
+const COUNTRY_PHONE_CODES = {
+  Afghanistan: "+93",
+  Albania: "+355",
+  Algeria: "+213",
+  Andorra: "+376",
+  Angola: "+244",
+  "Antigua and Barbuda": "+1",
+  Argentina: "+54",
+  Armenia: "+374",
+  Australia: "+61",
+  Austria: "+43",
+  Azerbaijan: "+994",
+  Bahamas: "+1",
+  Bahrain: "+973",
+  Bangladesh: "+880",
+  Barbados: "+1",
+  Belarus: "+375",
+  Belgium: "+32",
+  Belize: "+501",
+  Benin: "+229",
+  Bhutan: "+975",
+  Bolivia: "+591",
+  "Bosnia and Herzegovina": "+387",
+  Botswana: "+267",
+  Brazil: "+55",
+  Brunei: "+673",
+  Bulgaria: "+359",
+  "Burkina Faso": "+226",
+  Burundi: "+257",
+  "Cabo Verde": "+238",
+  Cambodia: "+855",
+  Cameroon: "+237",
+  Canada: "+1",
+  "Central African Republic": "+236",
+  Chad: "+235",
+  Chile: "+56",
+  China: "+86",
+  Colombia: "+57",
+  Comoros: "+269",
+  "Congo (Congo-Brazzaville)": "+242",
+  "Costa Rica": "+506",
+  Croatia: "+385",
+  Cuba: "+53",
+  Cyprus: "+357",
+  Czechia: "+420",
+  Denmark: "+45",
+  Djibouti: "+253",
+  Dominica: "+1",
+  "Dominican Republic": "+1",
+  Ecuador: "+593",
+  Egypt: "+20",
+  "El Salvador": "+503",
+  "Equatorial Guinea": "+240",
+  Eritrea: "+291",
+  Estonia: "+372",
+  Eswatini: "+268",
+  Ethiopia: "+251",
+  Fiji: "+679",
+  Finland: "+358",
+  France: "+33",
+  Gabon: "+241",
+  Gambia: "+220",
+  Georgia: "+995",
+  Germany: "+49",
+  Ghana: "+233",
+  Greece: "+30",
+  Grenada: "+1",
+  Guatemala: "+502",
+  Guinea: "+224",
+  "Guinea-Bissau": "+245",
+  Guyana: "+592",
+  Haiti: "+509",
+  Honduras: "+504",
+  Hungary: "+36",
+  Iceland: "+354",
+  India: "+91",
+  Indonesia: "+62",
+  Iran: "+98",
+  Iraq: "+964",
+  Ireland: "+353",
+  Israel: "+972",
+  Italy: "+39",
+  Jamaica: "+1",
+  Japan: "+81",
+  Jordan: "+962",
+  Kazakhstan: "+7",
+  Kenya: "+254",
+  Kiribati: "+686",
+  Kuwait: "+965",
+  Kyrgyzstan: "+996",
+  Laos: "+856",
+  Latvia: "+371",
+  Lebanon: "+961",
+  Lesotho: "+266",
+  Liberia: "+231",
+  Libya: "+218",
+  Liechtenstein: "+423",
+  Lithuania: "+370",
+  Luxembourg: "+352",
+  Madagascar: "+261",
+  Malawi: "+265",
+  Malaysia: "+60",
+  Maldives: "+960",
+  Mali: "+223",
+  Malta: "+356",
+  "Marshall Islands": "+692",
+  Mauritania: "+222",
+  Mauritius: "+230",
+  Mexico: "+52",
+  Micronesia: "+691",
+  Moldova: "+373",
+  Monaco: "+377",
+  Mongolia: "+976",
+  Montenegro: "+382",
+  Morocco: "+212",
+  Mozambique: "+258",
+  Myanmar: "+95",
+  Namibia: "+264",
+  Nauru: "+674",
+  Nepal: "+977",
+  Netherlands: "+31",
+  "New Zealand": "+64",
+  Nicaragua: "+505",
+  Niger: "+227",
+  Nigeria: "+234",
+  "North Korea": "+850",
+  "North Macedonia": "+389",
+  Norway: "+47",
+  Oman: "+968",
+  Pakistan: "+92",
+  Palau: "+680",
+  Palestine: "+970",
+  Panama: "+507",
+  "Papua New Guinea": "+675",
+  Paraguay: "+595",
+  Peru: "+51",
+  Philippines: "+63",
+  Poland: "+48",
+  Portugal: "+351",
+  Qatar: "+974",
+  Romania: "+40",
+  Russia: "+7",
+  Rwanda: "+250",
+  "Saint Kitts and Nevis": "+1",
+  "Saint Lucia": "+1",
+  "Saint Vincent and the Grenadines": "+1",
+  Samoa: "+685",
+  "San Marino": "+378",
+  "Sao Tome and Principe": "+239",
+  "Saudi Arabia": "+966",
+  Senegal: "+221",
+  Serbia: "+381",
+  Seychelles: "+248",
+  "Sierra Leone": "+232",
+  Singapore: "+65",
+  Slovakia: "+421",
+  Slovenia: "+386",
+  "Solomon Islands": "+677",
+  Somalia: "+252",
+  "South Africa": "+27",
+  "South Korea": "+82",
+  "South Sudan": "+211",
+  Spain: "+34",
+  "Sri Lanka": "+94",
+  Sudan: "+249",
+  Suriname: "+597",
+  Sweden: "+46",
+  Switzerland: "+41",
+  Syria: "+963",
+  Tajikistan: "+992",
+  Tanzania: "+255",
+  Thailand: "+66",
+  "Timor-Leste": "+670",
+  Togo: "+228",
+  Tonga: "+676",
+  "Trinidad and Tobago": "+1",
+  Tunisia: "+216",
+  Turkey: "+90",
+  Turkmenistan: "+993",
+  Tuvalu: "+688",
+  Uganda: "+256",
+  Ukraine: "+380",
+  "United Arab Emirates": "+971",
+  "United Kingdom": "+44",
+  "United States": "+1",
+  Uruguay: "+598",
+  Uzbekistan: "+998",
+  Vanuatu: "+678",
+  "Vatican City": "+379",
+  Venezuela: "+58",
+  Vietnam: "+84",
+  Yemen: "+967",
+  Zambia: "+260",
+  Zimbabwe: "+263",
+};
+
+const LINKEDIN_PARTIAL_PREFIXES = [
+  "",
+  "h",
+  "ht",
+  "htt",
+  "http",
+  "https",
+  "http:",
+  "https:",
+  "http:/",
+  "https:/",
+  "http://",
+  "https://",
+  "http://w",
+  "https://w",
+  "http://ww",
+  "https://ww",
+  "http://www",
+  "https://www",
+  "http://www.",
+  "https://www.",
+  "http://l",
+  "https://l",
+  "http://li",
+  "https://li",
+  "http://lin",
+  "https://lin",
+  "http://link",
+  "https://link",
+  "http://linkedin",
+  "https://linkedin",
+  "http://linkedin.",
+  "https://linkedin.",
+  "http://linkedin.c",
+  "https://linkedin.c",
+  "http://linkedin.co",
+  "https://linkedin.co",
+  "http://linkedin.com",
+  "https://linkedin.com",
+  "http://linkedin.com/",
+  "https://linkedin.com/",
+  "http://www.linkedin.com",
+  "https://www.linkedin.com",
+  "http://www.linkedin.com/",
+  "https://www.linkedin.com/",
+];
+
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -128,6 +371,35 @@ function isBlank(value) {
   if (typeof value === "string") return !value.trim();
   if (Array.isArray(value)) return value.length === 0;
   return !value;
+}
+
+function sanitizePhoneInput(value) {
+  const cleaned = value.replace(/[^\d+\s()-]/g, "");
+  const plusStripped = cleaned.replace(/\+/g, "");
+  return cleaned.startsWith("+") ? `+${plusStripped}` : plusStripped;
+}
+
+function sanitizeDigits(value) {
+  return value.replace(/\D/g, "");
+}
+
+function isOnlyCountryCode(phone, country) {
+  const code = COUNTRY_PHONE_CODES[country];
+  if (!code) return !phone.trim();
+  const normalized = phone.trim();
+  return normalized === code || normalized === `${code}`.trim();
+}
+
+function isAllowedLinkedInInput(value) {
+  const normalized = value.trim().toLowerCase();
+  if (LINKEDIN_PARTIAL_PREFIXES.includes(normalized)) return true;
+  if ("linkedin.com".startsWith(normalized)) return true;
+  if ("www.linkedin.com".startsWith(normalized)) return true;
+  return /^(https?:\/\/)?(www\.)?linkedin\.com\/.+/i.test(value.trim());
+}
+
+function isValidLinkedInUrl(value) {
+  return /^(https?:\/\/)?(www\.)?linkedin\.com\/.+/i.test(value.trim());
 }
 
 export default function ExpertsRegisterPage() {
@@ -199,6 +471,7 @@ export default function ExpertsRegisterPage() {
 
   const canContinue = useMemo(() => {
     if (step === 0) {
+      const linkedInValid = isValidLinkedInUrl(basic.linkedin);
       return Boolean(
         basic.fullName &&
           basic.email &&
@@ -206,7 +479,8 @@ export default function ExpertsRegisterPage() {
           basic.country &&
           basic.orgName &&
           basic.position &&
-          basic.linkedin
+          basic.linkedin &&
+          linkedInValid
       );
     }
     if (step === 1) {
@@ -262,7 +536,7 @@ export default function ExpertsRegisterPage() {
       errors.country = isBlank(basic.country);
       errors.orgName = isBlank(basic.orgName);
       errors.position = isBlank(basic.position);
-      errors.linkedin = isBlank(basic.linkedin);
+      errors.linkedin = isBlank(basic.linkedin) || !isValidLinkedInUrl(basic.linkedin);
     }
 
     if (step === 1) {
@@ -404,7 +678,16 @@ export default function ExpertsRegisterPage() {
                   <Input error={fieldErrors.email} type="email" spellCheck={false} icon={Mail} iconColor="#22D3EE" placeholder="ex: john.doe@email.com" value={basic.email} onChange={(e) => setBasic({ ...basic, email: e.target.value })} />
                 </Field>
                 <Field label="Phone Number" required error={fieldErrors.phone}>
-                  <Input error={fieldErrors.phone} icon={Phone} iconColor="#34D399" placeholder="ex: +49 151 23456789" value={basic.phone} onChange={(e) => setBasic({ ...basic, phone: e.target.value })} />
+                  <Input
+                    error={fieldErrors.phone}
+                    type="tel"
+                    inputMode="tel"
+                    icon={Phone}
+                    iconColor="#34D399"
+                    placeholder="ex: +49 151 23456789"
+                    value={basic.phone}
+                    onChange={(e) => setBasic({ ...basic, phone: sanitizePhoneInput(e.target.value) })}
+                  />
                 </Field>
                 <Field label="Country of Residence" required error={fieldErrors.country}>
                   <CountrySelect
@@ -412,7 +695,18 @@ export default function ExpertsRegisterPage() {
                     icon={MapPin}
                     iconColor="#F59E0B"
                     value={basic.country}
-                    onChange={(e) => setBasic({ ...basic, country: e.target.value })}
+                    onChange={(e) => {
+                      const country = e.target.value;
+                      const phoneCode = COUNTRY_PHONE_CODES[country];
+                      setBasic((prev) => ({
+                        ...prev,
+                        country,
+                        phone:
+                          !prev.phone.trim() || isOnlyCountryCode(prev.phone, prev.country)
+                            ? (phoneCode ? `${phoneCode} ` : "")
+                            : prev.phone,
+                      }));
+                    }}
                     options={COUNTRIES}
                   />
                 </Field>
@@ -422,8 +716,21 @@ export default function ExpertsRegisterPage() {
                 <Field label="Current Position / Title" required error={fieldErrors.position}>
                   <Input error={fieldErrors.position} icon={Briefcase} iconColor="#34D399" placeholder="ex: Senior Data Scientist" value={basic.position} onChange={(e) => setBasic({ ...basic, position: e.target.value })} />
                 </Field>
-                <Field label="LinkedIn Profile URL" required error={fieldErrors.linkedin}>
-                  <Input error={fieldErrors.linkedin} type="url" spellCheck={false} icon={LinkIcon} iconColor="#A78BFA" placeholder="ex: https://linkedin.com/in/johndoe" value={basic.linkedin} onChange={(e) => setBasic({ ...basic, linkedin: e.target.value })} />
+                <Field label="LinkedIn Profile URL" required error={fieldErrors.linkedin} errorMessage="Enter a valid LinkedIn URL.">
+                  <Input
+                    error={fieldErrors.linkedin}
+                    type="url"
+                    spellCheck={false}
+                    icon={LinkIcon}
+                    iconColor="#A78BFA"
+                    placeholder="ex: https://linkedin.com/in/johndoe"
+                    value={basic.linkedin}
+                    onChange={(e) => {
+                      const nextValue = e.target.value;
+                      if (!isAllowedLinkedInInput(nextValue)) return;
+                      setBasic({ ...basic, linkedin: nextValue });
+                    }}
+                  />
                 </Field>
                 <Field label="Company / University Website">
                   <Input type="url" spellCheck={false} icon={Globe2} iconColor="#F59E0B" placeholder="ex: https://example.org" value={basic.website} onChange={(e) => setBasic({ ...basic, website: e.target.value })} />
@@ -619,41 +926,45 @@ export default function ExpertsRegisterPage() {
                     <Field label="Program duration (weeks)" required error={fieldErrors.durationWeeks}>
                       <Input
                         error={fieldErrors.durationWeeks}
+                        inputMode="numeric"
                         icon={Clock3}
                         iconColor="#34D399"
                         placeholder="e.g. 8"
                         value={pricing.durationWeeks}
-                        onChange={(e) => setPricing({ ...pricing, durationWeeks: e.target.value })}
+                        onChange={(e) => setPricing({ ...pricing, durationWeeks: sanitizeDigits(e.target.value) })}
                       />
                     </Field>
                     <Field label="Total hours" required error={fieldErrors.totalHours}>
                       <Input
                         error={fieldErrors.totalHours}
+                        inputMode="numeric"
                         icon={Clock3}
                         iconColor="#34D399"
                         placeholder="e.g. 40"
                         value={pricing.totalHours}
-                        onChange={(e) => setPricing({ ...pricing, totalHours: e.target.value })}
+                        onChange={(e) => setPricing({ ...pricing, totalHours: sanitizeDigits(e.target.value) })}
                       />
                     </Field>
                     <Field label="Hours per session" required error={fieldErrors.hoursPerSession}>
                       <Input
                         error={fieldErrors.hoursPerSession}
+                        inputMode="numeric"
                         icon={Clock3}
                         iconColor="#34D399"
                         placeholder="e.g. 2"
                         value={pricing.hoursPerSession}
-                        onChange={(e) => setPricing({ ...pricing, hoursPerSession: e.target.value })}
+                        onChange={(e) => setPricing({ ...pricing, hoursPerSession: sanitizeDigits(e.target.value) })}
                       />
                     </Field>
                     <Field label="Number of sessions" required error={fieldErrors.numberOfSessions}>
                       <Input
                         error={fieldErrors.numberOfSessions}
+                        inputMode="numeric"
                         icon={Clock3}
                         iconColor="#34D399"
                         placeholder="e.g. 20"
                         value={pricing.numberOfSessions}
-                        onChange={(e) => setPricing({ ...pricing, numberOfSessions: e.target.value })}
+                        onChange={(e) => setPricing({ ...pricing, numberOfSessions: sanitizeDigits(e.target.value) })}
                       />
                     </Field>
                     <Field label="Delivery type" required error={fieldErrors.deliveryType}>
