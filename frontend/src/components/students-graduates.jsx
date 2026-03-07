@@ -2144,18 +2144,11 @@ function ApplyFlowModal({
                       {method === "Stripe" ? (
                         <div className="mt-4 space-y-3">
                           <div className="flex flex-wrap gap-2">
-                            {[
-                              { label: "VISA", bg: "#1434CB", text: "#FFFFFF" },
-                              { label: "Mastercard", bg: "#111827", text: "#FFFFFF" },
-                              { label: "AmEx", bg: "#2E77BC", text: "#FFFFFF" },
-                            ].map((brand) => (
-                              <span
-                                key={brand.label}
-                                className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ring-1 ring-[#0B1220]/10"
-                                style={{ background: brand.bg, color: brand.text }}
-                              >
-                                {brand.label}
-                              </span>
+                            {["visa", "mastercard", "amex"].map((brand) => (
+                              <PaymentBrandBadge
+                                key={brand}
+                                brand={brand}
+                              />
                             ))}
                           </div>
                           <Input
@@ -2544,6 +2537,58 @@ function Input({ icon, iconColor = THEME.accent, className, ...props }) {
         )}
       />
     </div>
+  );
+}
+
+function PaymentBrandLogo({ brand }) {
+  if (brand === "visa") {
+    return (
+      <svg viewBox="0 0 64 24" aria-label="Visa" className="h-5 w-auto" role="img">
+        <rect width="64" height="24" rx="12" fill="#FFFFFF" />
+        <text
+          x="32"
+          y="15.5"
+          textAnchor="middle"
+          fontSize="12"
+          fontWeight="900"
+          letterSpacing="-0.6"
+          fill="#1434CB"
+          fontStyle="italic"
+          fontFamily="Arial, sans-serif"
+        >
+          VISA
+        </text>
+      </svg>
+    );
+  }
+
+  if (brand === "mastercard") {
+    return (
+      <svg viewBox="0 0 72 24" aria-label="Mastercard" className="h-5 w-auto" role="img">
+        <rect width="72" height="24" rx="12" fill="#FFFFFF" />
+        <circle cx="28" cy="12" r="7" fill="#EB001B" />
+        <circle cx="38" cy="12" r="7" fill="#F79E1B" />
+        <path d="M33 6.8C34.5 8.1 35.4 9.9 35.4 12C35.4 14.1 34.5 15.9 33 17.2C31.5 15.9 30.6 14.1 30.6 12C30.6 9.9 31.5 8.1 33 6.8Z" fill="#FF5F00" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 88 24" aria-label="American Express" className="h-5 w-auto" role="img">
+      <rect width="88" height="24" rx="5" fill="#006FCF" />
+      <rect x="2" y="2" width="84" height="20" rx="4" fill="#2E77BC" />
+      <text x="44" y="15" textAnchor="middle" fontSize="8.4" fontWeight="700" fill="#FFFFFF" fontFamily="Arial, sans-serif">
+        AMERICAN EXPRESS
+      </text>
+    </svg>
+  );
+}
+
+function PaymentBrandBadge({ brand }) {
+  return (
+    <span className="inline-flex items-center rounded-xl border border-[#0B1220]/10 bg-white px-2.5 py-1.5 shadow-[0_6px_18px_rgba(11,18,32,0.08)]">
+      <PaymentBrandLogo brand={brand} />
+    </span>
   );
 }
 

@@ -268,6 +268,7 @@ function FancyButton({ href, children }) {
 
 export default function ExpertsValuePropositionPage() {
   const [openFaq, setOpenFaq] = useState(null);
+  const [showAllFaq, setShowAllFaq] = useState(false);
 
   // Same palette (unchanged), but now used as gradients for cohesive icon styling
   const gradients = [
@@ -463,30 +464,50 @@ export default function ExpertsValuePropositionPage() {
             <Card className="p-6" tone="light">
               <h3 className="text-lg font-semibold text-[#0B1220]">FAQ</h3>
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-                {FAQ.map((item, idx) => (
+                {(showAllFaq ? FAQ : FAQ.slice(0, 5)).map((item, idx) => {
+                  const actualIndex = showAllFaq ? idx : idx;
+                  return (
                   <article key={item.q} className="overflow-hidden rounded-2xl bg-white/60 ring-1 ring-[#0B1220]/10">
                     <button
                       type="button"
-                      onClick={() => setOpenFaq((current) => (current === idx ? null : idx))}
+                      onClick={() => setOpenFaq((current) => (current === actualIndex ? null : actualIndex))}
                       className="flex w-full items-center justify-between gap-3 p-4 text-left"
-                      aria-expanded={openFaq === idx}
+                      aria-expanded={openFaq === actualIndex}
                     >
                       <span className="text-sm font-semibold text-[#0B1220]/90">{item.q}</span>
                       <ChevronDown
                         className={cn(
                           "h-4 w-4 shrink-0 text-[#0B1220]/65 transition-transform duration-200",
-                          openFaq === idx ? "rotate-180" : ""
+                          openFaq === actualIndex ? "rotate-180" : ""
                         )}
                       />
                     </button>
-                    {openFaq === idx ? (
+                    {openFaq === actualIndex ? (
                       <div className="border-t border-[#0B1220]/10 px-4 py-3">
                         <p className="text-sm text-[#0B1220]/72">{item.a}</p>
                       </div>
                     ) : null}
                   </article>
-                ))}
+                  );
+                })}
               </div>
+              {FAQ.length > 5 ? (
+                <div className="mt-5 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowAllFaq((current) => !current)}
+                    className="inline-flex items-center gap-2 rounded-full bg-white/70 px-5 py-2 text-sm font-semibold text-[#0B1220] ring-1 ring-[#0B1220]/10 transition hover:bg-white"
+                  >
+                    {showAllFaq ? "Show less" : "More"}
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        showAllFaq ? "rotate-180" : ""
+                      )}
+                    />
+                  </button>
+                </div>
+              ) : null}
             </Card>
           </div>
 
