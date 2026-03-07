@@ -736,7 +736,7 @@ function ReachMap() {
               </svg>
 
               {/* legend */}
-              <div className="absolute left-3 bottom-3 sm:left-4 sm:bottom-4">
+              <div className="px-3 pb-3 pt-1 sm:absolute sm:left-4 sm:bottom-4 sm:p-0">
                 <div className="flex flex-col gap-2">
                   {points.map((p) => (
                     <div
@@ -1248,7 +1248,6 @@ function FormWizard() {
                         "University / Educational Institution",
                         "Company / Organization",
                         "Government / Public Sector",
-                        "Industry Expert / University Professor",
                       ]}
                     />
                  
