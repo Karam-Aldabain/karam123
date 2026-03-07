@@ -366,8 +366,6 @@ export default function ExpertsValuePropositionPage() {
       {/* BODY */}
       <section className="px-5 py-12">
         <div className="mx-auto max-w-6xl">
-          <Divider />
-
           <SectionHeader
             title="Program Types Experts Can Create"
             tone="light"
