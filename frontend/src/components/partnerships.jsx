@@ -78,6 +78,15 @@ function clampStyle(lines) {
     };
 }
 
+function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("Failed to read file."));
+        reader.readAsDataURL(file);
+    });
+}
+
 /** ---------------- VIEWPORT HOOK ---------------- */
 function useInViewOnce(threshold = 0.2) {
     const ref = useRef(null);
@@ -86,6 +95,7 @@ function useInViewOnce(threshold = 0.2) {
     useEffect(() => {
         const el = ref.current;
         if (!el) return;
+
         const obs = new IntersectionObserver(
             (entries) => {
                 for (const e of entries) {
@@ -98,6 +108,7 @@ function useInViewOnce(threshold = 0.2) {
             },
             { threshold }
         );
+
         obs.observe(el);
         return () => obs.disconnect();
     }, [threshold]);
@@ -115,12 +126,14 @@ function AnimatedNumber({ value, suffix = "", durationMs = 900 }) {
         let raf = 0;
         const start = performance.now();
         const from = 0;
+
         const tick = (t) => {
             const p = Math.min(1, (t - start) / durationMs);
             const eased = 1 - Math.pow(1 - p, 3);
             setN(Math.round(from + (value - from) * eased));
             if (p < 1) raf = requestAnimationFrame(tick);
         };
+
         raf = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(raf);
     }, [value, durationMs, reduce]);
@@ -179,6 +192,7 @@ function SectionTitle({ eyebrow, title, accentText, subtitle, dark = false }) {
                     <span>{eyebrow}</span>
                 </div>
             ) : null}
+
             <h2
                 className={cx(
                     eyebrow ? "mt-5 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl" : "mt-0 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl",
@@ -190,6 +204,7 @@ function SectionTitle({ eyebrow, title, accentText, subtitle, dark = false }) {
                     <span style={{ color: THEME.pink }}>{accentText}</span>
                 ) : null}
             </h2>
+
             {subtitle ? (
                 <p
                     className={cx(
@@ -217,7 +232,9 @@ function MagneticButton({ children, href, onClick, variant = "primary" }) {
         "bg-transparent text-white ring-1 ring-white/20 hover:bg-white/5";
 
     const stylePrimary = {
-        background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.84)} 55%, ${accent(0.60)} 120%)`,
+        background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.84)} 55%, ${accent(
+            0.60
+        )} 120%)`,
     };
 
     const Comp = href ? "a" : "button";
@@ -461,13 +478,16 @@ function ArchitectureCard({ item, index }) {
                     }}
                 />
             </div>
+
             <div
                 className="absolute inset-x-0 top-0 h-1 opacity-90"
                 style={{ background: `linear-gradient(90deg, ${item.accent} 0%, rgba(255,255,255,0) 80%)` }}
             />
+
             <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="shine" />
             </div>
+
             <div className="relative p-6 sm:p-7">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
@@ -480,6 +500,7 @@ function ArchitectureCard({ item, index }) {
                                 style={{ background: item.accent, boxShadow: `0 0 0 6px rgba(255,255,255,0.06)` }}
                             />
                         </motion.div>
+
                         <div>
                             <div className="text-lg font-semibold text-white" style={clampStyle(2)}>
                                 {item.title}
@@ -487,9 +508,11 @@ function ArchitectureCard({ item, index }) {
                         </div>
                     </div>
                 </div>
+
                 <p className="mt-4 text-sm leading-relaxed text-white/70" style={clampStyle(3)}>
                     {item.desc}
                 </p>
+
                 <div className="mt-5 grid grid-cols-1 gap-2">
                     {item.bullets.slice(0, 5).map((b) => (
                         <div key={b} className="flex items-start gap-3">
@@ -537,22 +560,26 @@ function PortraitTile({ p, idx }) {
                     }}
                 />
             </div>
+
             <div
                 className="absolute inset-x-0 top-0 h-1 opacity-90"
                 style={{ background: `linear-gradient(90deg, ${p.accent} 0%, rgba(255,255,255,0) 80%)` }}
             />
+
             <div className="relative p-6">
                 <div className="flex items-start justify-between gap-3">
                     <div>
                         <div className="text-base font-semibold text-white">{p.name}</div>
                         <div className="mt-1 text-sm text-white/70">{p.role}</div>
                     </div>
+
                     <div className="hidden sm:block">
                         <IconBadge color={p.accent}>
                             <BadgeCheck className="h-5 w-5" {...iconStrongProps} />
                         </IconBadge>
                     </div>
                 </div>
+
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     whileHover={{ opacity: 1, y: 0 }}
@@ -596,16 +623,22 @@ function ReachMap() {
         <div
             className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
             style={{
-                background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
+                background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
                 boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
             }}
         >
             <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.14)" }} />
             <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(167,139,250,0.12)" }} />
+
             <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(180deg, rgba(11,18,32,0.55) 0%, rgba(11,18,32,0.82) 100%)" }}
+                style={{
+                    background:
+                        "linear-gradient(180deg, rgba(11,18,32,0.55) 0%, rgba(11,18,32,0.82) 100%)",
+                }}
             />
+
             <div className="relative p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-4">
                     <div>
@@ -618,6 +651,7 @@ function ReachMap() {
                         </p>
                     </div>
                 </div>
+
                 <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-5">
                     <div className="lg:col-span-3">
                         <div className="relative overflow-hidden rounded-[32px] ring-1 ring-white/10 bg-white/5 backdrop-blur">
@@ -635,7 +669,9 @@ function ReachMap() {
                                         <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
                                     </linearGradient>
                                 </defs>
+
                                 <rect x="0" y="0" width="100" height="70" fill="url(#ocean)" />
+
                                 <g transform="translate(0,-8)">
                                     <path
                                         d="M20,50 C27,33 36,21 50,18 C58,16 64,20 69,25 C75,30 82,30 84,37 C86,47 78,55 64,60 C49,65 32,62 20,50 Z"
@@ -643,6 +679,7 @@ function ReachMap() {
                                         stroke="rgba(255,255,255,0.10)"
                                         strokeWidth="0.5"
                                     />
+
                                     {paths.map((p, i) => {
                                         const a = byId[p.from];
                                         const b = byId[p.to];
@@ -665,6 +702,7 @@ function ReachMap() {
                                             />
                                         );
                                     })}
+
                                     {points.map((pt, i) => (
                                         <g key={pt.id}>
                                             <motion.circle
@@ -694,6 +732,7 @@ function ReachMap() {
                                     ))}
                                 </g>
                             </svg>
+
                             <div className="absolute left-3 bottom-3 sm:left-4 sm:bottom-4">
                                 <div className="flex flex-col gap-2">
                                     {points.map((p) => (
@@ -716,6 +755,7 @@ function ReachMap() {
                             </div>
                         </div>
                     </div>
+
                     <div className="lg:col-span-2 space-y-3">
                         {[
                             { icon: GraduationCap, title: "European professors", desc: "Outcome-first academic integration.", color: THEME.accent2 },
@@ -759,12 +799,14 @@ function MetricsStrip() {
             <div
                 className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
                 style={{
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
+                    background:
+                        "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
                     boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
                 }}
             >
                 <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(245,158,11,0.10)" }} />
                 <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.12)" }} />
+
                 <div className="relative p-6 sm:p-8">
                     <div className="flex items-center justify-between gap-4">
                         <div>
@@ -772,6 +814,7 @@ function MetricsStrip() {
                             <div className="mt-2 text-2xl font-semibold text-white">Measured outcomes — not theoretical engagement</div>
                         </div>
                     </div>
+
                     <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
                         {IMPACT_METRICS.map((m, idx) => {
                             const Icon = m.icon;
@@ -817,6 +860,7 @@ function WhyPartner() {
                         <div className="mt-1 text-lg font-semibold text-[#0B1220]">Why Institutions Choose Praktix</div>
                     </div>
                 </div>
+
                 <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {WHY_PARTNER.map((b, i) => (
                         <motion.div
@@ -960,6 +1004,7 @@ function FilePicker({ label, id, fileName, onChange, accept, maxSize, required, 
 function FormCard({ title, icon, tone = "light", children }) {
     const isDark = tone === "dark";
     const isGrad = tone === "gradient";
+
     return (
         <div
             className={cx("relative overflow-hidden rounded-[36px] p-7 ring-1")}
@@ -981,6 +1026,7 @@ function FormCard({ title, icon, tone = "light", children }) {
                     }}
                 />
             ) : null}
+
             <div className="relative">
                 <div className="flex items-center gap-3">
                     <div
@@ -1002,10 +1048,15 @@ function FormCard({ title, icon, tone = "light", children }) {
                         </div>
                     </div>
                 </div>
+
                 <div className={cx("mt-6", isGrad || isDark ? "text-white" : "text-[#0B1220]")}>{children}</div>
             </div>
         </div>
     );
+}
+
+function RocketIcon() {
+    return <Zap className="h-5 w-5" {...iconStrongProps} />;
 }
 
 function MiniKV({ k, v }) {
@@ -1228,7 +1279,7 @@ function MultiSelect({
     );
 }
 
-/** ---------------- MULTI-STEP FORM WITH VALIDATION ---------------- */
+/** ---------------- MULTI-STEP FORM WITH API INTEGRATION ---------------- */
 function FormWizard() {
     const [step, setStep] = useState(0);
     const [submitted, setSubmitted] = useState(false);
@@ -1399,7 +1450,6 @@ function FormWizard() {
 
         if (Object.keys(errs).length > 0) {
             setFieldErrors(errs);
-            // Scroll to first error
             setTimeout(() => {
                 const firstError = document.querySelector('[data-error="true"]');
                 if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1578,15 +1628,36 @@ function FormWizard() {
                         </div>
                     </div>
 
-                    {/* Step indicators — display only, NOT clickable */}
+                    {/* Step indicators */}
                     <div className="mt-6 flex flex-wrap gap-2">
                         {steps.map((s, idx) => {
                             const active = idx === step;
                             const done = idx < step;
                             return (
-                                <div
+                                <button
                                     key={s.key}
-                                    className="rounded-full px-4 py-2 text-xs font-semibold ring-1 select-none"
+                                    type="button"
+                                    onClick={() => {
+                                        if (idx <= step) {
+                                            setStep(idx);
+                                            setFieldErrors({});
+                                            return;
+                                        }
+                                        const key = steps[step].key;
+                                        let errs = {};
+                                        if (key === "basic") errs = validateBasic();
+                                        else if (key === "partnership") errs = validatePartnership();
+                                        else if (key === "expert") errs = validateExpert();
+                                        else if (key === "alignment") errs = validateAlignment();
+
+                                        if (Object.keys(errs).length > 0) {
+                                            setFieldErrors(errs);
+                                            return;
+                                        }
+                                        setFieldErrors({});
+                                        setStep(idx);
+                                    }}
+                                    className="rounded-full px-4 py-2 text-xs font-semibold ring-1 transition"
                                     style={{
                                         background: active
                                             ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.45)} 100%)`
@@ -1595,7 +1666,6 @@ function FormWizard() {
                                                 : "rgba(11,18,32,0.06)",
                                         borderColor: active ? "rgba(11,18,32,0.10)" : "rgba(11,18,32,0.12)",
                                         color: active ? "white" : done ? "rgba(52,211,153,0.9)" : "rgba(11,18,32,0.45)",
-                                        cursor: "default",
                                     }}
                                 >
                                     {done ? (
@@ -1604,7 +1674,7 @@ function FormWizard() {
                                             {s.label}
                                         </span>
                                     ) : s.label}
-                                </div>
+                                </button>
                             );
                         })}
                     </div>
@@ -1990,10 +2060,8 @@ function FormWizard() {
                                             />
                                         </Field>
 
-                                        {/* Key projects — NOT required */}
                                         <Field
                                             label="Key projects (short description)"
-                                            hint="Optional"
                                             className="sm:col-span-2"
                                         >
                                             <Textarea

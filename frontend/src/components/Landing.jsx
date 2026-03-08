@@ -25,7 +25,7 @@ import {
 import apiClient from "../api/api.tsx";
 
 /* -----------------------------------------------------------
-   CONFIG (unchanged)
+   CONFIG (merged from both versions)
 ----------------------------------------------------------- */
 
 const COLORS = {
@@ -40,7 +40,6 @@ const HERO_VISUAL_MODE = "formation"; // "formation" | "core" | "grid"
 /**
  * Paper grain (no extra assets):
  * Uses SVG feTurbulence for a natural paper-like grain.
- * Safe to keep inline, and you can tune opacity in the background layers.
  */
 const PAPER_GRAIN_DATA_URI =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E";
@@ -51,7 +50,7 @@ const IMAGES = {
     solution3: "/landing-mentorship.png",
     solution4: "/life.jpg",
     solution5: "/landing-universities-companies.png",
-    about: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+    about: "/about-praktix-karam.jpg", // Updated from Unsplash
 };
 
 const SOLUTIONS = [
@@ -547,10 +546,6 @@ function LearningHeroLikeRef({
                     <p className="max-w-[60ch] text-base font-medium leading-relaxed text-white/78 sm:text-lg">
                         Built to turn potential into measurable performance.
                     </p>
-
-                    <div className="mt-8">
-
-                    </div>
                 </div>
 
                 <div className="relative mx-auto w-full max-w-[560px]">
@@ -1538,7 +1533,7 @@ function ExpertCard({ person }) {
     const toggle = () => setFlipped((v) => !v);
 
     const ORANGE = "#FF6A00";
-    const BACK_TOP = "#0B3C46";
+    const BACK_TOP = "#0B3C46"; // Updated to match second version
     const BACK_BOTTOM = "#071F26";
 
     // Add cache-busting parameter to force reload
@@ -1628,7 +1623,7 @@ function ExpertCard({ person }) {
                     </div>
                 </div>
 
-                {/* BACK - similar updates needed */}
+                {/* BACK - updated to match second version */}
                 <div
                     className="absolute inset-0 rounded-[30px] border border-white/10 p-6 sm:p-7"
                     style={{
@@ -1735,10 +1730,9 @@ export default function LandingPage() {
     const [pulseKey, setPulseKey] = useState(0);
     const [expertIndex, setExpertIndex] = useState(0);
     const [expertVisible, setExpertVisible] = useState(4);
+    const [journeyIndex, setJourneyIndex] = useState(0); // Added from second version
 
     // ── APPROVED EXPERTS STATE ──────────────────────────────────────────────────
-    // `experts` starts as an empty array; we populate it from the API.
-    // While loading we show skeletons; on error we show nothing gracefully.
     const [experts, setExperts] = useState([]);
     const [expertsLoading, setExpertsLoading] = useState(true);
     const [expertsError, setExpertsError] = useState(null);
@@ -1750,8 +1744,6 @@ export default function LandingPage() {
             try {
                 setExpertsLoading(true);
                 setExpertsError(null);
-                // Uses the same apiClient instance as PartnershipsPage so base URL,
-                // CSRF headers, etc. are consistent across the app.
                 const response = await apiClient.get("/experts/approved");
                 if (!cancelled) {
                     setExperts(response.data?.data ?? []);
@@ -1759,7 +1751,6 @@ export default function LandingPage() {
             } catch (err) {
                 if (!cancelled) {
                     setExpertsError("Unable to load experts at this time.");
-                    // Leave experts as [] so the section is simply hidden when empty.
                 }
             } finally {
                 if (!cancelled) {
@@ -1824,6 +1815,16 @@ export default function LandingPage() {
     };
     const goExpertRight = () => {
         setExpertIndex((prev) => (prev >= expertMaxStart ? 0 : prev + 1));
+    };
+
+    // Journey navigation (from second version)
+    const journeyImages = ["/apply.webp", "/projects.png", "/kkk.png", "/lunch.png"];
+    const journeyCount = HOW_IT_WORKS.length;
+    const goJourneyPrev = () => {
+        setJourneyIndex((prev) => (prev <= 0 ? journeyCount - 1 : prev - 1));
+    };
+    const goJourneyNext = () => {
+        setJourneyIndex((prev) => (prev >= journeyCount - 1 ? 0 : prev + 1));
     };
 
     const SUCCESS_STORIES = useMemo(
@@ -2374,12 +2375,24 @@ export default function LandingPage() {
                                         </div>
                                     </div>
                                 </MotionItem>
+
+                                {/* Added "Start as Expert" button from second version */}
+                                <MotionItem>
+                                    <div className="mt-10 flex justify-center">
+                                        <a
+                                            href="/experts/value-proposition"
+                                            className="inline-flex items-center gap-2 rounded-full border border-[rgba(197,31,93,0.45)] bg-[linear-gradient(135deg,rgba(197,31,93,1),rgba(165,22,78,1))] px-7 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(197,31,93,0.35)] transition hover:brightness-105"
+                                        >
+                                            Start as Expert
+                                        </a>
+                                    </div>
+                                </MotionItem>
                             </MotionSection>
                         </div>
                     </section>
                 )}
 
-                {/* JOURNEY */}
+                {/* JOURNEY - updated with mobile carousel from second version */}
                 <section className="relative pt-20 pb-16 sm:pb-20" id="journey" style={sandSectionVars}>
                     <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(233,231,223,1),rgba(233,231,223,0.96))]" />
                     <div className="mx-auto max-w-6xl px-4">
@@ -2393,7 +2406,107 @@ export default function LandingPage() {
                             </MotionItem>
 
                             <MotionItem>
-                                <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-2">
+                                {/* Mobile carousel (from second version) */}
+                                <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-2 sm:hidden">
+                                    {(() => {
+                                        const s = HOW_IT_WORKS[journeyIndex];
+                                        return (
+                                            <motion.div
+                                                key={s.title}
+                                                initial={reduce ? false : { opacity: 0, y: 10 }}
+                                                animate={reduce ? {} : { opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.35 }}
+                                                className="relative h-full overflow-hidden rounded-[26px] border border-[color:var(--journeyBorder)] bg-[color:var(--journeyBg)]"
+                                                style={{ boxShadow: "var(--journeyShadow)" }}
+                                            >
+                                                <div
+                                                    className="pointer-events-none absolute inset-0"
+                                                    style={{ background: "var(--journeyGlow)" }}
+                                                />
+                                                <div className="relative grid items-center gap-6 p-6">
+                                                    <div>
+                                                        <div className="flex items-center gap-3">
+                                                        <span
+                                                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold"
+                                                            style={{
+                                                                background: "var(--journeyBadgeBg)",
+                                                                color: "var(--journeyBadgeText)",
+                                                                border: "1px solid var(--journeyBadgeBorder)",
+                                                            }}
+                                                        >
+                                                            {String(journeyIndex + 1).padStart(2, "0")}
+                                                        </span>
+                                                            <div className="text-base font-semibold text-[color:var(--text)]">
+                                                                {s.title}
+                                                            </div>
+                                                        </div>
+
+                                                        <p className="mt-3 max-w-[55ch] text-sm font-medium leading-relaxed text-[color:var(--muted)]">
+                                                            {s.desc}
+                                                        </p>
+                                                    </div>
+
+                                                    <div
+                                                        className="overflow-hidden rounded-[18px]"
+                                                        style={{
+                                                            border: "1px solid var(--journeyImgBorder)",
+                                                            boxShadow: "var(--journeyImgShadow)",
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={journeyImages[journeyIndex]}
+                                                            alt={s.title}
+                                                            className={[
+                                                                "h-[170px] w-full",
+                                                                journeyIndex === 2 ? "object-contain bg-white" : "object-cover",
+                                                            ].join(" ")}
+                                                            loading="lazy"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="relative z-10 flex items-center justify-between px-6 pb-6">
+                                                    <button
+                                                        type="button"
+                                                        onClick={goJourneyPrev}
+                                                        className="inline-flex items-center gap-1 rounded-full border border-[color:var(--journeyBorder)] bg-white/65 px-3 py-1.5 text-xs font-semibold text-[color:var(--text)]"
+                                                        aria-label="Previous step"
+                                                    >
+                                                        <ChevronLeft className="h-4 w-4" />
+                                                        Prev
+                                                    </button>
+                                                    <div className="flex items-center gap-1.5">
+                                                        {HOW_IT_WORKS.map((_, dotIdx) => (
+                                                            <button
+                                                                key={dotIdx}
+                                                                type="button"
+                                                                onClick={() => setJourneyIndex(dotIdx)}
+                                                                aria-label={`Go to step ${dotIdx + 1}`}
+                                                                className="h-2.5 w-2.5 rounded-full transition"
+                                                                style={{
+                                                                    background:
+                                                                        dotIdx === journeyIndex ? "var(--accent)" : "rgba(36,52,71,0.25)",
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={goJourneyNext}
+                                                        className="inline-flex items-                                                        center gap-1 rounded-full border border-[color:var(--journeyBorder)] bg-white/65 px-3 py-1.5 text-xs font-semibold text-[color:var(--text)]"
+                                                        aria-label="Next step"
+                                                    >
+                                                        Next
+                                                        <ChevronRight className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })()}
+                                </div>
+
+                                {/* Desktop grid (from original) */}
+                                <div className="mt-10 hidden grid-cols-1 gap-6 sm:grid xl:grid-cols-2">
                                     {HOW_IT_WORKS.map((s, idx) => (
                                         <div
                                             key={s.title}
@@ -2438,12 +2551,7 @@ export default function LandingPage() {
                                                     }}
                                                 >
                                                     <img
-                                                        src={[
-                                                            "/apply.webp",
-                                                            "/projects.png",
-                                                            "/kkk.png",
-                                                            "/lunch.png",
-                                                        ][idx]}
+                                                        src={journeyImages[idx]}
                                                         alt={s.title}
                                                         className={[
                                                             "h-[170px] w-full md:h-[180px]",
