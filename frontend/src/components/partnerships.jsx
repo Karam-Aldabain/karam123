@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useId, useMemo, useRef, useState } from "react";
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   motion,
   AnimatePresence,
@@ -1067,15 +1067,8 @@ function FormWizard() {
     setStep((s) => Math.max(0, s - 1));
   }
 
-  useEffect(() => {
-    if (!validationErrors.length) return;
-    const errors = getStepErrors(step);
-    if (!errors.length) {
-      setValidationErrors([]);
-    } else {
-      setValidationErrors([REQUIRED_FIELDS_MESSAGE]);
-    }
-  }, [validationErrors, step, applicantType, basic, partnership, expert, uploads, alignment, REQUIRED_FIELDS_MESSAGE]);
+  const visibleValidationErrors =
+    validationErrors.length && getStepErrors(step).length ? [REQUIRED_FIELDS_MESSAGE] : [];
 
   function resetForm() {
     setStep(0);
@@ -1754,7 +1747,7 @@ function FormWizard() {
               >
                 Thank you. Your form was submitted successfully. Reference ID: {referenceId}. Our team will review it and contact you within 3-5 business days.
               </div>
-            ) : validationErrors.length ? (
+            ) : visibleValidationErrors.length ? (
               <div
                 className="rounded-2xl px-4 py-3 text-sm ring-1 sm:max-w-[560px]"
                 style={{
@@ -1764,7 +1757,7 @@ function FormWizard() {
                 }}
               >
                 <div className="font-semibold" style={{ color: THEME.pink }}>
-                  {validationErrors[0]}
+                  {visibleValidationErrors[0]}
                 </div>
               </div>
             ) : null}
@@ -2462,13 +2455,3 @@ const css = `
   100%{ transform: translateY(0px); opacity: 0.55; }
 }
 `;
-
-
-
-
-
-
-
-
-
-

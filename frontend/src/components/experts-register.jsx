@@ -417,17 +417,46 @@ function isValidLinkedInUrl(value) {
   return /^(https?:\/\/)?(www\.)?linkedin\.com\/.+/i.test(value.trim());
 }
 
+function getExpertAuthReturnState() {
+  if (typeof window === "undefined") {
+    return {
+      authStatus: null,
+      provider: null,
+      email: null,
+      nextStep: null,
+    };
+  }
+
+  const currentUrl = new URL(window.location.href);
+  return {
+    authStatus: currentUrl.searchParams.get("auth"),
+    provider: currentUrl.searchParams.get("provider"),
+    email: currentUrl.searchParams.get("email"),
+    nextStep: currentUrl.searchParams.get("step"),
+  };
+}
+
 export default function ExpertsRegisterPage() {
-  const [step, setStep] = useState(0);
+  const authReturnState = getExpertAuthReturnState();
+  const restoredAuthEmail =
+    authReturnState.email ||
+    (authReturnState.authStatus === "success" && authReturnState.provider
+      ? `${authReturnState.provider}@praktix.com`
+      : "");
+  const [step, setStep] = useState(() =>
+    authReturnState.nextStep === "2" ? 1 : 0
+  );
   const [submitted, setSubmitted] = useState(false);
   const [showStepError, setShowStepError] = useState(false);
   const formTopRef = useRef(null);
-  const [authMode, setAuthMode] = useState("login");
+  const [authMode, setAuthMode] = useState(() =>
+    authReturnState.authStatus === "success" ? "login" : "login"
+  );
 
-  const [auth, setAuth] = useState({
-    email: "",
-    password: "",
-  });
+  const [auth, setAuth] = useState(() => ({
+    email: restoredAuthEmail,
+    password: restoredAuthEmail ? "social-auth" : "",
+  }));
 
   const [createForm, setCreateForm] = useState({
     fullName: "",
@@ -633,37 +662,6 @@ export default function ExpertsRegisterPage() {
     if (typeof window === "undefined") return;
 
     const currentUrl = new URL(window.location.href);
-    const authStatus = currentUrl.searchParams.get("auth");
-    const provider = currentUrl.searchParams.get("provider");
-    const email = currentUrl.searchParams.get("email");
-    const nextStep = currentUrl.searchParams.get("step");
-
-    if (authStatus !== "success") {
-      if (nextStep === "2") {
-        setStep(1);
-      }
-      return;
-    }
-
-    setAuthMode("login");
-    if (email) {
-      setAuth((prev) => ({
-        ...prev,
-        email,
-        password: prev.password || "social-auth",
-      }));
-    } else if (provider) {
-      const fallbackEmail = `${provider}@praktix.com`;
-      setAuth((prev) => ({
-        ...prev,
-        email: prev.email || fallbackEmail,
-        password: prev.password || "social-auth",
-      }));
-    }
-
-    setStep(1);
-    setShowStepError(false);
-
     currentUrl.searchParams.delete("auth");
     currentUrl.searchParams.delete("provider");
     currentUrl.searchParams.delete("email");
