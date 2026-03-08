@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Briefcase,
@@ -328,6 +328,19 @@ function HeroInfoRow({ items, className = "" }) {
 export default function PraktixInternshipProgramPage() {
   const [applyOpen, setApplyOpen] = useState(false);
   const [openSection, setOpenSection] = useState("overview");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const currentUrl = new URL(window.location.href);
+    const authStatus = currentUrl.searchParams.get("auth");
+    const nextStep = currentUrl.searchParams.get("step");
+    const apply = currentUrl.searchParams.get("apply");
+
+    if (authStatus === "success" && nextStep === "2" && apply === "1") {
+      setApplyOpen(true);
+    }
+  }, []);
 
   useLayoutEffect(() => {
     if (window.location.hash) {

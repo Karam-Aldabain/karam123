@@ -958,7 +958,7 @@ function BackgroundFX() {
 function HeroVisual() {
   const reduce = useReducedMotion();
   return (
-    <div className="relative mx-auto w-full max-w-[600px] min-h-[330px] sm:min-h-[380px]">
+    <div className="relative mx-auto w-full max-w-[600px] min-h-[300px] overflow-hidden sm:min-h-[380px]">
       <div
         className="absolute inset-0 rounded-[48px] ring-1 ring-white/10"
         style={{
@@ -968,9 +968,9 @@ function HeroVisual() {
       />
 
       {/* Orbit system */}
-      <div className="absolute right-6 top-6 grid place-items-center sm:right-10 sm:top-10">
+      <div className="absolute left-1/2 top-5 grid -translate-x-1/2 place-items-center sm:left-auto sm:right-10 sm:top-10 sm:translate-x-0">
         <motion.div
-          className="relative grid h-[250px] w-[250px] place-items-center rounded-full"
+          className="relative grid h-[210px] w-[210px] place-items-center rounded-full sm:h-[250px] sm:w-[250px]"
           animate={reduce ? {} : undefined}
           transition={reduce ? undefined : undefined}
           style={{
@@ -982,7 +982,7 @@ function HeroVisual() {
           <div
             className="absolute inset-0 rounded-full"
             style={{
-              border: "10px solid rgba(233,231,223,0.75)",
+              border: "8px solid rgba(233,231,223,0.75)",
               opacity: 0.9,
               transform: "scale(0.92)",
             }}
@@ -990,7 +990,7 @@ function HeroVisual() {
           <div
             className="absolute inset-0 rounded-full"
             style={{
-              border: `8px solid ${accent(0.55)}`,
+              border: `6px solid ${accent(0.55)}`,
               opacity: 0.9,
               transform: "scale(1.02)",
             }}
@@ -1009,7 +1009,7 @@ function HeroVisual() {
                 style={{
                   background: i % 2 === 0 ? THEME.accent : THEME.accent2,
                   opacity: 0.55,
-                  transform: `rotate(${i * 60}deg) translateX(118px)`,
+                  transform: `rotate(${i * 60}deg) translateX(98px)`,
                   boxShadow: "0 0 0 8px rgba(255,255,255,0.04)",
                 }}
               />
@@ -1017,7 +1017,7 @@ function HeroVisual() {
           </motion.div>
 
           <div
-            className="relative h-[185px] w-[185px] overflow-hidden rounded-full ring-1 ring-white/15"
+            className="relative h-[154px] w-[154px] overflow-hidden rounded-full ring-1 ring-white/15 sm:h-[185px] sm:w-[185px]"
             style={{
               background:
                 "radial-gradient(circle at 30% 30%, rgba(233,231,223,0.22), rgba(11,18,32,0.82))",
@@ -1309,7 +1309,7 @@ function ProgramCard({ program, index = 0, onOpen }) {
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.65, ease: EASE, delay: Math.min(index * 0.03, 0.18) }}
       whileHover={{ y: -8, scale: 1.015 }}
-      className="group relative w-[360px] md:w-[420px] shrink-0 overflow-hidden rounded-[34px] ring-1"
+      className="group relative w-[min(360px,calc(100vw-3rem))] md:w-[420px] shrink-0 overflow-hidden rounded-[34px] ring-1"
       style={{
         borderColor: "rgba(255,255,255,0.10)",
         background: "rgba(255,255,255,0.04)",
@@ -1407,7 +1407,6 @@ function ApplyFlowModal({
   const [step, setStep] = useState(0);
   const [method, setMethod] = useState("");
   const [authMode, setAuthMode] = useState("login");
-  const [socialProvider, setSocialProvider] = useState(null);
   const [auth, setAuth] = useState({
     email: "",
     password: "",
@@ -1451,7 +1450,6 @@ function ApplyFlowModal({
     setStep(0);
     setMethod("");
     setAuthMode("login");
-    setSocialProvider(null);
     setErrors({});
     setAuth({
       email: "",
@@ -1566,35 +1564,9 @@ function ApplyFlowModal({
     return Object.keys(e).length === 0;
   };
 
-  const openSocialAuth = (provider) => {
-    const urls = {
-      google: "https://accounts.google.com/AccountChooser",
-      facebook: "https://www.facebook.com/login.php",
-      linkedin: "https://www.linkedin.com/login",
-    };
-    const url = urls[provider];
-    if (!url) return;
-
-    const popup = window.open(
-      url,
-      "social_auth_popup",
-      "width=520,height=720,menubar=no,toolbar=no,location=yes,status=no,resizable=yes,scrollbars=yes"
-    );
-    if (!popup) return;
-
-    const timer = window.setInterval(() => {
-      if (popup.closed) {
-        window.clearInterval(timer);
-        setErrors({});
-        setStep(1);
-      }
-    }, 500);
-  };
-
-  const completeSocialLogin = (email) => {
-    setAuth((p) => ({ ...p, email, password: "social-auth" }));
-    setSocialProvider(null);
-    setStep(1);
+  const openSocialAuth = () => {
+    setAuthMode("login");
+    setErrors({});
   };
 
   const next = () => {
@@ -1678,92 +1650,68 @@ function ApplyFlowModal({
 
                 {authMode === "login" ? (
                   <>
-                    {socialProvider ? (
-                      <div className="space-y-3 rounded-[16px] border border-[#0B1220]/12 bg-white p-4">
-                        <div className="text-sm font-semibold uppercase tracking-wide text-[#0B1220]/65">
-                          Choose {socialProvider} account
-                        </div>
-                        {[
-                          `student.${socialProvider}@gmail.com`,
-                          `applicant.${socialProvider}@gmail.com`,
-                          `intern.${socialProvider}@gmail.com`,
-                        ].map((email) => (
-                          <button
-                            key={email}
-                            type="button"
-                            onClick={() => completeSocialLogin(email)}
-                            className="w-full rounded-xl border border-[#0B1220]/12 bg-[#F8FAFC] px-4 py-3 text-left text-sm text-[#0B1220] transition hover:bg-[#EEF2F7]"
-                          >
-                            Continue as {email}
-                          </button>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => setSocialProvider(null)}
-                          className="w-full rounded-xl border border-[#0B1220]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0B1220]/75 transition hover:bg-[#F3F4F6]"
-                        >
-                          Back to login options
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-4 py-3">
-                          <div className="h-px flex-1 bg-[#0B1220]/20" />
-                          <div className="text-base font-semibold text-[#0B1220]/85">OR</div>
-                          <div className="h-px flex-1 bg-[#0B1220]/20" />
-                        </div>
+                    <div className="flex items-center gap-4 py-3">
+                      <div className="h-px flex-1 bg-[#0B1220]/20" />
+                      <div className="text-base font-semibold text-[#0B1220]/85">OR</div>
+                      <div className="h-px flex-1 bg-[#0B1220]/20" />
+                    </div>
 
-                        <button
-                          type="button"
-                          onClick={() => openSocialAuth("facebook")}
-                          className="flex w-full items-center gap-4 bg-[#2D73DA] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
-                        >
-                          <Facebook className="h-6 w-6" />
-                          <span className="text-center w-full -ml-8">Log In with Facebook</span>
-                        </button>
+                    <button
+                      type="button"
+                      disabled
+                      onClick={openSocialAuth}
+                      className="flex w-full items-center gap-4 bg-[#2D73DA] px-5 py-3 text-left text-[18px] font-bold uppercase text-white opacity-55 sm:text-[20px]"
+                    >
+                      <Facebook className="h-6 w-6" />
+                      <span className="text-center w-full -ml-8">Log In with Facebook</span>
+                    </button>
 
-                        <button
-                          type="button"
-                          onClick={() => openSocialAuth("google")}
-                          className="flex w-full items-center gap-4 border-2 border-[#8B8B8B] bg-white px-5 py-3 text-left text-[18px] font-bold uppercase text-[#5C6470] transition hover:bg-[#FAFAFA] sm:text-[20px]"
-                        >
-                          <Chrome className="h-6 w-6" />
-                          <span className="text-center w-full -ml-8">Log In with Google</span>
-                        </button>
+                    <button
+                      type="button"
+                      disabled
+                      onClick={openSocialAuth}
+                      className="flex w-full items-center gap-4 border-2 border-[#8B8B8B] bg-white px-5 py-3 text-left text-[18px] font-bold uppercase text-[#5C6470] opacity-55 sm:text-[20px]"
+                    >
+                      <Chrome className="h-6 w-6" />
+                      <span className="text-center w-full -ml-8">Log In with Google</span>
+                    </button>
 
-                        <button
-                          type="button"
-                          onClick={() => openSocialAuth("linkedin")}
-                          className="flex w-full items-center gap-4 bg-[#356BB0] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
-                        >
-                          <Linkedin className="h-6 w-6" />
-                          <span className="text-center w-full -ml-8">Log In with LinkedIn</span>
-                        </button>
+                    <button
+                      type="button"
+                      disabled
+                      onClick={openSocialAuth}
+                      className="flex w-full items-center gap-4 bg-[#356BB0] px-5 py-3 text-left text-[18px] font-bold uppercase text-white opacity-55 sm:text-[20px]"
+                    >
+                      <Linkedin className="h-6 w-6" />
+                      <span className="text-center w-full -ml-8">Log In with LinkedIn</span>
+                    </button>
 
-                        <div className="space-y-3 pt-2">
-                          <input
-                            type="email"
-                            value={auth.email}
-                            onChange={(e) => setAuth((p) => ({ ...p, email: e.target.value }))}
-                            placeholder="Email"
-                            className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
-                          />
-                          {errors.loginEmail ? <p className="text-xs text-rose-600">{errors.loginEmail}</p> : null}
-                          <input
-                            type="password"
-                            value={auth.password}
-                            onChange={(e) => setAuth((p) => ({ ...p, password: e.target.value }))}
-                            placeholder="Password"
-                            className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
-                          />
-                          {errors.loginPassword ? <p className="text-xs text-rose-600">{errors.loginPassword}</p> : null}
-                        </div>
+                    <p className="text-center text-xs text-[#0B1220]/55">
+                      Social sign-in is temporarily disabled until backend authentication is available.
+                    </p>
 
-                        <button type="button" className="block w-full text-center text-[20px] font-medium text-[#B00020] sm:text-[22px]">
-                          I forgot my password
-                        </button>
-                      </>
-                    )}
+                    <div className="space-y-3 pt-2">
+                      <input
+                        type="email"
+                        value={auth.email}
+                        onChange={(e) => setAuth((p) => ({ ...p, email: e.target.value }))}
+                        placeholder="Email"
+                        className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                      />
+                      {errors.loginEmail ? <p className="text-xs text-rose-600">{errors.loginEmail}</p> : null}
+                      <input
+                        type="password"
+                        value={auth.password}
+                        onChange={(e) => setAuth((p) => ({ ...p, password: e.target.value }))}
+                        placeholder="Password"
+                        className="w-full rounded-none border border-[#D0D0D0] bg-[#F3F4F6] px-4 py-3 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:text-[20px]"
+                      />
+                      {errors.loginPassword ? <p className="text-xs text-rose-600">{errors.loginPassword}</p> : null}
+                    </div>
+
+                    <button type="button" className="block w-full text-center text-[20px] font-medium text-[#B00020] sm:text-[22px]">
+                      I forgot my password
+                    </button>
                   </>
                 ) : (
                   <div className="space-y-3 pt-2">
