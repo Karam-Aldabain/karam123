@@ -49,17 +49,6 @@ const PRICING_MODELS = [
   "Revenue share model (for institutional partnerships)",
 ];
 const DELIVERY_TYPES = ["Live", "Hybrid", "Recorded"];
-const SOCIAL_AUTH_START_URLS = {
-  google: import.meta.env.VITE_GOOGLE_AUTH_START_URL || "",
-  facebook: import.meta.env.VITE_FACEBOOK_AUTH_START_URL || "",
-  linkedin: import.meta.env.VITE_LINKEDIN_AUTH_START_URL || "",
-};
-
-const SOCIAL_AUTH_FALLBACK_URLS = {
-  google: "https://accounts.google.com/AccountChooser",
-  facebook: "https://www.facebook.com/login.php",
-  linkedin: "https://www.linkedin.com/login",
-};
 
 const EXPERTISE_OPTIONS = [
   "Software Development",
@@ -417,46 +406,17 @@ function isValidLinkedInUrl(value) {
   return /^(https?:\/\/)?(www\.)?linkedin\.com\/.+/i.test(value.trim());
 }
 
-function getExpertAuthReturnState() {
-  if (typeof window === "undefined") {
-    return {
-      authStatus: null,
-      provider: null,
-      email: null,
-      nextStep: null,
-    };
-  }
-
-  const currentUrl = new URL(window.location.href);
-  return {
-    authStatus: currentUrl.searchParams.get("auth"),
-    provider: currentUrl.searchParams.get("provider"),
-    email: currentUrl.searchParams.get("email"),
-    nextStep: currentUrl.searchParams.get("step"),
-  };
-}
-
 export default function ExpertsRegisterPage() {
-  const authReturnState = getExpertAuthReturnState();
-  const restoredAuthEmail =
-    authReturnState.email ||
-    (authReturnState.authStatus === "success" && authReturnState.provider
-      ? `${authReturnState.provider}@praktix.com`
-      : "");
-  const [step, setStep] = useState(() =>
-    authReturnState.nextStep === "2" ? 1 : 0
-  );
+  const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [showStepError, setShowStepError] = useState(false);
   const formTopRef = useRef(null);
-  const [authMode, setAuthMode] = useState(() =>
-    authReturnState.authStatus === "success" ? "login" : "login"
-  );
+  const [authMode, setAuthMode] = useState("login");
 
-  const [auth, setAuth] = useState(() => ({
-    email: restoredAuthEmail,
-    password: restoredAuthEmail ? "social-auth" : "",
-  }));
+  const [auth, setAuth] = useState({
+    email: "",
+    password: "",
+  });
 
   const [createForm, setCreateForm] = useState({
     fullName: "",
@@ -658,38 +618,9 @@ export default function ExpertsRegisterPage() {
     return errors;
   }, [showStepError, step, authMode, auth, createForm, basic, expert, pricing, alignment, uploads]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.delete("auth");
-    currentUrl.searchParams.delete("provider");
-    currentUrl.searchParams.delete("email");
-    currentUrl.searchParams.delete("step");
-    window.history.replaceState({}, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
-  }, []);
-
-  function openSocialAuth(provider) {
+  function openSocialAuth() {
     setAuthMode("login");
     setShowStepError(false);
-    if (typeof window === "undefined") return;
-
-    const returnUrl = new URL(`${window.location.origin}/experts/register`);
-    returnUrl.searchParams.set("auth", "success");
-    returnUrl.searchParams.set("provider", provider);
-    returnUrl.searchParams.set("step", "2");
-
-    const configuredStartUrl = SOCIAL_AUTH_START_URLS[provider];
-    if (configuredStartUrl) {
-      const authUrl = new URL(configuredStartUrl);
-      authUrl.searchParams.set("returnTo", returnUrl.toString());
-      window.location.href = authUrl.toString();
-      return;
-    }
-
-    const fallbackUrl = SOCIAL_AUTH_FALLBACK_URLS[provider];
-    if (!fallbackUrl) return;
-    window.location.href = fallbackUrl;
   }
 
   function next() {
@@ -821,8 +752,9 @@ export default function ExpertsRegisterPage() {
                     <div className="space-y-3">
                       <button
                         type="button"
-                        onClick={() => openSocialAuth("facebook")}
-                        className="flex h-14 w-full items-center justify-between bg-[#2D73DA] px-6 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:h-[60px] sm:text-[20px]"
+                        disabled
+                        onClick={openSocialAuth}
+                        className="flex h-14 w-full items-center justify-between bg-[#2D73DA] px-6 text-left text-[18px] font-bold uppercase text-white opacity-55 sm:h-[60px] sm:text-[20px]"
                       >
                         <Facebook className="h-6 w-6 shrink-0" />
                         <span className="flex-1 text-center">Log In with Facebook</span>
@@ -831,8 +763,9 @@ export default function ExpertsRegisterPage() {
 
                       <button
                         type="button"
-                        onClick={() => openSocialAuth("google")}
-                        className="flex h-14 w-full items-center justify-between border-2 border-[#8B8B8B] bg-white px-6 text-left text-[18px] font-bold uppercase text-[#5C6470] transition hover:bg-[#FAFAFA] sm:h-[60px] sm:text-[20px]"
+                        disabled
+                        onClick={openSocialAuth}
+                        className="flex h-14 w-full items-center justify-between border-2 border-[#8B8B8B] bg-white px-6 text-left text-[18px] font-bold uppercase text-[#5C6470] opacity-55 sm:h-[60px] sm:text-[20px]"
                       >
                         <Chrome className="h-6 w-6 shrink-0" />
                         <span className="flex-1 text-center">Log In with Google</span>
@@ -841,14 +774,19 @@ export default function ExpertsRegisterPage() {
 
                       <button
                         type="button"
-                        onClick={() => openSocialAuth("linkedin")}
-                        className="flex h-14 w-full items-center justify-between bg-[#356BB0] px-6 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:h-[60px] sm:text-[20px]"
+                        disabled
+                        onClick={openSocialAuth}
+                        className="flex h-14 w-full items-center justify-between bg-[#356BB0] px-6 text-left text-[18px] font-bold uppercase text-white opacity-55 sm:h-[60px] sm:text-[20px]"
                       >
                         <Linkedin className="h-6 w-6 shrink-0" />
                         <span className="flex-1 text-center">Log In with LinkedIn</span>
                         <span className="w-6 shrink-0" aria-hidden="true" />
                       </button>
                     </div>
+
+                    <p className="text-center text-xs text-[#0B1220]/55">
+                      Social sign-in is temporarily disabled until backend authentication is available.
+                    </p>
 
                     <div className="space-y-3 pt-4">
                       <input

@@ -669,16 +669,6 @@ export const categories = [
 ];
 
 const iconStrongProps = { strokeWidth: 2.4 };
-const SOCIAL_AUTH_START_URLS = {
-  google: import.meta.env.VITE_GOOGLE_AUTH_START_URL || "",
-  facebook: import.meta.env.VITE_FACEBOOK_AUTH_START_URL || "",
-  linkedin: import.meta.env.VITE_LINKEDIN_AUTH_START_URL || "",
-};
-const SOCIAL_AUTH_FALLBACK_URLS = {
-  google: "https://accounts.google.com/AccountChooser",
-  facebook: "https://www.facebook.com/login.php",
-  linkedin: "https://www.linkedin.com/login",
-};
 
 function slugify(text = "") {
   return text
@@ -1516,38 +1506,6 @@ function ApplyFlowModal({
     return () => clearTimeout(timer);
   }, [paymentSuccess]);
 
-  useEffect(() => {
-    if (!open || typeof window === "undefined") return;
-
-    const currentUrl = new URL(window.location.href);
-    const authStatus = currentUrl.searchParams.get("auth");
-    const provider = currentUrl.searchParams.get("provider");
-    const email = currentUrl.searchParams.get("email");
-    const nextStep = currentUrl.searchParams.get("step");
-
-    if (authStatus !== "success" || nextStep !== "2") return;
-
-    const resolvedEmail = email || (provider ? `${provider}@praktix.com` : "");
-    if (resolvedEmail) {
-      setAuth((prev) => ({
-        ...prev,
-        email: resolvedEmail,
-        password: prev.password || "social-auth",
-      }));
-    }
-
-    setAuthMode("login");
-    setErrors({});
-    setStep(1);
-
-    currentUrl.searchParams.delete("auth");
-    currentUrl.searchParams.delete("provider");
-    currentUrl.searchParams.delete("email");
-    currentUrl.searchParams.delete("step");
-    currentUrl.searchParams.delete("apply");
-    window.history.replaceState({}, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
-  }, [open]);
-
   if (!open || !selected) return null;
 
   const price = Number(selected.price || CATEGORY_PRICES.eng);
@@ -1606,30 +1564,9 @@ function ApplyFlowModal({
     return Object.keys(e).length === 0;
   };
 
-  const openSocialAuth = (provider) => {
-    if (typeof window === "undefined") return;
-
+  const openSocialAuth = () => {
     setAuthMode("login");
     setErrors({});
-
-    const returnUrl = new URL(window.location.href);
-    returnUrl.searchParams.set("auth", "success");
-    returnUrl.searchParams.set("provider", provider);
-    returnUrl.searchParams.set("step", "2");
-    returnUrl.searchParams.set("apply", "1");
-
-    const configuredStartUrl = SOCIAL_AUTH_START_URLS[provider];
-    if (configuredStartUrl) {
-      const authUrl = new URL(configuredStartUrl);
-      authUrl.searchParams.set("returnTo", returnUrl.toString());
-      window.location.href = authUrl.toString();
-      return;
-    }
-
-    const fallbackUrl = SOCIAL_AUTH_FALLBACK_URLS[provider];
-    if (fallbackUrl) {
-      window.location.href = fallbackUrl;
-    }
   };
 
   const next = () => {
@@ -1721,8 +1658,9 @@ function ApplyFlowModal({
 
                     <button
                       type="button"
-                      onClick={() => openSocialAuth("facebook")}
-                      className="flex w-full items-center gap-4 bg-[#2D73DA] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
+                      disabled
+                      onClick={openSocialAuth}
+                      className="flex w-full items-center gap-4 bg-[#2D73DA] px-5 py-3 text-left text-[18px] font-bold uppercase text-white opacity-55 sm:text-[20px]"
                     >
                       <Facebook className="h-6 w-6" />
                       <span className="text-center w-full -ml-8">Log In with Facebook</span>
@@ -1730,8 +1668,9 @@ function ApplyFlowModal({
 
                     <button
                       type="button"
-                      onClick={() => openSocialAuth("google")}
-                      className="flex w-full items-center gap-4 border-2 border-[#8B8B8B] bg-white px-5 py-3 text-left text-[18px] font-bold uppercase text-[#5C6470] transition hover:bg-[#FAFAFA] sm:text-[20px]"
+                      disabled
+                      onClick={openSocialAuth}
+                      className="flex w-full items-center gap-4 border-2 border-[#8B8B8B] bg-white px-5 py-3 text-left text-[18px] font-bold uppercase text-[#5C6470] opacity-55 sm:text-[20px]"
                     >
                       <Chrome className="h-6 w-6" />
                       <span className="text-center w-full -ml-8">Log In with Google</span>
@@ -1739,12 +1678,17 @@ function ApplyFlowModal({
 
                     <button
                       type="button"
-                      onClick={() => openSocialAuth("linkedin")}
-                      className="flex w-full items-center gap-4 bg-[#356BB0] px-5 py-3 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:text-[20px]"
+                      disabled
+                      onClick={openSocialAuth}
+                      className="flex w-full items-center gap-4 bg-[#356BB0] px-5 py-3 text-left text-[18px] font-bold uppercase text-white opacity-55 sm:text-[20px]"
                     >
                       <Linkedin className="h-6 w-6" />
                       <span className="text-center w-full -ml-8">Log In with LinkedIn</span>
                     </button>
+
+                    <p className="text-center text-xs text-[#0B1220]/55">
+                      Social sign-in is temporarily disabled until backend authentication is available.
+                    </p>
 
                     <div className="space-y-3 pt-2">
                       <input
