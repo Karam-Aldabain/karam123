@@ -1298,7 +1298,7 @@ export default function SchoolsEarlyTalentLanding() {
               ))}
 
               <div className="absolute inset-0 sm:hidden">
-                <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 320 260" fill="none" preserveAspectRatio="none">
+                <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-45" viewBox="0 0 320 260" fill="none" preserveAspectRatio="none">
                   <motion.path
                     d="M76 68 C 124 62, 166 62, 230 68"
                     stroke={accent(0.62)}
@@ -1337,7 +1337,11 @@ export default function SchoolsEarlyTalentLanding() {
                   />
                 </svg>
 
-                <div className="absolute inset-x-4 bottom-4 grid grid-cols-2 gap-3">
+                <div
+                  className="absolute inset-x-3 bottom-3 rounded-[26px] bg-[linear-gradient(180deg,rgba(7,16,43,0.04),rgba(7,16,43,0.34))] p-2 backdrop-blur-[2px]"
+                  style={{ boxShadow: "0 16px 36px rgba(0,0,0,0.18)" }}
+                >
+                  <div className="grid grid-cols-2 gap-2.5">
                   {[
                     { x: heroIcons[0], delay: 0 },
                     { x: heroIcons[1], delay: 0.15 },
@@ -1349,14 +1353,14 @@ export default function SchoolsEarlyTalentLanding() {
                       initial={{ opacity: 0, scale: 0.96 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.4, ease: "easeOut" }}
-                      className="relative min-w-0 rounded-2xl bg-white/8 px-3 py-3 ring-1 ring-white/12 backdrop-blur-md"
+                      className="relative min-w-0 rounded-[20px] bg-white/10 px-3 py-2.5 ring-1 ring-white/12 backdrop-blur-md"
                       style={{ boxShadow: "0 12px 32px rgba(0,0,0,0.24)" }}
                     >
                       <div className="flex items-center gap-2.5">
-                        <IconBadge color={n.x.color} size={26}>
+                        <IconBadge color={n.x.color} size={24}>
                           <n.x.Icon className="h-3.5 w-3.5" {...iconStrongProps} />
                         </IconBadge>
-                        <div className="truncate text-base font-semibold text-white">{n.x.label}</div>
+                        <div className="truncate text-[15px] font-semibold text-white">{n.x.label}</div>
                       </div>
                       <motion.span
                         className="pointer-events-none absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full"
@@ -1366,6 +1370,7 @@ export default function SchoolsEarlyTalentLanding() {
                       />
                     </motion.div>
                   ))}
+                  </div>
                 </div>
               </div>
 
