@@ -1890,18 +1890,20 @@ export default function AIForRealWorldCareersPage() {
               const Icon = s.icon;
               return (
                 <Reveal key={s.title} delay={i * 0.05} amount={0.35}>
-                  <motion.div whileHover={{ y: -3 }} className="relative rounded-[36px] bg-white/55 p-6 ring-1 ring-[#0B1220]/10">
-                    <div className="flex items-start gap-4">
-                      <div className="mt-1">
+                  <motion.div whileHover={{ y: -3 }} className="relative rounded-[28px] bg-white/55 p-4 ring-1 ring-[#0B1220]/10 sm:rounded-[36px] sm:p-6">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="mt-1 shrink-0">
                         <IconBadge color={s.color}>
                           <Icon className="h-5 w-5" {...iconStrongProps} />
                         </IconBadge>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-                          <div className="text-lg font-semibold text-[#0B1220]">{s.title}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 text-base font-semibold leading-tight text-[#0B1220] sm:text-lg">
+                            {s.title}
+                          </div>
                           <span
-                            className="rounded-full px-3 py-1 text-xs font-semibold ring-1"
+                            className="shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 sm:text-xs"
                             style={{
                               background: "rgba(11,18,32,0.06)",
                               color: "rgba(11,18,32,0.70)",

@@ -455,9 +455,7 @@ function SplitImperative() {
                   )}
                 </IconBadge>
                 <div>
-                  <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">
-                    {mode === "unstructured" ? "RISK MODE" : "ADVANTAGE MODE"}
-                  </div>
+              
                   <div className="mt-1 text-xl font-semibold text-[#0B1220]">
                     {mode === "unstructured"
                       ? "Adoption without direction creates risk."
@@ -496,9 +494,7 @@ function SplitImperative() {
               <ClipboardCheck className="h-5 w-5" {...iconStrongProps} />
             </IconBadge>
             <div>
-              <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">
-                THE REALITY
-              </div>
+             
               <div className="mt-1 text-xl font-semibold text-[#0B1220]">
                 AI is not the future. It’s the standard.
               </div>
@@ -830,9 +826,7 @@ function OutcomesDeliverablesGrid({ inView, reduce }) {
                 <I className="h-5 w-5" {...iconStrongProps} />
               </IconBadge>
               <div>
-                <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">
-                  DELIVERABLE
-                </div>
+              
                 <div className="mt-1 text-lg font-semibold text-[#0B1220]">{x.t}</div>
                 <p className="mt-2 text-sm text-[#0B1220]/70">
                   Executive-ready output designed for action, governance, and adoption.
@@ -1037,7 +1031,6 @@ export default function AIForOrganizationsLanding() {
           <div className="mt-8 rounded-3xl bg-white/5 p-6 ring-1 ring-white/10">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="text-xs font-semibold tracking-widest text-white/60">DELIVERY MODE</div>
                 <div className="mt-1 text-base font-semibold text-white">
                   Real implementation, case simulations, and roadmap planning — not generic content.
                 </div>
@@ -1255,10 +1248,7 @@ export default function AIForOrganizationsLanding() {
           </div>
 
           <div className="mt-8 rounded-[36px] bg-white/70 p-7 ring-1 ring-[#0B1220]/10">
-            <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">NOTE</div>
-            <div className="mt-2 text-2xl font-semibold text-[#0B1220]">
-              Designed around your organization — not generic content.
-            </div>
+            
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 "Industry sector",
@@ -1278,9 +1268,7 @@ export default function AIForOrganizationsLanding() {
             </div>
 
             <div className="mt-6 rounded-[32px] p-6 ring-1 ring-[#0B1220]/10" style={{ background: "rgba(11,18,32,0.04)" }}>
-              <div className="text-sm font-semibold text-[#0B1220]">
-                “AI Adoption Without Structure Creates Risk. We Deliver Structured Transformation.”
-              </div>
+              
             </div>
           </div>
         </div>
@@ -1376,9 +1364,7 @@ export default function AIForOrganizationsLanding() {
                 <BadgeCheck className="h-5 w-5" {...iconStrongProps} />
               </IconBadge>
               <div>
-                <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">
-                  OPTIONAL ADD-ON
-                </div>
+             
                 <div className="mt-1 text-xl font-semibold text-[#0B1220]">
                   Ongoing AI advisory partnership
                 </div>
@@ -1390,9 +1376,7 @@ export default function AIForOrganizationsLanding() {
           </div>
 
           <div className="mt-8 rounded-[36px] bg-white/70 p-7 ring-1 ring-[#0B1220]/10">
-            <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">
-              WHO THIS IS DESIGNED FOR
-            </div>
+           
             <div className="mt-4 flex flex-wrap gap-2">
               {[
                 "Corporations & Enterprises",

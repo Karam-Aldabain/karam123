@@ -1337,34 +1337,36 @@ export default function SchoolsEarlyTalentLanding() {
                   />
                 </svg>
 
-                {[
-                  { x: heroIcons[0], left: "13%", top: "17%", delay: 0, width: "40%" },
-                  { x: heroIcons[1], left: "45%", top: "17%", delay: 0.15, width: "40%" },
-                  { x: heroIcons[2], left: "13%", top: "48%", delay: 0.3, width: "40%" },
-                  { x: heroIcons[3], left: "45%", top: "48%", delay: 0.45, width: "40%" },
-                ].map((n) => (
-                  <motion.div
-                    key={`mobile-node-${n.x.label}`}
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="absolute rounded-2xl bg-white/6 px-3 py-2.5 ring-1 ring-white/12 backdrop-blur"
-                    style={{ left: n.left, top: n.top, width: n.width, boxShadow: "0 12px 32px rgba(0,0,0,0.24)" }}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <IconBadge color={n.x.color} size={28}>
-                        <n.x.Icon className="h-3.5 w-3.5" {...iconStrongProps} />
-                      </IconBadge>
-                      <div className="truncate text-lg font-semibold text-white">{n.x.label}</div>
-                    </div>
-                    <motion.span
-                      className="pointer-events-none absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full"
-                      style={{ background: n.x.color, boxShadow: `0 0 12px ${n.x.color}` }}
-                      animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-                      transition={{ duration: 2.3, repeat: Infinity, ease: "easeInOut", delay: n.delay }}
-                    />
-                  </motion.div>
-                ))}
+                <div className="absolute inset-x-4 bottom-4 grid grid-cols-2 gap-3">
+                  {[
+                    { x: heroIcons[0], delay: 0 },
+                    { x: heroIcons[1], delay: 0.15 },
+                    { x: heroIcons[2], delay: 0.3 },
+                    { x: heroIcons[3], delay: 0.45 },
+                  ].map((n) => (
+                    <motion.div
+                      key={`mobile-node-${n.x.label}`}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      className="relative min-w-0 rounded-2xl bg-white/8 px-3 py-3 ring-1 ring-white/12 backdrop-blur-md"
+                      style={{ boxShadow: "0 12px 32px rgba(0,0,0,0.24)" }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <IconBadge color={n.x.color} size={26}>
+                          <n.x.Icon className="h-3.5 w-3.5" {...iconStrongProps} />
+                        </IconBadge>
+                        <div className="truncate text-base font-semibold text-white">{n.x.label}</div>
+                      </div>
+                      <motion.span
+                        className="pointer-events-none absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full"
+                        style={{ background: n.x.color, boxShadow: `0 0 12px ${n.x.color}` }}
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                        transition={{ duration: 2.3, repeat: Infinity, ease: "easeInOut", delay: n.delay }}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
               </div>
 
             </div>

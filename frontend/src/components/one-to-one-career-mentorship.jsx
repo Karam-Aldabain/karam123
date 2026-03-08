@@ -583,7 +583,7 @@ export default function CareerMentorshipPage() {
             transition={{ duration: 0.75, ease: "easeOut", delay: 0.05 }}
             className="relative"
           >
-            <div className="relative mx-auto h-[540px] w-full max-w-[560px] sm:h-auto sm:aspect-[4/3]">
+            <div className="relative mx-auto min-h-[720px] w-full max-w-[560px] sm:min-h-0 sm:h-auto sm:aspect-[4/3]">
               <div
                 className="absolute inset-0 rounded-[44px] ring-1 ring-white/10"
                 style={{
@@ -608,14 +608,14 @@ export default function CareerMentorshipPage() {
               </div>
 
               {/* Right side: “expert in consultation” (placeholder image) */}
-              <div className="absolute inset-4 grid grid-cols-1 gap-3 sm:inset-6 sm:grid-cols-2 sm:gap-4">
-                <div className="flex flex-col justify-between rounded-[32px] bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur sm:rounded-[36px] sm:p-5">
+              <div className="absolute inset-4 flex flex-col gap-3 sm:inset-6 sm:grid sm:grid-cols-2 sm:gap-4">
+                <div className="flex flex-col justify-start rounded-[32px] bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur sm:justify-between sm:rounded-[36px] sm:p-5">
                   <div>
                     <div className="mt-2 text-lg font-semibold leading-tight text-white sm:text-xl">Strategic Mentorship for Serious Professionals</div>
                     <p className="mt-3 text-sm leading-relaxed text-white/70">This is not motivational coaching. This is structured advisory designed to:</p>
                   </div>
 
-                  <div className="mt-4 space-y-2 text-sm text-white/75">
+                  <div className="mt-5 space-y-2 text-sm text-white/75 sm:mt-4">
                     <div>Define your direction</div>
                     <div>Identify skill gaps</div>
                     <div>Build actionable roadmaps</div>
@@ -624,7 +624,7 @@ export default function CareerMentorshipPage() {
                   </div>
                 </div>
 
-                <div className="relative min-h-[220px] overflow-hidden rounded-[32px] ring-1 ring-white/10 sm:min-h-0 sm:rounded-[36px]">
+                <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-[32px] ring-1 ring-white/10 sm:min-h-0 sm:rounded-[36px]">
                   {/* Replace src with your own asset */}
                   <img
                     src="/a_colored_Woman_Showing_Documents_1390x940_2502_d14330746b.jpg"

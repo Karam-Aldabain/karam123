@@ -5,13 +5,16 @@ import {
   Building2,
   Coins,
   CheckCircle2,
+  Chrome,
   CircleDollarSign,
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Facebook,
   FileSpreadsheet,
   Globe2,
   Link as LinkIcon,
+  Linkedin,
   Mail,
   MapPin,
   Phone,
@@ -27,13 +30,14 @@ const THEME = {
 };
 
 const STEPS = [
+  { key: "auth", label: "Account Access" },
   { key: "basic", label: "Basic Info" },
   { key: "expert", label: "Expert Profile" },
   { key: "pricing", label: "Pricing & Monetization" },
   { key: "alignment", label: "Alignment & Compliance" },
   { key: "review", label: "Review & Submit" },
 ];
-const VISIBLE_STEP_ORDER = [0, 1, 3, 4];
+const VISIBLE_STEP_ORDER = [0, 1, 2, 4, 5];
 
 const CURRENCIES = ["EUR", "USD", "GBP", "AED", "EGP", "SAR", "Custom currency (manual approval)"];
 const PRICING_MODELS = [
@@ -45,6 +49,17 @@ const PRICING_MODELS = [
   "Revenue share model (for institutional partnerships)",
 ];
 const DELIVERY_TYPES = ["Live", "Hybrid", "Recorded"];
+const SOCIAL_AUTH_START_URLS = {
+  google: import.meta.env.VITE_GOOGLE_AUTH_START_URL || "",
+  facebook: import.meta.env.VITE_FACEBOOK_AUTH_START_URL || "",
+  linkedin: import.meta.env.VITE_LINKEDIN_AUTH_START_URL || "",
+};
+
+const SOCIAL_AUTH_FALLBACK_URLS = {
+  google: "https://accounts.google.com/AccountChooser",
+  facebook: "https://www.facebook.com/login.php",
+  linkedin: "https://www.linkedin.com/login",
+};
 
 const EXPERTISE_OPTIONS = [
   "Software Development",
@@ -407,6 +422,19 @@ export default function ExpertsRegisterPage() {
   const [submitted, setSubmitted] = useState(false);
   const [showStepError, setShowStepError] = useState(false);
   const formTopRef = useRef(null);
+  const [authMode, setAuthMode] = useState("login");
+
+  const [auth, setAuth] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [createForm, setCreateForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const [basic, setBasic] = useState({
     fullName: "",
@@ -471,6 +499,18 @@ export default function ExpertsRegisterPage() {
 
   const canContinue = useMemo(() => {
     if (step === 0) {
+      if (authMode === "create") {
+        return Boolean(
+          createForm.fullName.trim() &&
+            createForm.email.trim() &&
+            createForm.password &&
+            createForm.confirmPassword &&
+            createForm.password === createForm.confirmPassword
+        );
+      }
+      return Boolean(auth.email.trim() && auth.password);
+    }
+    if (step === 1) {
       const linkedInValid = isValidLinkedInUrl(basic.linkedin);
       return Boolean(
         basic.fullName &&
@@ -483,7 +523,7 @@ export default function ExpertsRegisterPage() {
           linkedInValid
       );
     }
-    if (step === 1) {
+    if (step === 2) {
       const expertiseOtherValid = !expert.expertise.includes("Other (Specify)") || Boolean(expert.expertiseOther.trim());
       const roleTypeOtherValid = expert.roleType !== "Other" || Boolean(expert.roleTypeOther.trim());
       return Boolean(
@@ -501,7 +541,7 @@ export default function ExpertsRegisterPage() {
           uploads.photo
       );
     }
-    if (step === 2) {
+    if (step === 3) {
       const currencyValid =
         pricing.defaultCurrency &&
         (pricing.defaultCurrency !== "Custom currency (manual approval)" || pricing.customCurrency.trim().length > 0);
@@ -517,11 +557,11 @@ export default function ExpertsRegisterPage() {
           pricing.taxRegistrationCountry
       );
     }
-    if (step === 3) {
+    if (step === 4) {
       return Boolean(alignment.confirm && alignment.contact && alignment.consent);
     }
     return true;
-  }, [step, basic, expert, pricing, alignment, uploads]);
+  }, [step, authMode, auth, createForm, basic, expert, pricing, alignment, uploads]);
 
   const currentVisibleStepIndex = VISIBLE_STEP_ORDER.indexOf(step);
 
@@ -530,6 +570,19 @@ export default function ExpertsRegisterPage() {
     const errors = {};
 
     if (step === 0) {
+      if (authMode === "create") {
+        errors.createFullName = isBlank(createForm.fullName);
+        errors.createEmail = isBlank(createForm.email);
+        errors.createPassword = isBlank(createForm.password);
+        errors.createConfirmPassword =
+          isBlank(createForm.confirmPassword) || createForm.password !== createForm.confirmPassword;
+      } else {
+        errors.loginEmail = isBlank(auth.email);
+        errors.loginPassword = isBlank(auth.password);
+      }
+    }
+
+    if (step === 1) {
       errors.fullName = isBlank(basic.fullName);
       errors.email = isBlank(basic.email);
       errors.phone = isBlank(basic.phone);
@@ -539,7 +592,7 @@ export default function ExpertsRegisterPage() {
       errors.linkedin = isBlank(basic.linkedin) || !isValidLinkedInUrl(basic.linkedin);
     }
 
-    if (step === 1) {
+    if (step === 2) {
       errors.expertise = isBlank(expert.expertise);
       errors.expertiseOther = expert.expertise.includes("Other (Specify)") && isBlank(expert.expertiseOther);
       errors.years = isBlank(expert.years);
@@ -554,7 +607,7 @@ export default function ExpertsRegisterPage() {
       errors.photo = !uploads.photo;
     }
 
-    if (step === 2) {
+    if (step === 3) {
       if (pricing.defaultCurrency === "Custom currency (manual approval)") {
         errors.customCurrency = isBlank(pricing.customCurrency);
       }
@@ -567,19 +620,92 @@ export default function ExpertsRegisterPage() {
       errors.taxRegistrationCountry = isBlank(pricing.taxRegistrationCountry);
     }
 
-    if (step === 3) {
+    if (step === 4) {
       errors.confirm = !alignment.confirm;
       errors.contact = !alignment.contact;
       errors.consent = !alignment.consent;
     }
 
     return errors;
-  }, [showStepError, step, basic, expert, pricing, alignment, uploads]);
+  }, [showStepError, step, authMode, auth, createForm, basic, expert, pricing, alignment, uploads]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const currentUrl = new URL(window.location.href);
+    const authStatus = currentUrl.searchParams.get("auth");
+    const provider = currentUrl.searchParams.get("provider");
+    const email = currentUrl.searchParams.get("email");
+    const nextStep = currentUrl.searchParams.get("step");
+
+    if (authStatus !== "success") {
+      if (nextStep === "2") {
+        setStep(1);
+      }
+      return;
+    }
+
+    setAuthMode("login");
+    if (email) {
+      setAuth((prev) => ({
+        ...prev,
+        email,
+        password: prev.password || "social-auth",
+      }));
+    } else if (provider) {
+      const fallbackEmail = `${provider}@praktix.com`;
+      setAuth((prev) => ({
+        ...prev,
+        email: prev.email || fallbackEmail,
+        password: prev.password || "social-auth",
+      }));
+    }
+
+    setStep(1);
+    setShowStepError(false);
+
+    currentUrl.searchParams.delete("auth");
+    currentUrl.searchParams.delete("provider");
+    currentUrl.searchParams.delete("email");
+    currentUrl.searchParams.delete("step");
+    window.history.replaceState({}, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+  }, []);
+
+  function openSocialAuth(provider) {
+    setAuthMode("login");
+    setShowStepError(false);
+    if (typeof window === "undefined") return;
+
+    const returnUrl = new URL(`${window.location.origin}/experts/register`);
+    returnUrl.searchParams.set("auth", "success");
+    returnUrl.searchParams.set("provider", provider);
+    returnUrl.searchParams.set("step", "2");
+
+    const configuredStartUrl = SOCIAL_AUTH_START_URLS[provider];
+    if (configuredStartUrl) {
+      const authUrl = new URL(configuredStartUrl);
+      authUrl.searchParams.set("returnTo", returnUrl.toString());
+      window.location.href = authUrl.toString();
+      return;
+    }
+
+    const fallbackUrl = SOCIAL_AUTH_FALLBACK_URLS[provider];
+    if (!fallbackUrl) return;
+    window.location.href = fallbackUrl;
+  }
 
   function next() {
     if (!canContinue) {
       setShowStepError(true);
       return;
+    }
+    if (step === 0) {
+      if (authMode === "create") {
+        setBasic((prev) => ({
+          ...prev,
+          fullName: prev.fullName || createForm.fullName,
+        }));
+      }
     }
     setShowStepError(false);
     setStep((s) => {
@@ -670,6 +796,143 @@ export default function ExpertsRegisterPage() {
 
           <div className="mt-7">
             {step === 0 ? (
+              <div className="mx-auto max-w-[600px] rounded-[24px] bg-[#E5E7EB] px-4 py-4 shadow-[0_18px_40px_rgba(11,18,32,0.08)] sm:px-6 sm:py-5">
+                <div className="text-center text-[24px] font-semibold leading-tight text-[#0B1220] sm:text-[32px]">
+                  Applying as an Expert?
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("create");
+                    setShowStepError(false);
+                  }}
+                  className="mt-4 h-14 w-full bg-[#F0B323] px-6 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95 sm:h-[60px] sm:text-base"
+                >
+                  Create Account
+                </button>
+
+                {authMode === "login" ? (
+                  <>
+                    <div className="flex items-center gap-4 py-4">
+                      <div className="h-px flex-1 bg-[#0B1220]/20" />
+                      <div className="text-base font-semibold text-[#0B1220]/85">OR</div>
+                      <div className="h-px flex-1 bg-[#0B1220]/20" />
+                    </div>
+
+                    <div className="space-y-3">
+                      <button
+                        type="button"
+                        onClick={() => openSocialAuth("facebook")}
+                        className="flex h-14 w-full items-center justify-between bg-[#2D73DA] px-6 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:h-[60px] sm:text-[20px]"
+                      >
+                        <Facebook className="h-6 w-6 shrink-0" />
+                        <span className="flex-1 text-center">Log In with Facebook</span>
+                        <span className="w-6 shrink-0" aria-hidden="true" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openSocialAuth("google")}
+                        className="flex h-14 w-full items-center justify-between border-2 border-[#8B8B8B] bg-white px-6 text-left text-[18px] font-bold uppercase text-[#5C6470] transition hover:bg-[#FAFAFA] sm:h-[60px] sm:text-[20px]"
+                      >
+                        <Chrome className="h-6 w-6 shrink-0" />
+                        <span className="flex-1 text-center">Log In with Google</span>
+                        <span className="w-6 shrink-0" aria-hidden="true" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openSocialAuth("linkedin")}
+                        className="flex h-14 w-full items-center justify-between bg-[#356BB0] px-6 text-left text-[18px] font-bold uppercase text-white transition hover:brightness-95 sm:h-[60px] sm:text-[20px]"
+                      >
+                        <Linkedin className="h-6 w-6 shrink-0" />
+                        <span className="flex-1 text-center">Log In with LinkedIn</span>
+                        <span className="w-6 shrink-0" aria-hidden="true" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3 pt-4">
+                      <input
+                        type="email"
+                        value={auth.email}
+                        onChange={(e) => setAuth((prev) => ({ ...prev, email: e.target.value }))}
+                        placeholder="Email"
+                        className="h-14 w-full rounded-[10px] border border-[#D0D0D0] bg-white px-4 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:h-[60px] sm:text-[20px]"
+                      />
+                      {fieldErrors.loginEmail ? <p className="text-xs text-rose-600">Email is required.</p> : null}
+                      <input
+                        type="password"
+                        value={auth.password}
+                        onChange={(e) => setAuth((prev) => ({ ...prev, password: e.target.value }))}
+                        placeholder="Password"
+                        className="h-14 w-full rounded-[10px] border border-[#D0D0D0] bg-white px-4 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:h-[60px] sm:text-[20px]"
+                      />
+                      {fieldErrors.loginPassword ? <p className="text-xs text-rose-600">Password is required.</p> : null}
+                    </div>
+
+                    <button type="button" className="mt-4 block w-full text-center text-[20px] font-medium text-[#B00020] sm:text-[22px]">
+                      I forgot my password
+                    </button>
+                  </>
+                ) : (
+                  <div className="space-y-3 pt-4">
+                    <input
+                      type="text"
+                      value={createForm.fullName}
+                      onChange={(e) => setCreateForm((prev) => ({ ...prev, fullName: e.target.value }))}
+                      placeholder="Full Name"
+                      className="h-14 w-full rounded-[10px] border border-[#D0D0D0] bg-white px-4 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:h-[60px] sm:text-[20px]"
+                    />
+                    {fieldErrors.createFullName ? <p className="text-xs text-rose-600">Full name is required.</p> : null}
+                    <input
+                      type="email"
+                      value={createForm.email}
+                      onChange={(e) => setCreateForm((prev) => ({ ...prev, email: e.target.value }))}
+                      placeholder="Email"
+                      className="h-14 w-full rounded-[10px] border border-[#D0D0D0] bg-white px-4 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:h-[60px] sm:text-[20px]"
+                    />
+                    {fieldErrors.createEmail ? <p className="text-xs text-rose-600">Email is required.</p> : null}
+                    <input
+                      type="password"
+                      value={createForm.password}
+                      onChange={(e) => setCreateForm((prev) => ({ ...prev, password: e.target.value }))}
+                      placeholder="Password"
+                      className="h-14 w-full rounded-[10px] border border-[#D0D0D0] bg-white px-4 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:h-[60px] sm:text-[20px]"
+                    />
+                    {fieldErrors.createPassword ? <p className="text-xs text-rose-600">Password is required.</p> : null}
+                    <input
+                      type="password"
+                      value={createForm.confirmPassword}
+                      onChange={(e) => setCreateForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                      placeholder="Confirm Password"
+                      className="h-14 w-full rounded-[10px] border border-[#D0D0D0] bg-white px-4 text-[18px] text-[#0B1220] placeholder:text-[#8B929D] outline-none sm:h-[60px] sm:text-[20px]"
+                    />
+                    {fieldErrors.createConfirmPassword ? <p className="text-xs text-rose-600">Passwords must match.</p> : null}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode("login");
+                        setShowStepError(false);
+                      }}
+                      className="block w-full pt-2 text-center text-[16px] font-medium text-[#356BB0] hover:underline"
+                    >
+                      Already have an account? Log In
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={next}
+                  className="mt-4 h-14 w-full bg-[#F0B323] px-6 text-sm font-bold uppercase tracking-wide text-white transition hover:brightness-95 sm:h-[60px] sm:text-base"
+                >
+                  {authMode === "create" ? "Create Account & Continue" : "Log In"}
+                </button>
+              </div>
+            ) : null}
+
+            {step === 1 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Full Name" required error={fieldErrors.fullName}>
                   <Input error={fieldErrors.fullName} icon={UserRound} iconColor="#A78BFA" placeholder="ex: John Doe" value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} />
@@ -738,7 +1001,7 @@ export default function ExpertsRegisterPage() {
               </div>
             ) : null}
 
-            {step === 1 ? (
+            {step === 2 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Primary area of expertise" required hint="Multi-select" className="sm:col-span-2" error={fieldErrors.expertise}>
                   <MultiSelect
@@ -865,7 +1128,7 @@ export default function ExpertsRegisterPage() {
               </div>
             ) : null}
 
-            {step === 2 ? (
+            {step === 3 ? (
               <div className="space-y-5">
                 <div className="rounded-3xl bg-white/60 p-4 ring-1 ring-black/10">
                   <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#0B1220]">
@@ -1029,7 +1292,7 @@ export default function ExpertsRegisterPage() {
               </div>
             ) : null}
 
-            {step === 3 ? (
+            {step === 4 ? (
               <div className="space-y-4">
                 <Field label="Why do you want to collaborate with Praktix?" error={fieldErrors.why}>
                   <textarea
@@ -1057,7 +1320,7 @@ export default function ExpertsRegisterPage() {
               </div>
             ) : null}
 
-            {step === 4 ? (
+            {step === 5 ? (
               <div className="rounded-3xl bg-white/60 p-6 ring-1 ring-black/10">
                 {submitted ? (
                   <div className="rounded-2xl bg-emerald-500/10 p-4 ring-1 ring-emerald-400/30">
@@ -1098,7 +1361,7 @@ export default function ExpertsRegisterPage() {
                 <ChevronLeft className="h-4 w-4" />
                 Back
               </button>
-              {currentVisibleStepIndex < VISIBLE_STEP_ORDER.length - 1 ? (
+              {step === 0 ? null : currentVisibleStepIndex < VISIBLE_STEP_ORDER.length - 1 ? (
                 <button
                   type="button"
                   onClick={next}
