@@ -15,7 +15,6 @@ import {
   Globe2,
   Link as LinkIcon,
   Linkedin,
-  Mail,
   MapPin,
   Phone,
   ReceiptText,
@@ -427,7 +426,6 @@ export default function ExpertsRegisterPage() {
 
   const [basic, setBasic] = useState({
     fullName: "",
-    email: "",
     phone: "",
     country: "",
     orgName: "",
@@ -503,7 +501,6 @@ export default function ExpertsRegisterPage() {
       const linkedInValid = isValidLinkedInUrl(basic.linkedin);
       return Boolean(
         basic.fullName &&
-          basic.email &&
           basic.phone &&
           basic.country &&
           basic.orgName &&
@@ -573,7 +570,6 @@ export default function ExpertsRegisterPage() {
 
     if (step === 1) {
       errors.fullName = isBlank(basic.fullName);
-      errors.email = isBlank(basic.email);
       errors.phone = isBlank(basic.phone);
       errors.country = isBlank(basic.country);
       errors.orgName = isBlank(basic.orgName);
@@ -872,9 +868,6 @@ export default function ExpertsRegisterPage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Full Name" required error={fieldErrors.fullName}>
                   <Input error={fieldErrors.fullName} icon={UserRound} iconColor="#A78BFA" placeholder="ex: John Doe" value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} />
-                </Field>
-                <Field label="Email Address" required error={fieldErrors.email}>
-                  <Input error={fieldErrors.email} type="email" spellCheck={false} icon={Mail} iconColor="#22D3EE" placeholder="ex: john.doe@email.com" value={basic.email} onChange={(e) => setBasic({ ...basic, email: e.target.value })} />
                 </Field>
                 <Field label="Phone Number" required error={fieldErrors.phone}>
                   <Input
@@ -1268,7 +1261,6 @@ export default function ExpertsRegisterPage() {
                 ) : (
                   <div className="space-y-2 text-sm text-[#0B1220]/80">
                     <p><strong>Name:</strong> {basic.fullName || "--"}</p>
-                    <p><strong>Email:</strong> {basic.email || "--"}</p>
                     <p><strong>Expertise:</strong> {expert.expertise.join(", ") || "--"}</p>
                     <p><strong>Engagement:</strong> {expert.engagement.join(", ") || "--"}</p>
                     <p><strong>Delivery Preference:</strong> {expert.delivery.join(", ") || "--"}</p>

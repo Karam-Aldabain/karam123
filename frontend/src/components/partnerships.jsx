@@ -1,2518 +1,2365 @@
 ﻿import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
-    motion,
-    AnimatePresence,
-    useReducedMotion,
+  motion,
+  AnimatePresence,
+  useReducedMotion,
 } from "framer-motion";
 import {
-    ArrowRight,
-    BadgeCheck,
-    Building2,
-    Calendar,
-    ChevronLeft,
-    ChevronRight,
-    ClipboardCheck,
-    Compass,
-    FileCheck2,
-    Globe2,
-    GraduationCap,
-    Handshake,
-    MapPin,
-    Shield,
-    Sparkles,
-    Star,
-    Target,
-    Zap,
-    Briefcase,
-    Users,
-    Network,
-    Landmark,
-    Mail,
-    Phone,
-    Link as LinkIcon,
-    Upload,
-    CheckCircle2,
-    AlertCircle,
+  ArrowRight,
+  BadgeCheck,
+  Building2,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardCheck,
+  Compass,
+  FileCheck2,
+  Globe2,
+  GraduationCap,
+  Handshake,
+  MapPin,
+  Shield,
+  Sparkles,
+  Star,
+  Target,
+  Zap,
+  Briefcase,
+  Users,
+  Network,
+  Landmark,
+  Mail,
+  Phone,
+  Link as LinkIcon,
+  Upload,
+  CheckCircle2,
 } from "lucide-react";
-import apiClient from "../api/api.tsx";
 
-/** ---------------- THEME ---------------- */
+/** ---------------- THEME (same as your provided code) ---------------- */
 const THEME = {
-    deep: "#0B1220",
-    slate: "#1E2A3A",
-    sand: "#E9E7DF",
-    accent: "#22D3EE",
-    accent2: "#A78BFA",
-    accent3: "#34D399",
-    accent4: "#F59E0B",
-    pink: "#C91D67",
-    star: "#F5D66B",
-    error: "#EF4444",
-    errorLight: "#FEE2E2",
+  deep: "#0B1220",
+  slate: "#1E2A3A",
+  sand: "#E9E7DF",
+
+  accent: "#22D3EE",
+  accent2: "#A78BFA",
+  accent3: "#34D399",
+  accent4: "#F59E0B",
+
+  pink: "#C91D67",
+  star: "#F5D66B",
 };
 
 const DARK_SECTION_BG = "linear-gradient(90deg, #050B1F 0%, #071A3E 100%)";
 const ACCENT_RGB = "201,29,103";
 const accent = (a) => `rgba(${ACCENT_RGB}, ${a})`;
+void motion;
 
 const POWER_ICON_SHELL = {
-    background:
-        "linear-gradient(145deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.07) 100%)",
-    border: "1px solid rgba(255,255,255,0.22)",
-    boxShadow:
-        "0 10px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.20)",
+  background:
+    "linear-gradient(145deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.07) 100%)",
+  border: "1px solid rgba(255,255,255,0.22)",
+  boxShadow:
+    "0 10px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.20)",
 };
 
 const iconStrongProps = { strokeWidth: 2.4 };
 
 function cx(...classes) {
-    return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(" ");
 }
 
 function clampStyle(lines) {
-    return {
-        display: "-webkit-box",
-        WebkitBoxOrient: "vertical",
-        WebkitLineClamp: lines,
-        overflow: "hidden",
-    };
+  return {
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: lines,
+    overflow: "hidden",
+  };
 }
 
 function readFileAsDataUrl(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ""));
-        reader.onerror = () => reject(new Error("Failed to read file."));
-        reader.readAsDataURL(file);
-    });
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Failed to read file."));
+    reader.readAsDataURL(file);
+  });
 }
 
 /** ---------------- VIEWPORT HOOK ---------------- */
 function useInViewOnce(threshold = 0.2) {
-    const ref = useRef(null);
-    const [inView, setInView] = useState(false);
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
 
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
 
-        const obs = new IntersectionObserver(
-            (entries) => {
-                for (const e of entries) {
-                    if (e.isIntersecting) {
-                        setInView(true);
-                        obs.disconnect();
-                        break;
-                    }
-                }
-            },
-            { threshold }
-        );
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setInView(true);
+            obs.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold }
+    );
 
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [threshold]);
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
 
-    return { ref, inView };
+  return { ref, inView };
 }
 
 /** ---------------- ANIMATED NUMBER ---------------- */
 function AnimatedNumber({ value, suffix = "", durationMs = 900 }) {
-    const reduce = useReducedMotion();
-    const [n, setN] = useState(reduce ? value : 0);
+  const reduce = useReducedMotion();
+  const [n, setN] = useState(reduce ? value : 0);
 
-    useEffect(() => {
-        if (reduce) return;
-        let raf = 0;
-        const start = performance.now();
-        const from = 0;
+  useEffect(() => {
+    if (reduce) return;
+    let raf = 0;
+    const start = performance.now();
+    const from = 0;
 
-        const tick = (t) => {
-            const p = Math.min(1, (t - start) / durationMs);
-            const eased = 1 - Math.pow(1 - p, 3);
-            setN(Math.round(from + (value - from) * eased));
-            if (p < 1) raf = requestAnimationFrame(tick);
-        };
+    const tick = (t) => {
+      const p = Math.min(1, (t - start) / durationMs);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(Math.round(from + (value - from) * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
 
-        raf = requestAnimationFrame(tick);
-        return () => cancelAnimationFrame(raf);
-    }, [value, durationMs, reduce]);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, durationMs, reduce]);
 
-    return (
-        <span>
-            {n.toLocaleString()}
-            {suffix}
-        </span>
-    );
+  return (
+    <span>
+      {n.toLocaleString()}
+      {suffix}
+    </span>
+  );
 }
 
 /** ---------------- UI ATOMS ---------------- */
 function IconBadge({ color, children }) {
-    return (
-        <span
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1"
-            style={{ ...POWER_ICON_SHELL }}
-        >
-            <span style={{ color }}>{children}</span>
-        </span>
-    );
+  return (
+    <span
+      className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1"
+      style={{ ...POWER_ICON_SHELL }}
+    >
+      <span style={{ color }}>{children}</span>
+    </span>
+  );
 }
 
 function Pill({ label, tone = "dark" }) {
-    const dark = tone === "dark";
-    return (
-        <span
-            className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
-            style={{
-                background: dark ? "rgba(255,255,255,0.08)" : "rgba(11,18,32,0.06)",
-                color: dark ? "rgba(255,255,255,0.84)" : "rgba(11,18,32,0.75)",
-                border: dark
-                    ? "1px solid rgba(255,255,255,0.12)"
-                    : "1px solid rgba(11,18,32,0.12)",
-            }}
-        >
-            {label}
-        </span>
-    );
+  const dark = tone === "dark";
+  return (
+    <span
+      className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+      style={{
+        background: dark ? "rgba(255,255,255,0.08)" : "rgba(11,18,32,0.06)",
+        color: dark ? "rgba(255,255,255,0.84)" : "rgba(11,18,32,0.75)",
+        border: dark
+          ? "1px solid rgba(255,255,255,0.12)"
+          : "1px solid rgba(11,18,32,0.12)",
+      }}
+    >
+      {label}
+    </span>
+  );
 }
 
 function SectionTitle({ eyebrow, title, accentText, subtitle, dark = false }) {
-    return (
-        <div className={cx("mx-auto max-w-6xl", dark ? "text-white" : "text-[#0B1220]")}>
-            {eyebrow ? (
-                <div
-                    className={cx(
-                        "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold tracking-widest",
-                        dark
-                            ? "bg-white/10 text-white/80 ring-1 ring-white/10"
-                            : "bg-[#0B1220]/5 text-[#0B1220]/70 ring-1 ring-[#0B1220]/10"
-                    )}
-                >
-                    <Sparkles className="h-4 w-4" style={{ color: THEME.accent }} {...iconStrongProps} />
-                    <span>{eyebrow}</span>
-                </div>
-            ) : null}
-
-            <h2
-                className={cx(
-                    eyebrow ? "mt-5 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl" : "mt-0 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl",
-                    dark ? "text-white" : "text-[#0B1220]"
-                )}
-            >
-                {title}{" "}
-                {accentText ? (
-                    <span style={{ color: THEME.pink }}>{accentText}</span>
-                ) : null}
-            </h2>
-
-            {subtitle ? (
-                <p
-                    className={cx(
-                        "mt-3 max-w-5xl text-balance text-base sm:text-lg",
-                        dark ? "text-white/70" : "text-[#0B1220]/70"
-                    )}
-                >
-                    {subtitle}
-                </p>
-            ) : null}
+  return (
+    <div className={cx("mx-auto max-w-6xl", dark ? "text-white" : "text-[#0B1220]")}>
+      {eyebrow ? (
+        <div
+          className={cx(
+            "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold tracking-widest",
+            dark
+              ? "bg-white/10 text-white/80 ring-1 ring-white/10"
+              : "bg-[#0B1220]/5 text-[#0B1220]/70 ring-1 ring-[#0B1220]/10"
+          )}
+        >
+          <Sparkles className="h-4 w-4" style={{ color: THEME.accent }} {...iconStrongProps} />
+          <span>{eyebrow}</span>
         </div>
-    );
+      ) : null}
+
+      <h2
+        className={cx(
+          eyebrow ? "mt-5 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl" : "mt-0 text-balance text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl",
+          dark ? "text-white" : "text-[#0B1220]"
+        )}
+      >
+        {title}{" "}
+        {accentText ? (
+          <span style={{ color: THEME.pink }}>{accentText}</span>
+        ) : null}
+      </h2>
+
+      {subtitle ? (
+        <p
+          className={cx(
+            "mt-3 max-w-5xl text-balance text-base sm:text-lg",
+            dark ? "text-white/70" : "text-[#0B1220]/70"
+          )}
+        >
+          {subtitle}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 function MagneticButton({ children, href, onClick, variant = "primary" }) {
-    const ref = useRef(null);
-    const reduce = useReducedMotion();
-    const [pos, setPos] = useState({ x: 0, y: 0 });
+  const ref = useRef(null);
+  const reduce = useReducedMotion();
+  const [pos, setPos] = useState({ x: 0, y: 0 });
 
-    const base =
-        "relative inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
-    const primary =
-        "text-white shadow-[0_16px_40px_rgba(34,211,238,0.16)] hover:translate-y-[-1px] active:translate-y-[0px]";
-    const secondary =
-        "bg-transparent text-white ring-1 ring-white/20 hover:bg-white/5";
+  const base =
+    "relative inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
+  const primary =
+    "text-white shadow-[0_16px_40px_rgba(34,211,238,0.16)] hover:translate-y-[-1px] active:translate-y-[0px]";
+  const secondary =
+    "bg-transparent text-white ring-1 ring-white/20 hover:bg-white/5";
 
-    const stylePrimary = {
-        background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.84)} 55%, ${accent(
-            0.60
-        )} 120%)`,
-    };
+  const stylePrimary = {
+    background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.84)} 55%, ${accent(
+      0.60
+    )} 120%)`,
+  };
 
-    const Comp = href ? "a" : "button";
-    const props = href ? { href } : { type: "button" };
+  const Comp = href ? "a" : "button";
+  const props = href ? { href } : { type: "button" };
 
-    function onMove(e) {
-        if (reduce) return;
-        const el = ref.current;
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        const x = e.clientX - (r.left + r.width / 2);
-        const y = e.clientY - (r.top + r.height / 2);
-        setPos({ x: x * 0.18, y: y * 0.18 });
-    }
+  function onMove(e) {
+    if (reduce) return;
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = e.clientX - (r.left + r.width / 2);
+    const y = e.clientY - (r.top + r.height / 2);
+    setPos({ x: x * 0.18, y: y * 0.18 });
+  }
 
-    function onLeave() {
-        setPos({ x: 0, y: 0 });
-    }
+  function onLeave() {
+    setPos({ x: 0, y: 0 });
+  }
 
-    return (
-        <Comp
-            {...props}
-            onClick={onClick}
-            ref={ref}
-            onMouseMove={onMove}
-            onMouseLeave={onLeave}
-            className={cx(base, variant === "primary" ? primary : secondary)}
-            style={variant === "primary" ? stylePrimary : undefined}
-        >
-            <motion.span
-                animate={reduce ? undefined : { x: pos.x, y: pos.y }}
-                transition={{ type: "spring", stiffness: 240, damping: 18 }}
-                className="inline-flex items-center gap-2"
-            >
-                {children}
-                <ArrowRight className="h-4 w-4" {...iconStrongProps} />
-            </motion.span>
-            <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
-                <span className="shine" />
-            </span>
-        </Comp>
-    );
+  return (
+    <Comp
+      {...props}
+      onClick={onClick}
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      className={cx(base, variant === "primary" ? primary : secondary)}
+      style={variant === "primary" ? stylePrimary : undefined}
+    >
+      <motion.span
+        animate={reduce ? undefined : { x: pos.x, y: pos.y }}
+        transition={{ type: "spring", stiffness: 240, damping: 18 }}
+        className="inline-flex items-center gap-2"
+      >
+        {children}
+        <ArrowRight className="h-4 w-4" {...iconStrongProps} />
+      </motion.span>
+      <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
+        <span className="shine" />
+      </span>
+    </Comp>
+  );
 }
 
-/** ---------------- PAGE DATA ---------------- */
+/** ---------------- PAGE DATA (from PDF content) ---------------- */
 const ARCHITECTURE = [
-    {
-        title: "University Partnerships",
-        desc: "Integrate real industry experience into academic frameworks through structured internships, industrial courses, and co-hosted initiatives.",
-        icon: GraduationCap,
-        accent: THEME.accent2,
-        photo: "/images/uni-partnership.jpg",
-        bullets: [
-            "Industry-integrated internships (3–6 months)",
-            "Industrial courses aligned with curricula",
-            "Co-hosted global programs",
-            "Portfolio-driven outcomes",
-            "Academic–industry integration",
-        ],
-    },
-    {
-        title: "Industry & Corporate Partnerships",
-        desc: "Workforce development, innovation acceleration, and future skills adoption through tailored programs and execution models.",
-        icon: Building2,
-        accent: THEME.accent,
-        photo: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80",
-        bullets: [
-            "AI & emerging tech upskilling",
-            "Tailored executive programs",
-            "Workshops & masterclasses",
-            "Employee development tracks",
-            "Innovation labs collaboration",
-        ],
-    },
-    {
-        title: "Strategic Alliances",
-        desc: "Long-term institutional collaboration designed to create ecosystem-level impact across regions and sectors.",
-        icon: Landmark,
-        accent: THEME.accent4,
-        photo: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1400&q=80",
-        bullets: [
-            "Government collaboration",
-            "Innovation ecosystem development",
-            "Public-private partnerships",
-            "Regional transformation initiatives",
-            "International program expansion",
-        ],
-    },
-    {
-        title: "Co-Hosted Programs",
-        desc: "Co-host programs leveraging our European expert network while enhancing institutional positioning and shared outcomes.",
-        icon: Handshake,
-        accent: THEME.accent3,
-        photo: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1400&q=80",
-        bullets: [
-            "Joint certification",
-            "Shared academic branding",
-            "Onsite / hybrid implementation",
-            "Faculty collaboration",
-        ],
-    },
+  {
+    title: "University Partnerships",
+    desc: "Integrate real industry experience into academic frameworks through structured internships, industrial courses, and co-hosted initiatives.",
+    icon: GraduationCap,
+    accent: THEME.accent2,
+    photo:
+      "/images/uni-partnership.jpg",
+    bullets: [
+      "Industry-integrated internships (3–6 months)",
+      "Industrial courses aligned with curricula",
+      "Co-hosted global programs",
+      "Portfolio-driven outcomes",
+      "Academic–industry integration",
+    ],
+  },
+  {
+    title: "Industry & Corporate Partnerships",
+    desc: "Workforce development, innovation acceleration, and future skills adoption through tailored programs and execution models.",
+    icon: Building2,
+    accent: THEME.accent,
+    photo:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80",
+    bullets: [
+      "AI & emerging tech upskilling",
+      "Tailored executive programs",
+      "Workshops & masterclasses",
+      "Employee development tracks",
+      "Innovation labs collaboration",
+    ],
+  },
+  {
+    title: "Strategic Alliances",
+    desc: "Long-term institutional collaboration designed to create ecosystem-level impact across regions and sectors.",
+    icon: Landmark,
+    accent: THEME.accent4,
+    photo:
+      "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1400&q=80",
+    bullets: [
+      "Government collaboration",
+      "Innovation ecosystem development",
+      "Public-private partnerships",
+      "Regional transformation initiatives",
+      "International program expansion",
+    ],
+  },
+  {
+    title: "Co-Hosted Programs",
+    desc: "Co-host programs leveraging our European expert network while enhancing institutional positioning and shared outcomes.",
+    icon: Handshake,
+    accent: THEME.accent3,
+    photo:
+      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1400&q=80",
+    bullets: [
+      "Joint certification",
+      "Shared academic branding",
+      "Onsite / hybrid implementation",
+      "Faculty collaboration",
+    ],
+  },
 ];
 
 const EXPERT_OPPORTUNITIES = [
-    { label: "Internship supervision", icon: Briefcase, color: THEME.accent3 },
-    { label: "AI & executive workshops", icon: Sparkles, color: THEME.accent2 },
-    { label: "Curriculum co-design", icon: ClipboardCheck, color: THEME.accent4 },
-    { label: "Industry mentorship", icon: Users, color: THEME.accent },
-    { label: "Advisory boards", icon: Shield, color: THEME.accent3 },
+  { label: "Internship supervision", icon: Briefcase, color: THEME.accent3 },
+  { label: "AI & executive workshops", icon: Sparkles, color: THEME.accent2 },
+  { label: "Curriculum co-design", icon: ClipboardCheck, color: THEME.accent4 },
+  { label: "Industry mentorship", icon: Users, color: THEME.accent },
+  { label: "Advisory boards", icon: Shield, color: THEME.accent3 },
 ];
 
 const EXPERT_ELIGIBILITY = [
-    "Proven industry experience",
-    "Academic background (preferred but not mandatory)",
-    "Leadership or project ownership experience",
-    "Fluent professional communication",
+  "Proven industry experience",
+  "Academic background (preferred but not mandatory)",
+  "Leadership or project ownership experience",
+  "Fluent professional communication",
 ];
 
 const IMPACT_METRICS = [
-    { label: "Trainees engaged", value: 1000, suffix: "+", icon: GraduationCap, color: THEME.accent },
-    { label: "Institutional collaborations", value: 40, suffix: "+", icon: Network, color: THEME.accent2 },
-    { label: "Industry mentors", value: 20, suffix: "+", icon: BadgeCheck, color: THEME.accent3 },
-    { label: "Portfolio completion", value: 85, suffix: "%", icon: FileCheck2, color: THEME.accent4 },
-    { label: "Improved career readiness", value: 70, suffix: "%", icon: Target, color: THEME.accent },
+  { label: "Trainees engaged", value: 1000, suffix: "+", icon: GraduationCap, color: THEME.accent },
+  { label: "Institutional collaborations", value: 40, suffix: "+", icon: Network, color: THEME.accent2 },
+  { label: "Industry mentors", value: 20, suffix: "+", icon: BadgeCheck, color: THEME.accent3 },
+  { label: "Portfolio completion", value: 85, suffix: "%", icon: FileCheck2, color: THEME.accent4 },
+  { label: "Improved career readiness", value: 70, suffix: "%", icon: Target, color: THEME.accent },
 ];
 
 const WHY_PARTNER = [
-    "Structured delivery model",
-    "Real project-based execution",
-    "European academic & industry integration",
-    "AI-driven curriculum evolution",
-    "Measurable outcomes",
-    "Scalable deployment",
+  "Structured delivery model",
+  "Real project-based execution",
+  "European academic & industry integration",
+  "AI-driven curriculum evolution",
+  "Measurable outcomes",
+  "Scalable deployment",
 ];
 
 const PORTRAITS = [
-    {
-        name: "Prof. Elina M.",
-        role: "University Professor • AI Systems",
-        photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
-        bio: "Curriculum co-design + academic rigor for outcome-based programs.",
-        accent: THEME.accent2,
-    },
-    {
-        name: "David K.",
-        role: "Senior Consultant • Digital Transformation",
-        photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80",
-        bio: "Workforce transformation roadmaps and scalable delivery playbooks.",
-        accent: THEME.accent,
-    },
-    {
-        name: "Sara N.",
-        role: "Industry Mentor • Data & BI",
-        photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
-        bio: "Mentorship and evaluation loops to ship portfolio-grade dashboards.",
-        accent: THEME.accent4,
-    },
-    {
-        name: "Lukas R.",
-        role: "Engineering Lead • Cloud & DevOps",
-        photo: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80",
-        bio: "Hands-on supervision for real infra + CI/CD production outputs.",
-        accent: THEME.accent3,
-    },
+  {
+    name: "Prof. Elina M.",
+    role: "University Professor • AI Systems",
+    photo:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
+    bio: "Curriculum co-design + academic rigor for outcome-based programs.",
+    accent: THEME.accent2,
+  },
+  {
+    name: "David K.",
+    role: "Senior Consultant • Digital Transformation",
+    photo:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80",
+    bio: "Workforce transformation roadmaps and scalable delivery playbooks.",
+    accent: THEME.accent,
+  },
+  {
+    name: "Sara N.",
+    role: "Industry Mentor • Data & BI",
+    photo:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
+    bio: "Mentorship and evaluation loops to ship portfolio-grade dashboards.",
+    accent: THEME.accent4,
+  },
+  {
+    name: "Lukas R.",
+    role: "Engineering Lead • Cloud & DevOps",
+    photo:
+      "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80",
+    bio: "Hands-on supervision for real infra + CI/CD production outputs.",
+    accent: THEME.accent3,
+  },
 ];
-
-/** ---------------- FIELD-LEVEL ERROR ---------------- */
-function FieldError({ error }) {
-    if (!error) return null;
-    return (
-        <motion.p
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.18 }}
-            className="mt-1.5 text-xs font-medium flex items-center gap-1.5"
-            style={{ color: THEME.error }}
-        >
-            <span
-                className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full shrink-0"
-                style={{ background: "rgba(239,68,68,0.12)" }}
-            >
-                <AlertCircle className="h-2.5 w-2.5" style={{ color: THEME.error }} />
-            </span>
-            {error}
-        </motion.p>
-    );
-}
 
 /** ---------------- HERO: network glow background nodes ---------------- */
 function NetworkBackdrop() {
-    return (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div
-                className="absolute inset-0 opacity-[0.14]"
-                style={{
-                    backgroundImage:
-                        "radial-gradient(900px circle at 15% 20%, rgba(34,211,238,0.18), transparent 55%), radial-gradient(900px circle at 85% 35%, rgba(167,139,250,0.16), transparent 55%), radial-gradient(900px circle at 60% 90%, rgba(245,158,11,0.12), transparent 55%)",
-                }}
-            />
-            <div
-                className="absolute inset-0 opacity-[0.16]"
-                style={{
-                    backgroundImage:
-                        "linear-gradient(rgba(233,231,223,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(233,231,223,0.12) 1px, transparent 1px)",
-                    backgroundSize: "64px 64px",
-                    maskImage: "radial-gradient(900px circle at 30% 25%, rgba(0,0,0,1), transparent 70%)",
-                }}
-            />
-            <div className="absolute inset-0 opacity-80">
-                <div className="constellation" />
-            </div>
-        </div>
-    );
+  // purely decorative; different from your other hero
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* subtle photo layer */}
+      <div
+        className="absolute inset-0 opacity-[0.14]"
+        style={{
+          backgroundImage:
+            "radial-gradient(900px circle at 15% 20%, rgba(34,211,238,0.18), transparent 55%), radial-gradient(900px circle at 85% 35%, rgba(167,139,250,0.16), transparent 55%), radial-gradient(900px circle at 60% 90%, rgba(245,158,11,0.12), transparent 55%)",
+        }}
+      />
+      {/* grid */}
+      <div
+        className="absolute inset-0 opacity-[0.16]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(233,231,223,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(233,231,223,0.12) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+          maskImage: "radial-gradient(900px circle at 30% 25%, rgba(0,0,0,1), transparent 70%)",
+        }}
+      />
+      {/* animated constellation */}
+      <div className="absolute inset-0 opacity-80">
+        <div className="constellation" />
+      </div>
+    </div>
+  );
 }
 
 /** ---------------- ARCHITECTURE CARD ---------------- */
 function ArchitectureCard({ item, index }) {
-    const Icon = item.icon;
-    return (
-        <motion.article
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.55, ease: "easeOut", delay: Math.min(index * 0.06, 0.18) }}
-            whileHover={{ y: -8, scale: 1.01 }}
-            className="group relative overflow-hidden rounded-[36px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
-            style={{ boxShadow: "0 22px 80px rgba(0,0,0,0.35)" }}
-        >
-            <div className="absolute inset-0">
-                <img
-                    src={item.photo}
-                    alt={item.title}
-                    className="h-full w-full object-cover opacity-[0.45] transition duration-500 group-hover:opacity-[0.58] group-hover:scale-[1.03]"
-                />
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        background:
-                            "linear-gradient(180deg, rgba(11,18,32,0.42) 0%, rgba(11,18,32,0.72) 65%, rgba(11,18,32,0.84) 100%)",
-                    }}
-                />
+  const Icon = item.icon;
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.55, ease: "easeOut", delay: Math.min(index * 0.06, 0.18) }}
+      whileHover={{ y: -8, scale: 1.01 }}
+      className="group relative overflow-hidden rounded-[36px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
+      style={{ boxShadow: "0 22px 80px rgba(0,0,0,0.35)" }}
+    >
+      {/* photo */}
+      <div className="absolute inset-0">
+        <img
+          src={item.photo}
+          alt={item.title}
+          className="h-full w-full object-cover opacity-[0.45] transition duration-500 group-hover:opacity-[0.58] group-hover:scale-[1.03]"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(11,18,32,0.42) 0%, rgba(11,18,32,0.72) 65%, rgba(11,18,32,0.84) 100%)",
+          }}
+        />
+      </div>
+
+      {/* top accent bar */}
+      <div
+        className="absolute inset-x-0 top-0 h-1 opacity-90"
+        style={{ background: `linear-gradient(90deg, ${item.accent} 0%, rgba(255,255,255,0) 80%)` }}
+      />
+
+      {/* hover shine */}
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="shine" />
+      </div>
+
+      <div className="relative p-6 sm:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <motion.div
+              whileHover={{ rotate: 6 }}
+              className="relative"
+            >
+              <IconBadge color={item.accent}>
+                <Icon className="h-5 w-5" {...iconStrongProps} />
+              </IconBadge>
+              <span
+                className="pointer-events-none absolute -right-2 -top-2 h-3 w-3 rounded-full"
+                style={{ background: item.accent, boxShadow: `0 0 0 6px rgba(255,255,255,0.06)` }}
+              />
+            </motion.div>
+
+            <div>
+              <div className="text-lg font-semibold text-white" style={clampStyle(2)}>
+                {item.title}
+              </div>
             </div>
+          </div>
 
-            <div
-                className="absolute inset-x-0 top-0 h-1 opacity-90"
-                style={{ background: `linear-gradient(90deg, ${item.accent} 0%, rgba(255,255,255,0) 80%)` }}
-            />
+        </div>
 
-            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <div className="shine" />
+        <p className="mt-4 text-sm leading-relaxed text-white/70" style={clampStyle(3)}>
+          {item.desc}
+        </p>
+
+        <div className="mt-5 grid grid-cols-1 gap-2">
+          {item.bullets.slice(0, 5).map((b) => (
+            <div key={b} className="flex items-start gap-3">
+              <span
+                className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full ring-1"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  borderColor: "rgba(255,255,255,0.10)",
+                }}
+              >
+                <span className="h-2 w-2 rounded-full" style={{ background: item.accent }} />
+              </span>
+              <div className="text-sm text-white/80">{b}</div>
             </div>
+          ))}
+        </div>
 
-            <div className="relative p-6 sm:p-7">
-                <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <motion.div whileHover={{ rotate: 6 }} className="relative">
-                            <IconBadge color={item.accent}>
-                                <Icon className="h-5 w-5" {...iconStrongProps} />
-                            </IconBadge>
-                            <span
-                                className="pointer-events-none absolute -right-2 -top-2 h-3 w-3 rounded-full"
-                                style={{ background: item.accent, boxShadow: `0 0 0 6px rgba(255,255,255,0.06)` }}
-                            />
-                        </motion.div>
-
-                        <div>
-                            <div className="text-lg font-semibold text-white" style={clampStyle(2)}>
-                                {item.title}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <p className="mt-4 text-sm leading-relaxed text-white/70" style={clampStyle(3)}>
-                    {item.desc}
-                </p>
-
-                <div className="mt-5 grid grid-cols-1 gap-2">
-                    {item.bullets.slice(0, 5).map((b) => (
-                        <div key={b} className="flex items-start gap-3">
-                            <span
-                                className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full ring-1"
-                                style={{
-                                    background: "rgba(255,255,255,0.06)",
-                                    borderColor: "rgba(255,255,255,0.10)",
-                                }}
-                            >
-                                <span className="h-2 w-2 rounded-full" style={{ background: item.accent }} />
-                            </span>
-                            <div className="text-sm text-white/80">{b}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </motion.article>
-    );
+      </div>
+    </motion.article>
+  );
 }
 
 /** ---------------- EXPERT PORTRAIT TILE ---------------- */
 function PortraitTile({ p, idx }) {
-    return (
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
+      whileHover={{ y: -6 }}
+      className="group relative overflow-hidden rounded-[32px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
+      style={{ boxShadow: "0 20px 70px rgba(0,0,0,0.32)" }}
+    >
+      <div className="absolute inset-0">
+        <img
+          src={p.photo}
+          alt={p.name}
+          className="h-full w-full object-cover opacity-[0.95] transition duration-500 group-hover:scale-[1.04]"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(11,18,32,0.06) 0%, rgba(11,18,32,0.88) 70%, rgba(11,18,32,0.98) 100%)",
+          }}
+        />
+      </div>
+
+      <div
+        className="absolute inset-x-0 top-0 h-1 opacity-90"
+        style={{ background: `linear-gradient(90deg, ${p.accent} 0%, rgba(255,255,255,0) 80%)` }}
+      />
+
+      <div className="relative p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-base font-semibold text-white">{p.name}</div>
+            <div className="mt-1 text-sm text-white/70">{p.role}</div>
+          </div>
+
+          <div className="hidden sm:block">
+            <IconBadge color={p.accent}>
+              <BadgeCheck className="h-5 w-5" {...iconStrongProps} />
+            </IconBadge>
+          </div>
+        </div>
+
         <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
-            whileHover={{ y: -6 }}
-            className="group relative overflow-hidden rounded-[32px] bg-white/5 ring-1 ring-white/10 backdrop-blur"
-            style={{ boxShadow: "0 20px 70px rgba(0,0,0,0.32)" }}
+          initial={{ opacity: 0, y: 10 }}
+          whileHover={{ opacity: 1, y: 0 }}
+          className="mt-4 rounded-2xl p-4 ring-1"
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            borderColor: "rgba(255,255,255,0.10)",
+          }}
         >
-            <div className="absolute inset-0">
-                <img
-                    src={p.photo}
-                    alt={p.name}
-                    className="h-full w-full object-cover opacity-[0.95] transition duration-500 group-hover:scale-[1.04]"
-                />
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        background:
-                            "linear-gradient(180deg, rgba(11,18,32,0.06) 0%, rgba(11,18,32,0.88) 70%, rgba(11,18,32,0.98) 100%)",
-                    }}
-                />
-            </div>
-
-            <div
-                className="absolute inset-x-0 top-0 h-1 opacity-90"
-                style={{ background: `linear-gradient(90deg, ${p.accent} 0%, rgba(255,255,255,0) 80%)` }}
-            />
-
-            <div className="relative p-6">
-                <div className="flex items-start justify-between gap-3">
-                    <div>
-                        <div className="text-base font-semibold text-white">{p.name}</div>
-                        <div className="mt-1 text-sm text-white/70">{p.role}</div>
-                    </div>
-
-                    <div className="hidden sm:block">
-                        <IconBadge color={p.accent}>
-                            <BadgeCheck className="h-5 w-5" {...iconStrongProps} />
-                        </IconBadge>
-                    </div>
-                </div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    whileHover={{ opacity: 1, y: 0 }}
-                    className="mt-4 rounded-2xl p-4 ring-1"
-                    style={{
-                        background: "rgba(255,255,255,0.06)",
-                        borderColor: "rgba(255,255,255,0.10)",
-                    }}
-                >
-                    <div className="text-xs font-semibold tracking-widest text-white/60">BIO</div>
-                    <div className="mt-2 text-sm text-white/80" style={clampStyle(3)}>
-                        {p.bio}
-                    </div>
-                </motion.div>
-            </div>
+          <div className="text-xs font-semibold tracking-widest text-white/60">BIO</div>
+          <div className="mt-2 text-sm text-white/80" style={clampStyle(3)}>
+            {p.bio}
+          </div>
         </motion.div>
-    );
+      </div>
+    </motion.div>
+  );
 }
 
-/** ---------------- MAP PANEL ---------------- */
+/** ---------------- MAP PANEL (animated SVG connections) ---------------- */
 function ReachMap() {
-    const reduce = useReducedMotion();
+  const reduce = useReducedMotion();
 
-    const points = [
-        { id: "hub", x: 49, y: 32, label: "Europe Hub", color: THEME.accent2 },
-        { id: "universities", x: 62, y: 26, label: "Universities", color: THEME.accent },
-        { id: "industry", x: 43, y: 42, label: "Industry", color: THEME.accent3 },
-        { id: "mena", x: 70, y: 56, label: "MENA Expansion", color: THEME.accent4 },
-    ];
+  const points = [
+    { id: "hub", x: 49, y: 32, label: "Europe Hub", color: THEME.accent2 },
+    { id: "universities", x: 62, y: 26, label: "Universities", color: THEME.accent },
+    { id: "industry", x: 43, y: 42, label: "Industry", color: THEME.accent3 },
+    { id: "mena", x: 70, y: 56, label: "MENA Expansion", color: THEME.accent4 },
+  ];
 
-    const paths = [
-        { from: "universities", to: "hub", color: THEME.accent, bend: 10 },
-        { from: "industry", to: "hub", color: THEME.accent3, bend: 8 },
-        { from: "industry", to: "universities", color: "rgba(255,255,255,0.45)", bend: 12 },
-        { from: "hub", to: "mena", color: THEME.accent2, bend: 14 },
-    ];
+  const paths = [
+    { from: "universities", to: "hub", color: THEME.accent, bend: 10 },
+    { from: "industry", to: "hub", color: THEME.accent3, bend: 8 },
+    { from: "industry", to: "universities", color: "rgba(255,255,255,0.45)", bend: 12 },
+    { from: "hub", to: "mena", color: THEME.accent2, bend: 14 },
+  ];
 
-    const byId = Object.fromEntries(points.map((p) => [p.id, p]));
+  const byId = Object.fromEntries(points.map((p) => [p.id, p]));
 
-    return (
-        <div
-            className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
-            style={{
-                background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
-                boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
-            }}
-        >
-            <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.14)" }} />
-            <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(167,139,250,0.12)" }} />
+  return (
+    <div
+      className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
+        boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
+      }}
+    >
+      <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.14)" }} />
+      <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(167,139,250,0.12)" }} />
 
-            <div
-                className="absolute inset-0"
-                style={{
-                    background:
-                        "linear-gradient(180deg, rgba(11,18,32,0.55) 0%, rgba(11,18,32,0.82) 100%)",
-                }}
-            />
+      {/* photo removed: clean layered background */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(11,18,32,0.55) 0%, rgba(11,18,32,0.82) 100%)",
+        }}
+      />
 
-            <div className="relative p-6 sm:p-8">
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <div className="text-xs font-semibold tracking-widest text-white/60">GLOBAL REACH</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">
-                            A European-rooted network with international expansion
-                        </div>
-                        <p className="mt-2 max-w-xl text-sm text-white/70">
-                            Universities, corporations, and ecosystems across Europe — with growing momentum in MENA and global markets.
-                        </p>
-                    </div>
-                </div>
-
-                <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-5">
-                    <div className="lg:col-span-3">
-                        <div className="relative overflow-hidden rounded-[32px] ring-1 ring-white/10 bg-white/5 backdrop-blur">
-                            <svg viewBox="0 0 100 70" className="h-[250px] w-full sm:h-[320px]">
-                                <defs>
-                                    <filter id="glow">
-                                        <feGaussianBlur stdDeviation="1.4" result="blur" />
-                                        <feMerge>
-                                            <feMergeNode in="blur" />
-                                            <feMergeNode in="SourceGraphic" />
-                                        </feMerge>
-                                    </filter>
-                                    <linearGradient id="ocean" x1="0" x2="1">
-                                        <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
-                                        <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
-                                    </linearGradient>
-                                </defs>
-
-                                <rect x="0" y="0" width="100" height="70" fill="url(#ocean)" />
-
-                                <g transform="translate(0,-8)">
-                                    <path
-                                        d="M20,50 C27,33 36,21 50,18 C58,16 64,20 69,25 C75,30 82,30 84,37 C86,47 78,55 64,60 C49,65 32,62 20,50 Z"
-                                        fill="rgba(255,255,255,0.06)"
-                                        stroke="rgba(255,255,255,0.10)"
-                                        strokeWidth="0.5"
-                                    />
-
-                                    {paths.map((p, i) => {
-                                        const a = byId[p.from];
-                                        const b = byId[p.to];
-                                        const midX = (a.x + b.x) / 2;
-                                        const bend = p.bend ?? 10;
-                                        const d = `M ${a.x} ${a.y} C ${midX - 3} ${a.y - bend}, ${midX + 4} ${b.y + bend * 0.35}, ${b.x} ${b.y}`;
-                                        return (
-                                            <motion.path
-                                                key={i}
-                                                d={d}
-                                                fill="none"
-                                                stroke={p.color}
-                                                strokeOpacity="0.75"
-                                                strokeWidth="0.8"
-                                                filter="url(#glow)"
-                                                initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-                                                animate={reduce ? false : { pathLength: 1, opacity: 1 }}
-                                                transition={{ duration: 1.1, ease: "easeInOut", delay: 0.15 + i * 0.12 }}
-                                                strokeDasharray="1 1"
-                                            />
-                                        );
-                                    })}
-
-                                    {points.map((pt, i) => (
-                                        <g key={pt.id}>
-                                            <motion.circle
-                                                cx={pt.x}
-                                                cy={pt.y}
-                                                r="2.1"
-                                                fill={pt.color}
-                                                filter="url(#glow)"
-                                                initial={{ opacity: 0, scale: 0.8 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ duration: 0.6, ease: "easeOut", delay: 0.12 + i * 0.08 }}
-                                            />
-                                            {!reduce ? (
-                                                <motion.circle
-                                                    cx={pt.x}
-                                                    cy={pt.y}
-                                                    r="5.2"
-                                                    fill="transparent"
-                                                    stroke={pt.color}
-                                                    strokeOpacity="0.35"
-                                                    strokeWidth="0.7"
-                                                    animate={{ scale: [1, 1.25, 1], opacity: [0.25, 0.5, 0.25] }}
-                                                    transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                                                />
-                                            ) : null}
-                                        </g>
-                                    ))}
-                                </g>
-                            </svg>
-
-                            <div className="absolute left-3 bottom-3 sm:left-4 sm:bottom-4">
-                                <div className="flex flex-col gap-2">
-                                    {points.map((p) => (
-                                        <div
-                                            key={p.id}
-                                            className="flex items-center gap-2 rounded-2xl px-3 py-2 ring-1 sm:gap-3 sm:px-4 sm:py-2.5"
-                                            style={{
-                                                background: "rgba(255,255,255,0.06)",
-                                                borderColor: "rgba(255,255,255,0.10)",
-                                            }}
-                                        >
-                                            <span
-                                                className="h-2.5 w-2.5 rounded-full"
-                                                style={{ background: p.color, boxShadow: `0 0 0 6px rgba(255,255,255,0.05)` }}
-                                            />
-                                            <div className="text-xs font-semibold text-white sm:text-sm">{p.label}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="lg:col-span-2 space-y-3">
-                        {[
-                            { icon: GraduationCap, title: "European professors", desc: "Outcome-first academic integration.", color: THEME.accent2 },
-                            { icon: Building2, title: "Leading companies", desc: "Mentors & partners across sectors.", color: THEME.accent3 },
-                            { icon: Globe2, title: "Cross-border delivery", desc: "Hybrid, onsite, and remote pathways.", color: THEME.accent },
-                        ].map((h, idx) => {
-                            const Icon = h.icon;
-                            return (
-                                <motion.div
-                                    key={h.title}
-                                    initial={{ opacity: 0, x: 12 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true, amount: 0.25 }}
-                                    transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
-                                    className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <IconBadge color={h.color}>
-                                            <Icon className="h-5 w-5" {...iconStrongProps} />
-                                        </IconBadge>
-                                        <div>
-                                            <div className="text-sm font-semibold text-white">{h.title}</div>
-                                            <div className="mt-1 text-sm text-white/70">{h.desc}</div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-                </div>
+      <div className="relative p-6 sm:p-8">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-xs font-semibold tracking-widest text-white/60">GLOBAL REACH</div>
+            <div className="mt-2 text-2xl font-semibold text-white">
+              A European-rooted network with international expansion
             </div>
+            <p className="mt-2 max-w-xl text-sm text-white/70">
+              Universities, corporations, and ecosystems across Europe — with growing momentum in MENA and global markets.
+            </p>
+          </div>
+
         </div>
-    );
+
+        <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-5">
+          <div className="lg:col-span-3">
+            <div className="relative overflow-hidden rounded-[32px] ring-1 ring-white/10 bg-white/5 backdrop-blur">
+              <svg viewBox="0 0 100 70" className="h-[250px] w-full sm:h-[320px]">
+                {/* subtle "continent" blob */}
+                <defs>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="1.4" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <linearGradient id="ocean" x1="0" x2="1">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
+                    <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
+                  </linearGradient>
+                </defs>
+
+                <rect x="0" y="0" width="100" height="70" fill="url(#ocean)" />
+
+                <g transform="translate(0,-8)">
+                  {/* abstract land */}
+                  <path
+                    d="M20,50 C27,33 36,21 50,18 C58,16 64,20 69,25 C75,30 82,30 84,37 C86,47 78,55 64,60 C49,65 32,62 20,50 Z"
+                    fill="rgba(255,255,255,0.06)"
+                    stroke="rgba(255,255,255,0.10)"
+                    strokeWidth="0.5"
+                  />
+
+                  {/* connections */}
+                  {paths.map((p, i) => {
+                    const a = byId[p.from];
+                    const b = byId[p.to];
+                    const midX = (a.x + b.x) / 2;
+                    const bend = p.bend ?? 10;
+                    const d = `M ${a.x} ${a.y} C ${midX - 3} ${a.y - bend}, ${midX + 4} ${b.y + bend * 0.35}, ${b.x} ${b.y}`;
+                    return (
+                      <motion.path
+                        key={i}
+                        d={d}
+                        fill="none"
+                        stroke={p.color}
+                        strokeOpacity="0.75"
+                        strokeWidth="0.8"
+                        filter="url(#glow)"
+                        initial={reduce ? false : { pathLength: 0, opacity: 0 }}
+                        animate={reduce ? false : { pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 1.1, ease: "easeInOut", delay: 0.15 + i * 0.12 }}
+                        strokeDasharray="1 1"
+                      />
+                    );
+                  })}
+
+                  {/* points */}
+                  {points.map((pt, i) => (
+                    <g key={pt.id}>
+                      <motion.circle
+                        cx={pt.x}
+                        cy={pt.y}
+                        r="2.1"
+                        fill={pt.color}
+                        filter="url(#glow)"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.6, ease: "easeOut", delay: 0.12 + i * 0.08 }}
+                      />
+                      {!reduce ? (
+                        <motion.circle
+                          cx={pt.x}
+                          cy={pt.y}
+                          r="5.2"
+                          fill="transparent"
+                          stroke={pt.color}
+                          strokeOpacity="0.35"
+                          strokeWidth="0.7"
+                          animate={{ scale: [1, 1.25, 1], opacity: [0.25, 0.5, 0.25] }}
+                          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+                        />
+                      ) : null}
+                    </g>
+                  ))}
+                </g>
+              </svg>
+
+              {/* legend */}
+              <div className="px-3 pb-3 pt-1 sm:absolute sm:left-4 sm:bottom-4 sm:p-0">
+                <div className="flex flex-col gap-2">
+                  {points.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center gap-2 rounded-2xl px-3 py-2 ring-1 sm:gap-3 sm:px-4 sm:py-2.5"
+                      style={{
+                        background: "rgba(255,255,255,0.06)",
+                        borderColor: "rgba(255,255,255,0.10)",
+                      }}
+                    >
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ background: p.color, boxShadow: `0 0 0 6px rgba(255,255,255,0.05)` }}
+                      />
+                      <div className="text-xs font-semibold text-white sm:text-sm">{p.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* side highlights */}
+          <div className="lg:col-span-2 space-y-3">
+            {[
+              { icon: GraduationCap, title: "European professors", desc: "Outcome-first academic integration.", color: THEME.accent2 },
+              { icon: Building2, title: "Leading companies", desc: "Mentors & partners across sectors.", color: THEME.accent3 },
+              { icon: Globe2, title: "Cross-border delivery", desc: "Hybrid, onsite, and remote pathways.", color: THEME.accent },
+            ].map((h, idx) => {
+              const Icon = h.icon;
+              return (
+                <motion.div
+                  key={h.title}
+                  initial={{ opacity: 0, x: 12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.25 }}
+                  transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
+                  className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
+                >
+                  <div className="flex items-start gap-3">
+                    <IconBadge color={h.color}>
+                      <Icon className="h-5 w-5" {...iconStrongProps} />
+                    </IconBadge>
+                    <div>
+                      <div className="text-sm font-semibold text-white">{h.title}</div>
+                      <div className="mt-1 text-sm text-white/70">{h.desc}</div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** ---------------- METRICS STRIP ---------------- */
 function MetricsStrip() {
-    const { ref: impactRef, inView: isImpactInView } = useInViewOnce(0.25);
-    return (
-        <div ref={impactRef} className="mt-10">
-            <div
-                className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
-                style={{
-                    background:
-                        "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
-                    boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
-                }}
-            >
-                <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(245,158,11,0.10)" }} />
-                <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.12)" }} />
+  const { ref: impactRef, inView: isImpactInView } = useInViewOnce(0.25);
+  return (
+    <div ref={impactRef} className="mt-10">
+      <div
+        className="relative overflow-hidden rounded-[40px] ring-1 ring-white/10"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
+          boxShadow: "0 26px 90px rgba(0,0,0,0.35)",
+        }}
+      >
+        <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(245,158,11,0.10)" }} />
+        <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full blur-3xl" style={{ background: "rgba(34,211,238,0.12)" }} />
 
-                <div className="relative p-6 sm:p-8">
-                    <div className="flex items-center justify-between gap-4">
-                        <div>
-                            <div className="text-xs font-semibold tracking-widest text-white/60">PARTNERSHIP IMPACT</div>
-                            <div className="mt-2 text-2xl font-semibold text-white">Measured outcomes — not theoretical engagement</div>
-                        </div>
-                    </div>
-
-                    <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                        {IMPACT_METRICS.map((m, idx) => {
-                            const Icon = m.icon;
-                            return (
-                                <motion.div
-                                    key={m.label}
-                                    initial={{ opacity: 0, y: 12 }}
-                                    animate={isImpactInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-                                    transition={{ duration: 0.5, ease: "easeOut", delay: idx * 0.05 }}
-                                    whileHover={{ y: -4 }}
-                                    className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
-                                >
-                                    <div className="flex items-start justify-between gap-3">
-                                        <IconBadge color={m.color}>
-                                            <Icon className="h-5 w-5" {...iconStrongProps} />
-                                        </IconBadge>
-                                        <div className="h-10 w-1 rounded-full" style={{ background: m.color, opacity: 0.55 }} />
-                                    </div>
-                                    <div className="mt-4 text-3xl font-semibold text-white">
-                                        {isImpactInView ? <AnimatedNumber value={m.value} suffix={m.suffix} /> : "0"}
-                                    </div>
-                                    <div className="mt-1 text-sm text-white/70">{m.label}</div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-                </div>
+        <div className="relative p-6 sm:p-8">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-xs font-semibold tracking-widest text-white/60">PARTNERSHIP IMPACT</div>
+              <div className="mt-2 text-2xl font-semibold text-white">Measured outcomes — not theoretical engagement</div>
             </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {IMPACT_METRICS.map((m, idx) => {
+              const Icon = m.icon;
+              return (
+                <motion.div
+                  key={m.label}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={isImpactInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                  transition={{ duration: 0.5, ease: "easeOut", delay: idx * 0.05 }}
+                  whileHover={{ y: -4 }}
+                  className="rounded-[28px] bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <IconBadge color={m.color}>
+                      <Icon className="h-5 w-5" {...iconStrongProps} />
+                    </IconBadge>
+                    <div className="h-10 w-1 rounded-full" style={{ background: m.color, opacity: 0.55 }} />
+                  </div>
+                  <div className="mt-4 text-3xl font-semibold text-white">
+                    {isImpactInView ? <AnimatedNumber value={m.value} suffix={m.suffix} /> : "0"}
+                  </div>
+                  <div className="mt-1 text-sm text-white/70">{m.label}</div>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 /** ---------------- WHY PARTNER ---------------- */
 function WhyPartner() {
-    return (
-        <div className="mt-10">
-            <div className="rounded-[40px] bg-white/55 p-7 ring-1 ring-[#0B1220]/10 backdrop-blur">
-                <div className="flex items-center gap-3">
-                    <IconBadge color={THEME.accent}>
-                        <Star className="h-5 w-5" style={{ color: THEME.star, fill: THEME.star }} strokeWidth={2.2} />
-                    </IconBadge>
-                    <div>
-                        <div className="mt-1 text-lg font-semibold text-[#0B1220]">Why Institutions Choose Praktix</div>
-                    </div>
-                </div>
-
-                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {WHY_PARTNER.map((b, i) => (
-                        <motion.div
-                            key={b}
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.25 }}
-                            transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.05 }}
-                            className="flex items-start gap-3 rounded-3xl bg-white/60 p-5 ring-1 ring-[#0B1220]/10"
-                        >
-                            <span
-                                className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl ring-1"
-                                style={{
-                                    background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.25)} 120%)`,
-                                    borderColor: "rgba(11,18,32,0.10)",
-                                }}
-                            >
-                                <CheckCircle2 className="h-4 w-4 text-white" {...iconStrongProps} />
-                            </span>
-                            <div className="text-sm font-semibold text-[#0B1220]/80">{b}</div>
-                        </motion.div>
-                    ))}
-                </div>
-            </div>
+  return (
+    <div className="mt-10">
+      <div className="rounded-[40px] bg-white/55 p-7 ring-1 ring-[#0B1220]/10 backdrop-blur">
+        <div className="flex items-center gap-3">
+          <IconBadge color={THEME.accent}>
+            <Star className="h-5 w-5" style={{ color: THEME.star, fill: THEME.star }} strokeWidth={2.2} />
+          </IconBadge>
+          <div>
+            <div className="mt-1 text-lg font-semibold text-[#0B1220]">Why Institutions Choose Praktix</div>
+          </div>
         </div>
-    );
-}
 
-/** ---------------- FILE UPLOAD COMPONENTS ---------------- */
-function FileRow({ onProfileImageChange, onCvFileChange, profileImageError }) {
-    const [profileImageName, setProfileImageName] = useState('');
-    const [cvFileName, setCvFileName] = useState('');
-
-    const handleProfileImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setProfileImageName(file.name);
-            onProfileImageChange(file);
-        }
-    };
-
-    const handleCvFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setCvFileName(file.name);
-            onCvFileChange(file);
-        }
-    };
-
-    return (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-                <FilePicker
-                    label="Upload Professional Photo"
-                    id="profile_image_upload"
-                    fileName={profileImageName}
-                    onChange={handleProfileImageChange}
-                    accept="image/jpeg,image/png,image/jpg,image/gif"
-                    maxSize="5MB"
-                    required
-                    error={!!profileImageError}
-                />
-                <AnimatePresence>
-                    {profileImageError && <FieldError error={profileImageError} />}
-                </AnimatePresence>
-            </div>
-            <FilePicker
-                label="Upload CV (PDF)"
-                id="cv_file_upload"
-                fileName={cvFileName}
-                onChange={handleCvFileChange}
-                accept=".pdf,.doc,.docx"
-                maxSize="10MB"
-            />
-        </div>
-    );
-}
-
-function FilePicker({ label, id, fileName, onChange, accept, maxSize, required, error }) {
-    return (
-        <div className="relative">
-            <input
-                id={id}
-                type="file"
-                className="hidden"
-                onChange={onChange}
-                accept={accept}
-            />
-            <label
-                htmlFor={id}
-                className="group relative flex min-h-[132px] cursor-pointer flex-col items-start justify-between rounded-2xl px-4 py-4 ring-1 transition"
-                style={{
-                    background: error ? "rgba(239,68,68,0.04)" : "rgba(255,255,255,0.60)",
-                    borderColor: error ? "rgba(239,68,68,0.30)" : "rgba(11,18,32,0.10)",
-                }}
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {WHY_PARTNER.map((b, i) => (
+            <motion.div
+              key={b}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.05 }}
+              className="flex items-start gap-3 rounded-3xl bg-white/60 p-5 ring-1 ring-[#0B1220]/10"
             >
-                <div className="flex items-start gap-3 w-full">
-                    <span
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1 shrink-0"
-                        style={{
-                            background: "rgba(11,18,32,0.05)",
-                            borderColor: "rgba(11,18,32,0.10)",
-                        }}
-                    >
-                        <Upload className="h-4 w-4" style={{ color: error ? THEME.error : THEME.accent3 }} {...iconStrongProps} />
-                    </span>
-                    <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-[#0B1220]">
-                            {label} {required && <span style={{ color: THEME.pink }}>*</span>}
-                        </div>
-                        <div className="text-xs text-[#0B1220]/55">
-                            {fileName ? (
-                                <span className="truncate block" title={fileName}>
-                                    Selected: {fileName}
-                                </span>
-                            ) : (
-                                `${required ? "Required" : "Optional"} — Max ${maxSize}`
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <span
-                    className="self-end rounded-full px-3 py-1 text-xs font-semibold ring-1 mt-2"
-                    style={{
-                        background: "rgba(11,18,32,0.06)",
-                        borderColor: "rgba(11,18,32,0.10)",
-                        color: "rgba(11,18,32,0.70)",
-                    }}
-                >
-                    {fileName ? 'Change' : 'Choose'}
-                </span>
-                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                    <div className="shine" />
-                </div>
-            </label>
+              <span
+                className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl ring-1"
+                style={{
+                  background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.25)} 120%)`,
+                  borderColor: "rgba(11,18,32,0.10)",
+                }}
+              >
+                <CheckCircle2 className="h-4 w-4 text-white" {...iconStrongProps} />
+              </span>
+              <div className="text-sm font-semibold text-[#0B1220]/80">{b}</div>
+            </motion.div>
+          ))}
         </div>
-    );
+      </div>
+    </div>
+  );
+}
+
+/** ---------------- MULTI-STEP FORM (wizard) ---------------- */
+function FormWizard() {
+  const REQUIRED_FIELDS_MESSAGE = "Please fill all required fields.";
+  const [step, setStep] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [referenceId, setReferenceId] = useState("");
+  const referenceCounterRef = useRef(0);
+  const [validationErrors, setValidationErrors] = useState([]);
+
+  const [applicantType, setApplicantType] = useState("University / Educational Institution");
+
+  const [basic, setBasic] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    country: "",
+    orgName: "",
+    position: "",
+    linkedin: "",
+    website: "",
+  });
+
+  const [partnership, setPartnership] = useState({
+    collab: [],
+    collabOther: "",
+    deliveryMode: "",
+    participants: "",
+    startTimeline: "",
+    objectives: "",
+  });
+
+  const [expert, setExpert] = useState({
+    expertise: [],
+    expertiseOther: "",
+    years: "",
+    organization: "",
+    roleType: "",
+    availability: "",
+    engagement: [],
+    engagementOther: "",
+    delivery: "",
+    travel: false,
+    hasMaterial: "",
+    contentTypes: [],
+    contentTypesOther: "",
+    coDesign: true,
+    ledProjects: true,
+    projectsDesc: "",
+    references: true,
+    portfolio: "",
+    scholar: "",
+    compensation: "",
+    longTerm: true,
+  });
+
+  const [alignment, setAlignment] = useState({
+    why: "",
+    impact: "",
+    confirm: false,
+    contact: false,
+    consent: false,
+  });
+  const [uploads, setUploads] = useState({
+    photo: null,
+    cv: null,
+  });
+
+  const isExpert = applicantType === "Industry Expert / University Professor";
+
+  const steps = useMemo(() => {
+    const arr = [
+      { key: "type", label: "Applicant Type" },
+      { key: "basic", label: "Basic Info" },
+      { key: isExpert ? "expert" : "partnership", label: isExpert ? "Expert Profile" : "Partnership Details" },
+      { key: "alignment", label: "Alignment & Compliance" },
+      { key: "review", label: "Review & Submit" },
+    ];
+    return arr;
+  }, [isExpert]);
+
+  const pct = Math.round(((step + 1) / steps.length) * 100);
+  const orgPlaceholderByType = {
+    "University / Educational Institution": "University / Faculty / Institution",
+    "Company / Organization": "Company / Organization",
+    "Government / Public Sector": "Ministry / Agency / Public Entity",
+    "Industry Expert / University Professor": "University / Company / Lab",
+  };
+  const orgNamePlaceholder =
+    orgPlaceholderByType[applicantType] || "Organization / Institution";
+
+  const isNonEmpty = (value) => String(value ?? "").trim().length > 0;
+  const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value ?? "").trim());
+  const isUrl = (value) => /^https?:\/\/\S+$/i.test(String(value ?? "").trim());
+
+  function getStepErrors(currentStep = step) {
+    const key = steps[currentStep]?.key;
+    if (!key) return ["Invalid step."];
+
+    if (key === "type") {
+      return isNonEmpty(applicantType) ? [] : ["Please select an applicant type."];
+    }
+
+    if (key === "basic") {
+      const errors = [];
+      if (!isNonEmpty(basic.fullName)) errors.push("Full Name is required.");
+      if (!isEmail(basic.email)) errors.push("Email Address must be a valid email.");
+      if (!isNonEmpty(basic.phone)) errors.push("Phone Number is required.");
+      if (!isNonEmpty(basic.country)) errors.push("Country of Residence is required.");
+      if (!isNonEmpty(basic.orgName)) errors.push("Organization Name is required.");
+      if (!isNonEmpty(basic.position)) errors.push("Current Position / Title is required.");
+      if (!isUrl(basic.linkedin)) errors.push("LinkedIn Profile URL must start with http:// or https://");
+      return errors;
+    }
+
+    if (key === "partnership") {
+      const errors = [];
+      if (partnership.collab.length === 0) errors.push("Select at least one collaboration type.");
+      if (partnership.collab.includes("Other (Specify)") && !isNonEmpty(partnership.collabOther)) {
+        errors.push("Please specify the other collaboration type.");
+      }
+      if (!isNonEmpty(partnership.deliveryMode)) errors.push("Preferred delivery mode is required.");
+      if (!isNonEmpty(partnership.participants)) errors.push("Estimated number of participants is required.");
+      if (!isNonEmpty(partnership.startTimeline)) errors.push("Expected start timeline is required.");
+      return errors;
+    }
+
+    if (key === "expert") {
+      const errors = [];
+      if (expert.expertise.length === 0) errors.push("Select at least one primary area of expertise.");
+      if (expert.engagement.length === 0) errors.push("Select at least one preferred engagement type.");
+      if (expert.engagement.includes("Other (Specify)") && !isNonEmpty(expert.engagementOther)) {
+        errors.push("Please specify the other preferred engagement type.");
+      }
+      if (expert.contentTypes.includes("Other (Specify)") && !isNonEmpty(expert.contentTypesOther)) {
+        errors.push("Please specify the other content type.");
+      }
+      if (!isNonEmpty(expert.years)) errors.push("Years of professional experience is required.");
+      if (!isNonEmpty(expert.roleType)) errors.push("Role type is required.");
+      if (!isNonEmpty(expert.availability)) errors.push("Weekly availability is required.");
+      if (!isNonEmpty(expert.delivery)) errors.push("Delivery preference is required.");
+      if (!isNonEmpty(expert.hasMaterial)) errors.push("Training material selection is required.");
+      if (!isNonEmpty(expert.projectsDesc)) errors.push("Key projects description is required.");
+      if (!isUrl(expert.portfolio)) errors.push("Portfolio URL must start with http:// or https://");
+      if (!isNonEmpty(expert.compensation)) errors.push("Preferred collaboration model is required.");
+      if (!uploads.photo?.dataUrl) errors.push("Upload Professional Photo is required.");
+      return errors;
+    }
+
+    if (key === "alignment") {
+      const errors = [];
+      if (!alignment.confirm) errors.push("You must confirm the information is accurate.");
+      if (!alignment.contact) errors.push("You must agree to be contacted.");
+      if (!alignment.consent) errors.push("You must consent to data processing.");
+      return errors;
+    }
+
+    return [];
+  }
+
+  function next() {
+    const errors = getStepErrors(step);
+    if (errors.length) {
+      setValidationErrors([REQUIRED_FIELDS_MESSAGE]);
+      return;
+    }
+    setValidationErrors([]);
+    setStep((s) => Math.min(steps.length - 1, s + 1));
+  }
+  function back() {
+    setValidationErrors([]);
+    setStep((s) => Math.max(0, s - 1));
+  }
+
+  const visibleValidationErrors =
+    validationErrors.length && getStepErrors(step).length ? [REQUIRED_FIELDS_MESSAGE] : [];
+
+  function resetForm() {
+    setStep(0);
+    setIsSubmitting(false);
+    setApplicantType("University / Educational Institution");
+    setBasic({
+      fullName: "",
+      email: "",
+      phone: "",
+      country: "",
+      orgName: "",
+      position: "",
+      linkedin: "",
+      website: "",
+    });
+    setPartnership({
+      collab: [],
+      collabOther: "",
+      deliveryMode: "",
+      participants: "",
+      startTimeline: "",
+      objectives: "",
+    });
+    setExpert({
+      expertise: [],
+      expertiseOther: "",
+      years: "",
+      organization: "",
+      roleType: "",
+      availability: "",
+      engagement: [],
+      engagementOther: "",
+      delivery: "",
+      travel: false,
+      hasMaterial: "",
+      contentTypes: [],
+      contentTypesOther: "",
+      coDesign: true,
+      ledProjects: true,
+      projectsDesc: "",
+      references: true,
+      portfolio: "",
+      scholar: "",
+      compensation: "",
+      longTerm: true,
+    });
+    setUploads({
+      photo: null,
+      cv: null,
+    });
+    setAlignment({
+      why: "",
+      impact: "",
+      confirm: false,
+      contact: false,
+      consent: false,
+    });
+  }
+
+  async function submit() {
+    const errors = getStepErrors(step);
+    if (errors.length) {
+      setValidationErrors([REQUIRED_FIELDS_MESSAGE]);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setValidationErrors([]);
+
+    referenceCounterRef.current += 1;
+    setReferenceId(String(referenceCounterRef.current));
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 9000);
+    resetForm();
+    setIsSubmitting(false);
+  }
+
+  return (
+    <div className="mt-10">
+      <div className="relative overflow-hidden rounded-[42px] p-[1px]" style={{ background: "#FFFFFF", boxShadow: "0 26px 90px rgba(0,0,0,0.18)" }}>
+        <div className="relative rounded-[40px] bg-white/55 p-6 sm:p-8 ring-1 ring-[#0B1220]/10 backdrop-blur">
+          {/* header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <div className="mt-1 text-2xl font-semibold text-[#0B1220]">Partnership & Expert Application Form</div>
+              <p className="mt-2 max-w-3xl text-sm text-[#0B1220]/70">
+                We collaborate with universities, corporations, public institutions, and industry experts to deliver structured, measurable professional impact.
+              </p>
+              <p className="mt-2 max-w-3xl text-sm text-[#0B1220]/70">
+                Please complete the form below to initiate a partnership or apply to join our expert network.
+              </p>
+            </div>
+
+            <div className="w-full sm:w-[280px]">
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#0B1220]/10">
+                <motion.div
+                  className="h-full"
+                  initial={false}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.55, ease: "easeOut" }}
+                  style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.55)} 100%)` }}
+                />
+              </div>
+              <div className="mt-2 text-xs text-[#0B1220]/60">
+                Step {step + 1} of {steps.length}: <span className="font-semibold">{steps[step].label}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* stepper pills */}
+          <div className="mt-6 flex flex-wrap gap-2">
+            {steps.map((s, idx) => {
+              const active = idx === step;
+              const done = idx < step;
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => {
+                    if (idx <= step) {
+                      setStep(idx);
+                      setValidationErrors([]);
+                      return;
+                    }
+                    const errors = getStepErrors(step);
+                    if (errors.length) {
+                      setValidationErrors([REQUIRED_FIELDS_MESSAGE]);
+                      return;
+                    }
+                    setValidationErrors([]);
+                    setStep(idx);
+                  }}
+                  className="rounded-full px-4 py-2 text-xs font-semibold ring-1 transition"
+                  style={{
+                    background: active
+                      ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.45)} 100%)`
+                      : done
+                      ? "rgba(52,211,153,0.14)"
+                      : "rgba(11,18,32,0.06)",
+                    borderColor: active ? "rgba(11,18,32,0.10)" : "rgba(11,18,32,0.12)",
+                    color: active ? "white" : "rgba(11,18,32,0.72)",
+                  }}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* body */}
+          <div className="mt-6">
+            <AnimatePresence mode="wait">
+              {steps[step].key === "type" ? (
+                <motion.div
+                  key="type"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="grid grid-cols-1 gap-4"
+                >
+                  <FormCard
+                    title="Choose applicant type"
+                    icon={<Users className="h-5 w-5" {...iconStrongProps} />}
+                  >
+                    <RadioGroup
+                      value={applicantType}
+                      onChange={setApplicantType}
+                      options={[
+                        "University / Educational Institution",
+                        "Company / Organization",
+                        "Government / Public Sector",
+                      ]}
+                    />
+                 
+                  </FormCard>
+
+                </motion.div>
+              ) : null}
+
+              {steps[step].key === "basic" ? (
+                <motion.div
+                  key="basic"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                >
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Field label="Full Name" required>
+                      <Input
+                        icon={BadgeCheck}
+                        iconColor={THEME.accent2}
+                        placeholder="Your full name"
+                        value={basic.fullName}
+                        onChange={(e) => setBasic({ ...basic, fullName: e.target.value })}
+                      />
+                    </Field>
+
+                    <Field label="Email Address" required>
+                      <Input
+                        icon={Mail}
+                        iconColor={THEME.accent}
+                        placeholder="name@email.com"
+                        type="email"
+                        value={basic.email}
+                        onChange={(e) => setBasic({ ...basic, email: e.target.value })}
+                      />
+                    </Field>
+
+                    <Field label="Phone Number" required>
+                      <Input
+                        icon={Phone}
+                        iconColor={THEME.accent3}
+                        placeholder="+(country code) ..."
+                        value={basic.phone}
+                        onChange={(e) => setBasic({ ...basic, phone: e.target.value })}
+                      />
+                    </Field>
+
+                    <Field label="Country of Residence" required>
+                      <Input
+                        icon={MapPin}
+                        iconColor={THEME.accent4}
+                        placeholder="Country"
+                        value={basic.country}
+                        onChange={(e) => setBasic({ ...basic, country: e.target.value })}
+                      />
+                    </Field>
+
+                    <Field label="Organization Name" required>
+                      <Input
+                        icon={Building2}
+                        iconColor={THEME.accent}
+                        placeholder={orgNamePlaceholder}
+                        value={basic.orgName}
+                        onChange={(e) => setBasic({ ...basic, orgName: e.target.value })}
+                      />
+                    </Field>
+
+                    <Field label="Current Position / Title" required>
+                      <Input
+                        icon={Briefcase}
+                        iconColor={THEME.accent3}
+                        placeholder="Role / Title"
+                        value={basic.position}
+                        onChange={(e) => setBasic({ ...basic, position: e.target.value })}
+                      />
+                    </Field>
+
+                    <Field
+                      label="LinkedIn Profile URL"
+                      required
+                    >
+                      <Input
+                        icon={LinkIcon}
+                        iconColor={THEME.accent2}
+                        placeholder="https://linkedin.com/in/..."
+                        value={basic.linkedin}
+                        onChange={(e) => setBasic({ ...basic, linkedin: e.target.value })}
+                      />
+                    </Field>
+
+                    <Field label="Company / University Website">
+                      <Input
+                        icon={Globe2}
+                        iconColor={THEME.accent4}
+                        placeholder="https://..."
+                        value={basic.website}
+                        onChange={(e) => setBasic({ ...basic, website: e.target.value })}
+                      />
+                    </Field>
+                  </div>
+                </motion.div>
+              ) : null}
+
+              {steps[step].key === "partnership" ? (
+                <motion.div
+                  key="partnership"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                >
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <Field label="Type of collaboration interested in" required hint="Multi-select" className="sm:col-span-2">
+                          <MultiSelect
+                            value={partnership.collab}
+                            onChange={(v) =>
+                              setPartnership({
+                                ...partnership,
+                                collab: v,
+                                collabOther: v.includes("Other (Specify)") ? partnership.collabOther : "",
+                              })
+                            }
+                            otherValue={partnership.collabOther}
+                            onOtherValueChange={(v) => setPartnership({ ...partnership, collabOther: v })}
+                            options={[
+                              "Internship Programs (3–6 months)",
+                              "AI Training Programs",
+                          "Industrial Courses Integration",
+                          "Executive Workshops",
+                          "Tailored Corporate Programs",
+                          "Co-Hosted Programs",
+                              "Strategic Alliance",
+                              "Hiring Initiatives",
+                              "Research Collaboration",
+                              "Other (Specify)",
+                            ]}
+                          />
+                    </Field>
+
+                    <Field label="Preferred delivery mode" required>
+                      <Select
+                        value={partnership.deliveryMode}
+                        onChange={(v) => setPartnership({ ...partnership, deliveryMode: v })}
+                        options={["Online", "Hybrid", "Onsite"]}
+                        icon={Compass}
+                        iconColor={THEME.accent}
+                      />
+                    </Field>
+
+                    <Field label="Estimated number of participants" required>
+                      <Select
+                        value={partnership.participants}
+                        onChange={(v) => setPartnership({ ...partnership, participants: v })}
+                        options={["10–25", "25–50", "50–100", "100+"]}
+                        icon={Users}
+                        iconColor={THEME.accent3}
+                      />
+                    </Field>
+
+                    <Field label="Expected start timeline" required>
+                      <Select
+                        value={partnership.startTimeline}
+                        onChange={(v) => setPartnership({ ...partnership, startTimeline: v })}
+                        options={["Immediately", "Within 1 Month", "Within 3 Months", "Within 6 Months"]}
+                        icon={Calendar}
+                        iconColor={THEME.accent4}
+                      />
+                    </Field>
+
+                    <Field label="Primary objectives (outcomes you aim to achieve)" className="sm:col-span-2">
+                      <Textarea
+                        value={partnership.objectives}
+                        onChange={(e) => setPartnership({ ...partnership, objectives: e.target.value })}
+                        placeholder="What outcomes are you aiming to achieve?"
+                      />
+                    </Field>
+                  </div>
+                </motion.div>
+              ) : null}
+
+              {steps[step].key === "expert" ? (
+                <motion.div
+                  key="expert"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                >
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        <Field label="Primary area of expertise" required hint="Multi-select" className="sm:col-span-2">
+                          <MultiSelect
+                            value={expert.expertise}
+                            onChange={(v) =>
+                              setExpert({
+                                ...expert,
+                                expertise: v,
+                                expertiseOther: v.includes("Other (Specify)") ? expert.expertiseOther : "",
+                              })
+                            }
+                            otherValue={expert.expertiseOther}
+                            onOtherValueChange={(v) => setExpert({ ...expert, expertiseOther: v })}
+                            options={[
+                              "Software Development",
+                              "AI & Machine Learning",
+                              "Data Science",
+                              "Cloud & DevOps",
+                              "Cybersecurity",
+                              "Digital Transformation",
+                              "Product Management",
+                              "UX/UI",
+                              "Business & Consulting",
+                              "Finance & FinTech",
+                              "Healthcare & Digital Health",
+                              "Marketing & Growth",
+                              "Entrepreneurship",
+                              "Supply Chain",
+                              "Project Management",
+                              "Other (Specify)",
+                            ]}
+                          />
+                        </Field>
+
+                        <Field label="Years of professional experience" required>
+                          <Select
+                            value={expert.years}
+                            onChange={(v) => setExpert({ ...expert, years: v })}
+                            options={["3–5", "5–10", "10–15", "15+"]}
+                            icon={BadgeCheck}
+                            iconColor={THEME.accent3}
+                          />
+                        </Field>
+
+                        <Field label="Role type" required>
+                          <Select
+                            value={expert.roleType}
+                            onChange={(v) => setExpert({ ...expert, roleType: v })}
+                            options={["Industry Professional", "University Professor", "Consultant", "Executive", "Founder", "Other"]}
+                            icon={Briefcase}
+                            iconColor={THEME.accent4}
+                          />
+                        </Field>
+
+                        <Field label="Weekly availability (hours)" required>
+                          <Select
+                            value={expert.availability}
+                            onChange={(v) => setExpert({ ...expert, availability: v })}
+                            options={["2–4 Hours", "4–8 Hours", "8–12 Hours", "12+ Hours"]}
+                            icon={Calendar}
+                            iconColor={THEME.accent2}
+                          />
+                        </Field>
+
+                        <Field label="Preferred engagement type" required hint="Multi-select" className="sm:col-span-2">
+                          <MultiSelect
+                            value={expert.engagement}
+                            onChange={(v) =>
+                              setExpert({
+                                ...expert,
+                                engagement: v,
+                                engagementOther: v.includes("Other (Specify)") ? expert.engagementOther : "",
+                              })
+                            }
+                            otherValue={expert.engagementOther}
+                            onOtherValueChange={(v) => setExpert({ ...expert, engagementOther: v })}
+                            options={[
+                              "Internship Supervision",
+                              "1-to-1 Mentorship",
+                              "Workshops & Masterclasses",
+                              "AI Training Programs",
+                              "Curriculum Co-Design",
+                              "Advisory Board",
+                              "Research Supervision",
+                              "Other (Specify)",
+                            ]}
+                          />
+                        </Field>
+
+                        <Field label="Delivery preference">
+                          <Select
+                            value={expert.delivery}
+                            onChange={(v) => setExpert({ ...expert, delivery: v })}
+                            options={["Online", "Hybrid", "Onsite (Europe)", "Onsite (MENA)"]}
+                            icon={Compass}
+                            iconColor={THEME.accent}
+                          />
+                        </Field>
+
+                        <Field label="Do you have existing training material?">
+                          <Select
+                            value={expert.hasMaterial}
+                            onChange={(v) => setExpert({ ...expert, hasMaterial: v })}
+                            options={["Yes", "No", "Partially"]}
+                            icon={FileCheck2}
+                            iconColor={THEME.accent4}
+                          />
+                        </Field>
+
+                        <Field label="Type of content available" hint="Optional" className="sm:col-span-2">
+                          <MultiSelect
+                            value={expert.contentTypes}
+                            onChange={(v) =>
+                              setExpert({
+                                ...expert,
+                                contentTypes: v,
+                                contentTypesOther: v.includes("Other (Specify)") ? expert.contentTypesOther : "",
+                              })
+                            }
+                            otherValue={expert.contentTypesOther}
+                            onOtherValueChange={(v) => setExpert({ ...expert, contentTypesOther: v })}
+                            options={[
+                              "Course Curriculum",
+                              "Slides & Workshops",
+                              "Case Studies",
+                              "Real Industry Projects",
+                              "Recorded Sessions",
+                              "AI Labs / Technical Modules",
+                              "Other (Specify)",
+                            ]}
+                          />
+                        </Field>
+
+                        <Field label="Key projects (short description)" required className="sm:col-span-2">
+                          <Textarea
+                            value={expert.projectsDesc}
+                            onChange={(e) => setExpert({ ...expert, projectsDesc: e.target.value })}
+                            placeholder="Short description of key projects"
+                          />
+                        </Field>
+
+                        <Field label="Portfolio / personal website URL" required>
+                          <Input
+                            icon={Globe2}
+                            iconColor={THEME.accent3}
+                            placeholder="https://..."
+                            value={expert.portfolio}
+                            onChange={(e) => setExpert({ ...expert, portfolio: e.target.value })}
+                          />
+                        </Field>
+
+                        <Field label="Preferred collaboration model" required>
+                          <Select
+                            value={expert.compensation}
+                            onChange={(v) => setExpert({ ...expert, compensation: v })}
+                            options={["Per Program", "Per Hour"]}
+                            icon={Handshake}
+                            iconColor={THEME.accent4}
+                          />
+                        </Field>
+
+                        <Field label="Uploads" required className="sm:col-span-2">
+                          <FileRow
+                            uploads={uploads}
+                            onChange={(nextUploads) => setUploads(nextUploads)}
+                          />
+                        </Field>
+                  </div>
+                </motion.div>
+              ) : null}
+
+              {steps[step].key === "alignment" ? (
+                <motion.div
+                  key="alignment"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="grid grid-cols-1 gap-6"
+                >
+                  <div className="space-y-4">
+                    <Field label="Why do you want to collaborate with Praktix?">
+                      <Textarea
+                        value={alignment.why}
+                        onChange={(e) => setAlignment({ ...alignment, why: e.target.value })}
+                        placeholder="Explain motivation and collaboration goals."
+                      />
+                    </Field>
+
+                    <Field label="What impact do you want to create?">
+                      <Textarea
+                        value={alignment.impact}
+                        onChange={(e) => setAlignment({ ...alignment, impact: e.target.value })}
+                        placeholder="Describe the impact you want to achieve (outcomes)."
+                      />
+                    </Field>
+                  </div>
+
+                  <div className="space-y-2 rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
+                    <Checkbox
+                      checked={alignment.confirm}
+                      onChange={(v) => setAlignment({ ...alignment, confirm: v })}
+                      label="I confirm the information provided is accurate."
+                    />
+                    <Checkbox
+                      checked={alignment.contact}
+                      onChange={(v) => setAlignment({ ...alignment, contact: v })}
+                      label="I agree to be contacted regarding partnership opportunities."
+                    />
+                    <Checkbox
+                      checked={alignment.consent}
+                      onChange={(v) => setAlignment({ ...alignment, consent: v })}
+                      label="I consent to data processing in accordance with the privacy policy."
+                    />
+                  </div>
+                </motion.div>
+              ) : null}
+
+              {steps[step].key === "review" ? (
+                <motion.div
+                  key="review"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="grid grid-cols-1 gap-6"
+                >
+                  <div>
+                    <div className="rounded-[36px] bg-white/60 p-6 ring-1 ring-[#0B1220]/10">
+                      <div className="text-xs font-semibold tracking-widest text-[#0B1220]/60">REVIEW</div>
+                      <div className="mt-2 text-lg font-semibold text-[#0B1220]">Check details before submitting</div>
+
+                      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <MiniKV k="Applicant type" v={applicantType} />
+                        <MiniKV k="Name" v={basic.fullName || "—"} />
+                        <MiniKV k="Email" v={basic.email || "—"} />
+                        <MiniKV k="Country" v={basic.country || "—"} />
+                        <MiniKV k="Organization" v={basic.orgName || "—"} />
+                        <MiniKV k="LinkedIn" v={basic.linkedin || "—"} />
+                      </div>
+
+                      <div className="mt-5 rounded-3xl bg-white/60 p-5 ring-1 ring-[#0B1220]/10">
+                        <div className="text-sm font-semibold text-[#0B1220]">
+                          {isExpert ? "Expert profile" : "Partnership details"}
+                        </div>
+                        <div className="mt-2 text-sm text-[#0B1220]/70">
+                          {isExpert ? (
+                            <>
+                              Expertise: <span className="font-semibold">{expert.expertise.join(", ") || "—"}</span>
+                              <br />
+                              Engagement: <span className="font-semibold">{expert.engagement.join(", ") || "—"}</span>
+                              <br />
+                              Availability: <span className="font-semibold">{expert.availability}</span>
+                            </>
+                          ) : (
+                            <>
+                              Collaboration:{" "}
+                              <span className="font-semibold">
+                                {partnership.collab.length
+                                  ? partnership.collab
+                                      .map((item) =>
+                                        item === "Other (Specify)" && partnership.collabOther
+                                          ? `Other: ${partnership.collabOther}`
+                                          : item
+                                      )
+                                      .join(", ")
+                                  : "—"}
+                              </span>
+                              <br />
+                              Delivery: <span className="font-semibold">{partnership.deliveryMode}</span>
+                              <br />
+                              Objectives: <span className="font-semibold">{partnership.objectives || "—"}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                    
+                    </div>
+                  </div>
+
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
+
+          {/* footer nav */}
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <button
+              type="button"
+              onClick={back}
+              disabled={step === 0}
+              className={cx(
+                "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ring-1 transition",
+                step === 0 ? "opacity-40" : "hover:bg-[#0B1220]/5"
+              )}
+              style={{
+                background: "rgba(11,18,32,0.04)",
+                borderColor: "rgba(11,18,32,0.10)",
+                color: "rgba(11,18,32,0.78)",
+              }}
+            >
+              <ChevronLeft className="h-4 w-4" {...iconStrongProps} />
+              Back
+            </button>
+
+            {submitted ? (
+              <div
+                className="rounded-2xl px-4 py-3 text-sm ring-1 sm:max-w-[680px]"
+                style={{
+                  background: "linear-gradient(90deg, #1B2746 0%, #243258 100%)",
+                  borderColor: "rgba(197,31,93,0.35)",
+                  color: "rgba(255,255,255,0.95)",
+                }}
+              >
+                Thank you. Your form was submitted successfully. Reference ID: {referenceId}. Our team will review it and contact you within 3-5 business days.
+              </div>
+            ) : visibleValidationErrors.length ? (
+              <div
+                className="rounded-2xl px-4 py-3 text-sm ring-1 sm:max-w-[560px]"
+                style={{
+                  background: "rgba(201,29,103,0.08)",
+                  borderColor: "rgba(201,29,103,0.35)",
+                  color: "rgba(11,18,32,0.86)",
+                }}
+              >
+                <div className="font-semibold" style={{ color: THEME.pink }}>
+                  {visibleValidationErrors[0]}
+                </div>
+              </div>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={step === steps.length - 1 ? submit : next}
+              disabled={isSubmitting}
+              className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:opacity-70"
+              style={{
+                background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.78)} 80%)`,
+              }}
+            >
+              {isSubmitting ? "Submitting..." : step === steps.length - 1 ? "Submit" : "Continue"}
+              <ChevronRight className="h-4 w-4" {...iconStrongProps} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** ---------------- FORM SUBCOMPONENTS ---------------- */
 function FormCard({ title, icon, tone = "light", children }) {
-    const isDark = tone === "dark";
-    const isGrad = tone === "gradient";
+  const isDark = tone === "dark";
+  const isGrad = tone === "gradient";
 
-    return (
+  return (
+    <div
+      className={cx("relative overflow-hidden rounded-[36px] p-7 ring-1")}
+      style={{
+        background: isGrad
+          ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.55)} 100%)`
+          : isDark
+          ? "linear-gradient(135deg, #061A3B 0%, #0A2A4F 100%)"
+          : "rgba(255,255,255,0.55)",
+        borderColor: isGrad || isDark ? "rgba(255,255,255,0.12)" : "rgba(11,18,32,0.10)",
+      }}
+    >
+      {isGrad ? (
         <div
-            className={cx("relative overflow-hidden rounded-[36px] p-7 ring-1")}
+          className="pointer-events-none absolute inset-0 opacity-[0.16]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(135deg, rgba(255,255,255,0.22) 0px, rgba(255,255,255,0.22) 12px, transparent 12px, transparent 28px)",
+          }}
+        />
+      ) : null}
+
+      <div className="relative">
+        <div className="flex items-center gap-3">
+          <div
+            className="inline-flex h-12 w-12 items-center justify-center rounded-2xl"
             style={{
-                background: isGrad
-                    ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.55)} 100%)`
-                    : isDark
-                        ? "linear-gradient(135deg, #061A3B 0%, #0A2A4F 100%)"
-                        : "rgba(255,255,255,0.55)",
-                borderColor: isGrad || isDark ? "rgba(255,255,255,0.12)" : "rgba(11,18,32,0.10)",
+              background: isGrad || isDark ? "rgba(255,255,255,0.12)" : "rgba(11,18,32,0.05)",
+              border: isGrad || isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(11,18,32,0.10)",
+              color: isGrad || isDark ? "rgba(255,255,255,0.95)" : THEME.accent,
             }}
-        >
-            {isGrad ? (
-                <div
-                    className="pointer-events-none absolute inset-0 opacity-[0.16]"
-                    style={{
-                        backgroundImage:
-                            "repeating-linear-gradient(135deg, rgba(255,255,255,0.22) 0px, rgba(255,255,255,0.22) 12px, transparent 12px, transparent 28px)",
-                    }}
-                />
-            ) : null}
-
-            <div className="relative">
-                <div className="flex items-center gap-3">
-                    <div
-                        className="inline-flex h-12 w-12 items-center justify-center rounded-2xl"
-                        style={{
-                            background: isGrad || isDark ? "rgba(255,255,255,0.12)" : "rgba(11,18,32,0.05)",
-                            border: isGrad || isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(11,18,32,0.10)",
-                            color: isGrad || isDark ? "rgba(255,255,255,0.95)" : THEME.accent,
-                        }}
-                    >
-                        {icon}
-                    </div>
-                    <div>
-                        <div className={cx("text-xs font-semibold tracking-widest", isGrad || isDark ? "text-white/70" : "text-[#0B1220]/55")}>
-                            SECTION
-                        </div>
-                        <div className={cx("mt-1 text-lg font-semibold", isGrad || isDark ? "text-white" : "text-[#0B1220]")}>
-                            {title}
-                        </div>
-                    </div>
-                </div>
-
-                <div className={cx("mt-6", isGrad || isDark ? "text-white" : "text-[#0B1220]")}>{children}</div>
+          >
+            {icon}
+          </div>
+          <div>
+            <div className={cx("text-xs font-semibold tracking-widest", isGrad || isDark ? "text-white/70" : "text-[#0B1220]/55")}>
+              SECTION
             </div>
+            <div className={cx("mt-1 text-lg font-semibold", isGrad || isDark ? "text-white" : "text-[#0B1220]")}>
+              {title}
+            </div>
+          </div>
         </div>
-    );
+
+        <div className={cx("mt-6", isGrad || isDark ? "text-white" : "text-[#0B1220]")}>{children}</div>
+      </div>
+    </div>
+  );
 }
 
 function RocketIcon() {
-    return <Zap className="h-5 w-5" {...iconStrongProps} />;
+  return <Zap className="h-5 w-5" {...iconStrongProps} />;
 }
 
 function MiniKV({ k, v }) {
-    return (
-        <div className="rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
-            <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">{k}</div>
-            <div className="mt-1 text-sm font-semibold text-[#0B1220]/80" style={clampStyle(2)}>
-                {v}
-            </div>
-        </div>
-    );
+  return (
+    <div className="rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
+      <div className="text-xs font-semibold tracking-widest text-[#0B1220]/55">{k}</div>
+      <div className="mt-1 text-sm font-semibold text-[#0B1220]/80" style={clampStyle(2)}>
+        {v}
+      </div>
+    </div>
+  );
 }
 
-function Field({ label, required, hint, children, className, error }) {
-    return (
-        <div className={cx("group block", className)}>
-            <div className="mb-2 flex items-center justify-between">
-                <div className="text-sm font-semibold text-[#0B1220]">
-                    {label} {required ? <span style={{ color: THEME.pink }}>*</span> : null}
-                </div>
-                {hint ? <div className="text-xs text-[#0B1220]/55">{hint}</div> : null}
-            </div>
-            <div className="relative">
-                {children}
-                <AnimatePresence>
-                    {error && <FieldError error={error} />}
-                </AnimatePresence>
-            </div>
+function Field({ label, required, hint, children, className }) {
+  return (
+    <label className={cx("group block", className)}>
+      <div className="mb-2 flex items-center justify-between">
+        <div className="text-sm font-semibold text-[#0B1220]">
+          {label} {required ? <span style={{ color: THEME.pink }}>*</span> : null}
         </div>
-    );
-}
-
-function Input({ icon: Icon, iconColor = THEME.accent, className, error, ...props }) {
-    const hasIcon = !!Icon;
-    return (
-        <div className="relative">
-            {hasIcon ? (
-                <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
-                    <Icon className="h-4 w-4" style={{ color: error ? THEME.error : iconColor }} {...iconStrongProps} />
-                </div>
-            ) : null}
-            <input
-                {...props}
-                className={cx(
-                    "w-full rounded-2xl px-4 py-3 text-sm outline-none ring-1 transition",
-                    "bg-white/60 text-[#0B1220] placeholder:text-[#0B1220]/40",
-                    error
-                        ? "ring-red-300 hover:ring-red-400 focus:ring-2 focus:ring-red-400 bg-red-50/30"
-                        : "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]",
-                    hasIcon ? "pl-11" : "",
-                    className
-                )}
-            />
-        </div>
-    );
-}
-
-function Textarea({ error, ...props }) {
-    return (
-        <textarea
-            {...props}
-            className={cx(
-                "w-full rounded-2xl px-4 py-3 text-sm outline-none ring-1 transition",
-                "bg-white/60 text-[#0B1220] placeholder:text-[#0B1220]/40",
-                error
-                    ? "ring-red-300 hover:ring-red-400 focus:ring-2 focus:ring-red-400 bg-red-50/30"
-                    : "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]"
-            )}
-            rows={4}
+        {hint ? <div className="text-xs text-[#0B1220]/55">{hint}</div> : null}
+      </div>
+      <div className="relative">
+        {children}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-200 group-focus-within:opacity-100"
+          style={{
+            boxShadow: "0 0 0 4px rgba(34,211,238,0.18), 0 20px 60px rgba(34,211,238,0.14)",
+          }}
         />
-    );
+      </div>
+    </label>
+  );
 }
 
-function Select({ value, onChange, onBlur, options, icon: Icon, iconColor = THEME.accent, placeholder = "Select", error }) {
-    const hasIcon = !!Icon;
-    return (
-        <div className="relative">
-            {hasIcon ? (
-                <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
-                    <Icon className="h-4 w-4" style={{ color: error ? THEME.error : iconColor }} {...iconStrongProps} />
-                </div>
-            ) : null}
-            <select
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                onBlur={onBlur}
-                className={cx(
-                    "w-full appearance-none rounded-2xl px-4 py-3 pr-10 text-sm outline-none ring-1 transition",
-                    "bg-white/60 text-[#0B1220]",
-                    error
-                        ? "ring-red-300 hover:ring-red-400 focus:ring-2 focus:ring-red-400 bg-red-50/30"
-                        : "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]",
-                    hasIcon ? "pl-11" : ""
-                )}
-            >
-                <option value="" disabled>
-                    {placeholder}
-                </option>
-                {options.map((o) => (
-                    <option key={o} value={o}>
-                        {o}
-                    </option>
-                ))}
-            </select>
-            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#0B1220]/55">
-                <ChevronRight className="h-4 w-4 rotate-90" {...iconStrongProps} />
-            </div>
+function Input({ icon: Icon, iconColor = THEME.accent, className, ...props }) {
+  const hasIcon = !!Icon;
+  return (
+    <div className="relative">
+      {hasIcon ? (
+        <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+          <Icon className="h-4 w-4" style={{ color: iconColor }} {...iconStrongProps} />
         </div>
-    );
+      ) : null}
+      <input
+        {...props}
+        className={cx(
+          "w-full rounded-2xl px-4 py-3 text-sm outline-none ring-1 transition",
+          "bg-white/60 text-[#0B1220] placeholder:text-[#0B1220]/40",
+          "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]",
+          hasIcon ? "pl-11" : "",
+          className
+        )}
+      />
+    </div>
+  );
 }
 
-function Checkbox({ checked, onChange, label, onBlur, error }) {
-    return (
-        <label
-            className="flex cursor-pointer items-start gap-3 rounded-3xl p-4 ring-1 transition"
-            style={{
-                background: error ? "rgba(239,68,68,0.04)" : "rgba(255,255,255,0.60)",
-                borderColor: error ? "rgba(239,68,68,0.30)" : "rgba(11,18,32,0.10)",
-            }}
-        >
-            <input
-                type="checkbox"
-                checked={checked}
-                onChange={(e) => onChange(e.target.checked)}
-                onBlur={onBlur}
-                className="mt-1 h-4 w-4 accent-[#C91D67]"
-            />
-            <div className={cx("text-sm", error ? "text-red-600" : "text-[#0B1220]/75")}>{label}</div>
-        </label>
-    );
+function Textarea(props) {
+  return (
+    <textarea
+      {...props}
+      className={cx(
+        "w-full rounded-2xl px-4 py-3 text-sm outline-none ring-1 transition",
+        "bg-white/60 text-[#0B1220] placeholder:text-[#0B1220]/40",
+        "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]"
+      )}
+      rows={4}
+    />
+  );
+}
+
+function Select({ value, onChange, options, icon: Icon, iconColor = THEME.accent, placeholder = "Select" }) {
+  const hasIcon = !!Icon;
+  return (
+    <div className="relative">
+      {hasIcon ? (
+        <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+          <Icon className="h-4 w-4" style={{ color: iconColor }} {...iconStrongProps} />
+        </div>
+      ) : null}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cx(
+          "w-full appearance-none rounded-2xl px-4 py-3 pr-10 text-sm outline-none ring-1 transition",
+          "bg-white/60 text-[#0B1220]",
+          "ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]",
+          hasIcon ? "pl-11" : ""
+        )}
+      >
+        <option value="" disabled>
+          {placeholder}
+        </option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#0B1220]/55">
+        <ChevronRight className="h-4 w-4 rotate-90" {...iconStrongProps} />
+      </div>
+    </div>
+  );
+}
+
+function Checkbox({ checked, onChange, label }) {
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-1 h-4 w-4 accent-[#C91D67]"
+      />
+      <div className="text-sm text-[#0B1220]/75">{label}</div>
+    </label>
+  );
 }
 
 function RadioGroup({ value, onChange, options }) {
-    return (
-        <div className="space-y-2">
-            {options.map((o) => (
-                <label
-                    key={o}
-                    className="flex cursor-pointer items-center justify-between rounded-3xl bg-white/60 px-5 py-4 ring-1 ring-[#0B1220]/10 transition hover:ring-[#0B1220]/20"
-                >
-                    <div className="text-sm font-semibold text-[#0B1220]/80">{o}</div>
-                    <input
-                        type="radio"
-                        name="applicantType"
-                        checked={value === o}
-                        onChange={() => onChange(o)}
-                        className="h-4 w-4 accent-[#C91D67]"
-                    />
-                </label>
-            ))}
-        </div>
-    );
+  return (
+    <div className="space-y-2">
+      {options.map((o) => (
+        <label
+          key={o}
+          className="flex cursor-pointer items-center justify-between rounded-3xl bg-white/60 px-5 py-4 ring-1 ring-[#0B1220]/10 transition hover:ring-[#0B1220]/20"
+        >
+          <div className="text-sm font-semibold text-[#0B1220]/80">{o}</div>
+          <input
+            type="radio"
+            name="applicantType"
+            checked={value === o}
+            onChange={() => onChange(o)}
+            className="h-4 w-4 accent-[#C91D67]"
+          />
+        </label>
+      ))}
+    </div>
+  );
 }
 
 function MultiSelect({
-                         value,
-                         onChange,
-                         options,
-                         otherValue = "",
-                         onOtherValueChange = () => null,
-                         otherOptionLabel = "Other (Specify)",
-                         onBlur,
-                         error,
-                     }) {
-    const showOtherInput = value.includes(otherOptionLabel);
-    return (
-        <div
-            className="rounded-3xl p-4 ring-1 transition"
-            style={{
-                background: error ? "rgba(239,68,68,0.04)" : "rgba(255,255,255,0.60)",
-                borderColor: error ? "rgba(239,68,68,0.30)" : "rgba(11,18,32,0.10)",
-            }}
-        >
-            <div className="flex flex-wrap gap-2">
-                {options.map((o) => {
-                    const active = value.includes(o);
-                    return (
-                        <button
-                            key={o}
-                            type="button"
-                            onClick={() => {
-                                onChange(active ? value.filter((x) => x !== o) : [...value, o]);
-                                if (onBlur) onBlur();
-                            }}
-                            className="rounded-full px-3 py-2 text-xs font-semibold ring-1 transition"
-                            style={{
-                                background: active
-                                    ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.35)} 100%)`
-                                    : "rgba(11,18,32,0.06)",
-                                borderColor: active ? "rgba(11,18,32,0.10)" : "rgba(11,18,32,0.12)",
-                                color: active ? "white" : "rgba(11,18,32,0.72)",
-                            }}
-                        >
-                            {o}
-                        </button>
-                    );
-                })}
-            </div>
-            {showOtherInput ? (
-                <div className="mt-3">
-                    <input
-                        type="text"
-                        value={otherValue}
-                        onChange={(e) => onOtherValueChange(e.target.value)}
-                        placeholder="Please specify"
-                        className="w-full rounded-xl px-3 py-2 text-xs outline-none ring-1 transition bg-white/70 text-[#0B1220] placeholder:text-[#0B1220]/40 ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]"
-                    />
-                </div>
-            ) : null}
-            {value.length ? (
-                <div className="mt-3 text-xs text-[#0B1220]/55">
-                    Selected: <span className="font-semibold text-[#0B1220]/75">{value.length}</span>
-                </div>
-            ) : (
-                <div className="mt-3 text-xs" style={{ color: error ? "rgba(239,68,68,0.7)" : "rgba(11,18,32,0.55)" }}>
-                    Select one or more.
-                </div>
-            )}
+  value,
+  onChange,
+  options,
+  otherValue = "",
+  onOtherValueChange = () => null,
+  otherOptionLabel = "Other (Specify)",
+}) {
+  const showOtherInput = value.includes(otherOptionLabel);
+  return (
+    <div className="rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
+      <div className="flex flex-wrap gap-2">
+        {options.map((o) => {
+          const active = value.includes(o);
+          return (
+            <button
+              key={o}
+              type="button"
+              onClick={() => onChange(active ? value.filter((x) => x !== o) : [...value, o])}
+              className="rounded-full px-3 py-2 text-xs font-semibold ring-1 transition"
+              style={{
+                background: active
+                  ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.35)} 100%)`
+                  : "rgba(11,18,32,0.06)",
+                borderColor: active ? "rgba(11,18,32,0.10)" : "rgba(11,18,32,0.12)",
+                color: active ? "white" : "rgba(11,18,32,0.72)",
+              }}
+            >
+              {o}
+            </button>
+          );
+        })}
+      </div>
+      {showOtherInput ? (
+        <div className="mt-3">
+          <input
+            type="text"
+            value={otherValue}
+            onChange={(e) => onOtherValueChange(e.target.value)}
+            placeholder="Please specify"
+            className="w-full rounded-xl px-3 py-2 text-xs outline-none ring-1 transition bg-white/70 text-[#0B1220] placeholder:text-[#0B1220]/40 ring-[#0B1220]/10 hover:ring-[#0B1220]/20 focus:ring-2 focus:ring-[rgba(34,211,238,0.35)]"
+          />
         </div>
-    );
+      ) : null}
+      {value.length ? (
+        <div className="mt-3 text-xs text-[#0B1220]/55">
+          Selected: <span className="font-semibold text-[#0B1220]/75">{value.length}</span>
+        </div>
+      ) : (
+        <div className="mt-3 text-xs text-[#0B1220]/55">Select one or more.</div>
+      )}
+    </div>
+  );
 }
 
-/** ---------------- MULTI-STEP FORM WITH API INTEGRATION ---------------- */
-function FormWizard() {
-    const [step, setStep] = useState(0);
-    const [submitted, setSubmitted] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [fieldErrors, setFieldErrors] = useState({});
-    const [applicationId, setApplicationId] = useState(null);
+function FileRow({ uploads, onChange }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <FilePicker
+        label="Upload Professional Photo"
+        required
+        file={uploads.photo}
+        accept="image/*"
+        onFileChange={(file) => onChange({ ...uploads, photo: file })}
+      />
+      <FilePicker
+        label="Upload CV (PDF)"
+        file={uploads.cv}
+        accept=".pdf,application/pdf"
+        onFileChange={(file) => onChange({ ...uploads, cv: file })}
+      />
+    </div>
+  );
+}
 
-    const [profileImageFile, setProfileImageFile] = useState(null);
-    const [cvFile, setCvFile] = useState(null);
-
-    const [applicantType, setApplicantType] = useState("University / Educational Institution");
-
-    const [basic, setBasic] = useState({
-        fullName: "",
-        email: "",
-        phone: "",
-        country: "",
-        orgName: "",
-        position: "",
-        linkedin: "",
-        website: "",
-    });
-
-    const [partnership, setPartnership] = useState({
-        collab: [],
-        deliveryMode: "",
-        participants: "",
-        startTimeline: "",
-        objectives: "",
-    });
-
-    const [expert, setExpert] = useState({
-        expertise: [],
-        expertiseOther: "",
-        years: "",
-        organization: "",
-        roleType: "",
-        availability: "",
-        engagement: [],
-        delivery: "",
-        travel: false,
-        hasMaterial: "",
-        coDesign: true,
-        ledProjects: true,
-        projectsDesc: "",
-        references: true,
-        portfolio: "",
-        scholar: "",
-        compensation: "",
-        longTerm: true,
-    });
-
-    const [alignment, setAlignment] = useState({
-        why: "",
-        impact: "",
-        confirm: false,
-        contact: false,
-        consent: false,
-    });
-
-    const isExpert = applicantType === "Industry Expert / University Professor";
-
-    const steps = useMemo(() => {
-        return [
-            { key: "type", label: "Applicant Type" },
-            { key: "basic", label: "Basic Info" },
-            { key: isExpert ? "expert" : "partnership", label: isExpert ? "Expert Profile" : "Partnership Details" },
-            { key: "alignment", label: "Alignment & Compliance" },
-            { key: "review", label: "Review & Submit" },
-        ];
-    }, [isExpert]);
-
-    const pct = Math.round(((step + 1) / steps.length) * 100);
-
-    const orgPlaceholderByType = {
-        "University / Educational Institution": "University / Faculty / Institution",
-        "Company / Organization": "Company / Organization",
-        "Government / Public Sector": "Ministry / Agency / Public Entity",
-        "Industry Expert / University Professor": "University / Company / Lab",
-    };
-    const orgNamePlaceholder = orgPlaceholderByType[applicantType] || "Organization / Institution";
-
-    /** ---------------- VALIDATION ---------------- */
-    const validateBasic = () => {
-        const errs = {};
-        if (!basic.fullName?.trim())
-            errs.fullName = "Full name is required";
-        if (!basic.email?.trim())
-            errs.email = "Email address is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(basic.email))
-            errs.email = "Enter a valid email — e.g. name@company.com";
-        if (!basic.phone?.trim())
-            errs.phone = "Phone number is required";
-        if (!basic.country?.trim())
-            errs.country = "Country of residence is required";
-        if (!basic.orgName?.trim())
-            errs.orgName = "Organization or institution name is required";
-        if (!basic.position?.trim())
-            errs.position = "Your current position or title is required";
-        if (!basic.linkedin?.trim())
-            errs.linkedin = "LinkedIn profile URL is required";
-        else if (!/^https?:\/\/(www\.)?linkedin\.com\/.*$/.test(basic.linkedin))
-            errs.linkedin = "Must be a valid LinkedIn URL — e.g. https://linkedin.com/in/yourname";
-        if (basic.website && !/^https?:\/\/.*\..*$/.test(basic.website))
-            errs.website = "Must be a valid URL starting with https://";
-        return errs;
-    };
-
-    const validatePartnership = () => {
-        const errs = {};
-        if (!partnership.collab?.length)
-            errs.collab = "Select at least one collaboration type";
-        if (!partnership.deliveryMode)
-            errs.deliveryMode = "Select a preferred delivery mode";
-        if (!partnership.participants)
-            errs.participants = "Select an estimated participant range";
-        if (!partnership.startTimeline)
-            errs.startTimeline = "Select an expected start timeline";
-        return errs;
-    };
-
-    const validateExpert = () => {
-        const errs = {};
-        if (!expert.expertise?.length)
-            errs.expertise = "Select at least one area of expertise";
-        if (!expert.engagement?.length)
-            errs.engagement = "Select at least one engagement type";
-        if (!expert.years)
-            errs.years = "Select your years of experience";
-        if (!expert.roleType)
-            errs.roleType = "Select your role type";
-        if (!expert.availability)
-            errs.availability = "Select your weekly availability";
-        if (!expert.delivery)
-            errs.delivery = "Select a delivery preference";
-        if (!expert.hasMaterial)
-            errs.hasMaterial = "Indicate whether you have training material";
-        if (!expert.portfolio?.trim())
-            errs.portfolio = "Portfolio or personal website URL is required";
-        else if (!/^https?:\/\/.*\..*$/.test(expert.portfolio))
-            errs.portfolio = "Must be a valid URL — e.g. https://yoursite.com";
-        if (!expert.compensation)
-            errs.compensation = "Select a preferred collaboration model";
-        if (!profileImageFile)
-            errs.profile_image = "A professional photo is required";
-        return errs;
-    };
-
-    const validateAlignment = () => {
-        const errs = {};
-        if (!alignment.confirm)
-            errs.confirm = "Please confirm the information is accurate before proceeding";
-        if (!alignment.contact)
-            errs.contact = "Please agree to be contacted to continue";
-        if (!alignment.consent)
-            errs.consent = "Data processing consent is required to submit";
-        return errs;
-    };
-
-    /** ---------------- NAVIGATION — block if errors ---------------- */
-    function next() {
-        const key = steps[step].key;
-        let errs = {};
-        if (key === "basic") errs = validateBasic();
-        else if (key === "partnership") errs = validatePartnership();
-        else if (key === "expert") errs = validateExpert();
-        else if (key === "alignment") errs = validateAlignment();
-
-        if (Object.keys(errs).length > 0) {
-            setFieldErrors(errs);
-            setTimeout(() => {
-                const firstError = document.querySelector('[data-error="true"]');
-                if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
-            }, 50);
+function FilePicker({ label, file, onFileChange, accept, required = false }) {
+  const id = `file_${useId().replace(/:/g, "")}`;
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type="file"
+        accept={accept}
+        className="hidden"
+        onChange={async (e) => {
+          const next = e.target.files?.[0] || null;
+          if (!next) {
+            onFileChange(null);
             return;
-        }
-
-        setFieldErrors({});
-        setStep((s) => Math.min(steps.length - 1, s + 1));
-    }
-
-    function back() {
-        setStep((s) => Math.max(0, s - 1));
-        setFieldErrors({});
-    }
-
-    function resetForm() {
-        setStep(0);
-        setApplicantType("University / Educational Institution");
-        setBasic({ fullName: "", email: "", phone: "", country: "", orgName: "", position: "", linkedin: "", website: "" });
-        setPartnership({ collab: [], deliveryMode: "", participants: "", startTimeline: "", objectives: "" });
-        setExpert({
-            expertise: [], expertiseOther: "", years: "", organization: "", roleType: "", availability: "",
-            engagement: [], delivery: "", travel: false, hasMaterial: "", coDesign: true,
-            ledProjects: true, projectsDesc: "", references: true, portfolio: "", scholar: "", compensation: "", longTerm: true,
-        });
-        setAlignment({ why: "", impact: "", confirm: false, contact: false, consent: false });
-        setFieldErrors({});
-        setApplicationId(null);
-        setProfileImageFile(null);
-        setCvFile(null);
-    }
-
-    async function submit() {
-        const basicErrors = validateBasic();
-        const partnershipErrors = isExpert ? {} : validatePartnership();
-        const expertErrors = isExpert ? validateExpert() : {};
-        const alignmentErrors = validateAlignment();
-
-        const allErrors = { ...basicErrors, ...partnershipErrors, ...expertErrors, ...alignmentErrors };
-
-        if (Object.keys(allErrors).length > 0) {
-            setFieldErrors(allErrors);
-            return;
-        }
-
-        setLoading(true);
-
-        const formData = new FormData();
-        formData.append('applicantType', applicantType);
-        formData.append('basic[fullName]', basic.fullName);
-        formData.append('basic[email]', basic.email);
-        formData.append('basic[phone]', basic.phone || '');
-        formData.append('basic[country]', basic.country || '');
-        formData.append('basic[orgName]', basic.orgName || '');
-        formData.append('basic[position]', basic.position || '');
-        formData.append('basic[linkedin]', basic.linkedin || '');
-        formData.append('basic[website]', basic.website || '');
-        formData.append('alignment[why]', alignment.why || '');
-        formData.append('alignment[impact]', alignment.impact || '');
-        formData.append('alignment[confirm]', alignment.confirm ? '1' : '0');
-        formData.append('alignment[contact]', alignment.contact ? '1' : '0');
-        formData.append('alignment[consent]', alignment.consent ? '1' : '0');
-
-        if (isExpert) {
-            if (expert.expertise?.length) {
-                expert.expertise.forEach((item, index) => formData.append(`expert[expertise][${index}]`, item));
-            } else {
-                formData.append('expert[expertise]', JSON.stringify([]));
-            }
-            formData.append('expert[expertiseOther]', expert.expertiseOther || '');
-            formData.append('expert[years]', expert.years);
-            formData.append('expert[roleType]', expert.roleType);
-            formData.append('expert[availability]', expert.availability);
-            if (expert.engagement?.length) {
-                expert.engagement.forEach((item, index) => formData.append(`expert[engagement][${index}]`, item));
-            } else {
-                formData.append('expert[engagement]', JSON.stringify([]));
-            }
-            formData.append('expert[delivery]', expert.delivery);
-            formData.append('expert[travel]', expert.travel ? '1' : '0');
-            formData.append('expert[hasMaterial]', expert.hasMaterial || '');
-            formData.append('expert[coDesign]', expert.coDesign ? '1' : '0');
-            formData.append('expert[ledProjects]', expert.ledProjects ? '1' : '0');
-            formData.append('expert[projectsDesc]', expert.projectsDesc || '');
-            formData.append('expert[references]', expert.references ? '1' : '0');
-            formData.append('expert[portfolio]', expert.portfolio || '');
-            formData.append('expert[scholar]', expert.scholar || '');
-            formData.append('expert[compensation]', expert.compensation || '');
-            formData.append('expert[longTerm]', expert.longTerm ? '1' : '0');
-            if (profileImageFile) formData.append('profile_image', profileImageFile);
-            if (cvFile) formData.append('cv_file', cvFile);
-        } else {
-            if (partnership.collab?.length) {
-                partnership.collab.forEach((item, index) => formData.append(`partnership[collab][${index}]`, item));
-            } else {
-                formData.append('partnership[collab]', JSON.stringify([]));
-            }
-            formData.append('partnership[deliveryMode]', partnership.deliveryMode);
-            formData.append('partnership[participants]', partnership.participants);
-            formData.append('partnership[startTimeline]', partnership.startTimeline);
-            formData.append('partnership[objectives]', partnership.objectives || '');
-        }
-
-        try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            const response = await apiClient.post('/partnerships/submit', formData, {
-                headers: { 'X-CSRF-TOKEN': csrfToken || '', 'Content-Type': 'multipart/form-data' }
+          }
+          try {
+            const dataUrl = await readFileAsDataUrl(next);
+            onFileChange({
+              name: next.name,
+              size: next.size,
+              type: next.type,
+              dataUrl,
             });
-            if (response.status === 201 || response.status === 200) {
-                setSubmitted(true);
-                setApplicationId(response.data.application_id);
-                setTimeout(() => { setSubmitted(false); resetForm(); }, 9000);
-            }
-        } catch (error) {
-            console.error('Submission error:', error);
-            if (error.response) {
-                if (error.response.status === 422) {
-                    setFieldErrors(error.response.data.errors || {});
-                }
-            }
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    return (
-        <div className="mt-10">
-            <div className="relative overflow-hidden rounded-[42px] p-[1px]" style={{ background: "#FFFFFF", boxShadow: "0 26px 90px rgba(0,0,0,0.18)" }}>
-                <div className="relative rounded-[40px] bg-white/55 p-6 sm:p-8 ring-1 ring-[#0B1220]/10 backdrop-blur">
-
-                    {/* Success toast */}
-                    <AnimatePresence>
-                        {submitted ? (
-                            <motion.div
-                                initial={{ opacity: 0, x: 24, y: 24, scale: 0.96 }}
-                                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, x: 24, y: 24, scale: 0.96 }}
-                                className="fixed bottom-4 left-1/2 z-[95] hidden w-[min(92vw,560px)] -translate-x-1/2 sm:block"
-                            >
-                                <div className="rounded-2xl border border-[#C51F5D]/40 bg-gradient-to-r from-[#0B1220]/95 via-[#1A2340]/95 to-[#0B1220]/95 p-4 text-white shadow-[0_18px_55px_rgba(197,31,93,0.35)] backdrop-blur">
-                                    <p className="text-sm leading-relaxed text-white/95">
-                                        Thank you. Your form was submitted successfully.
-                                        {applicationId && ` Reference ID: ${applicationId}.`}
-                                        {" "}Our team will review it and contact you within 3–5 business days.
-                                    </p>
-                                </div>
-                            </motion.div>
-                        ) : null}
-                    </AnimatePresence>
-
-                    {/* Header */}
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                            <div className="mt-1 text-2xl font-semibold text-[#0B1220]">Partnership & Expert Application Form</div>
-                            <p className="mt-2 max-w-3xl text-sm text-[#0B1220]/70">
-                                We collaborate with universities, corporations, public institutions, and industry experts to deliver structured, measurable professional impact.
-                            </p>
-                            <p className="mt-2 max-w-3xl text-sm text-[#0B1220]/70">
-                                Please complete the form below to initiate a partnership or apply to join our expert network.
-                            </p>
-                        </div>
-                        <div className="w-full sm:w-[280px]">
-                            <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#0B1220]/10">
-                                <motion.div
-                                    className="h-full"
-                                    initial={false}
-                                    animate={{ width: `${pct}%` }}
-                                    transition={{ duration: 0.55, ease: "easeOut" }}
-                                    style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.55)} 100%)` }}
-                                />
-                            </div>
-                            <div className="mt-2 text-xs text-[#0B1220]/60">
-                                Step {step + 1} of {steps.length}: <span className="font-semibold">{steps[step].label}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Step indicators */}
-                    <div className="mt-6 flex flex-wrap gap-2">
-                        {steps.map((s, idx) => {
-                            const active = idx === step;
-                            const done = idx < step;
-                            return (
-                                <button
-                                    key={s.key}
-                                    type="button"
-                                    onClick={() => {
-                                        if (idx <= step) {
-                                            setStep(idx);
-                                            setFieldErrors({});
-                                            return;
-                                        }
-                                        const key = steps[step].key;
-                                        let errs = {};
-                                        if (key === "basic") errs = validateBasic();
-                                        else if (key === "partnership") errs = validatePartnership();
-                                        else if (key === "expert") errs = validateExpert();
-                                        else if (key === "alignment") errs = validateAlignment();
-
-                                        if (Object.keys(errs).length > 0) {
-                                            setFieldErrors(errs);
-                                            return;
-                                        }
-                                        setFieldErrors({});
-                                        setStep(idx);
-                                    }}
-                                    className="rounded-full px-4 py-2 text-xs font-semibold ring-1 transition"
-                                    style={{
-                                        background: active
-                                            ? `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.45)} 100%)`
-                                            : done
-                                                ? "rgba(52,211,153,0.14)"
-                                                : "rgba(11,18,32,0.06)",
-                                        borderColor: active ? "rgba(11,18,32,0.10)" : "rgba(11,18,32,0.12)",
-                                        color: active ? "white" : done ? "rgba(52,211,153,0.9)" : "rgba(11,18,32,0.45)",
-                                    }}
-                                >
-                                    {done ? (
-                                        <span className="inline-flex items-center gap-1.5">
-                                            <CheckCircle2 className="h-3 w-3" />
-                                            {s.label}
-                                        </span>
-                                    ) : s.label}
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* Step content */}
-                    <div className="mt-6">
-                        <AnimatePresence mode="wait">
-                            {/* STEP: TYPE */}
-                            {steps[step].key === "type" ? (
-                                <motion.div
-                                    key="type"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                    className="grid grid-cols-1 gap-4"
-                                >
-                                    <FormCard
-                                        title="Choose applicant type"
-                                        icon={<Users className="h-5 w-5" {...iconStrongProps} />}
-                                    >
-                                        <RadioGroup
-                                            value={applicantType}
-                                            onChange={setApplicantType}
-                                            options={[
-                                                "University / Educational Institution",
-                                                "Company / Organization",
-                                                "Government / Public Sector",
-                                                "Industry Expert / University Professor",
-                                            ]}
-                                        />
-                                    </FormCard>
-                                </motion.div>
-                            ) : null}
-
-                            {/* STEP: BASIC */}
-                            {steps[step].key === "basic" ? (
-                                <motion.div
-                                    key="basic"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                >
-                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        <Field label="Full Name" required error={fieldErrors.fullName || null}>
-                                            <Input
-                                                icon={BadgeCheck}
-                                                iconColor={THEME.accent2}
-                                                placeholder="Your full name"
-                                                value={basic.fullName}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, fullName: e.target.value });
-                                                    if (fieldErrors.fullName) setFieldErrors(prev => ({ ...prev, fullName: null }));
-                                                }}
-                                                error={!!fieldErrors.fullName}
-                                                data-error={!!fieldErrors.fullName}
-                                            />
-                                        </Field>
-
-                                        <Field label="Email Address" required error={fieldErrors.email || null}>
-                                            <Input
-                                                icon={Mail}
-                                                iconColor={THEME.accent}
-                                                placeholder="name@email.com"
-                                                type="email"
-                                                value={basic.email}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, email: e.target.value });
-                                                    if (fieldErrors.email) setFieldErrors(prev => ({ ...prev, email: null }));
-                                                }}
-                                                error={!!fieldErrors.email}
-                                            />
-                                        </Field>
-
-                                        <Field label="Phone Number" required error={fieldErrors.phone || null}>
-                                            <Input
-                                                icon={Phone}
-                                                iconColor={THEME.accent3}
-                                                placeholder="+(country code) ..."
-                                                value={basic.phone}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, phone: e.target.value });
-                                                    if (fieldErrors.phone) setFieldErrors(prev => ({ ...prev, phone: null }));
-                                                }}
-                                                error={!!fieldErrors.phone}
-                                            />
-                                        </Field>
-
-                                        <Field label="Country of Residence" required error={fieldErrors.country || null}>
-                                            <Input
-                                                icon={MapPin}
-                                                iconColor={THEME.accent4}
-                                                placeholder="Country"
-                                                value={basic.country}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, country: e.target.value });
-                                                    if (fieldErrors.country) setFieldErrors(prev => ({ ...prev, country: null }));
-                                                }}
-                                                error={!!fieldErrors.country}
-                                            />
-                                        </Field>
-
-                                        <Field label="Organization Name" required error={fieldErrors.orgName || null}>
-                                            <Input
-                                                icon={Building2}
-                                                iconColor={THEME.accent}
-                                                placeholder={orgNamePlaceholder}
-                                                value={basic.orgName}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, orgName: e.target.value });
-                                                    if (fieldErrors.orgName) setFieldErrors(prev => ({ ...prev, orgName: null }));
-                                                }}
-                                                error={!!fieldErrors.orgName}
-                                            />
-                                        </Field>
-
-                                        <Field label="Current Position / Title" required error={fieldErrors.position || null}>
-                                            <Input
-                                                icon={Briefcase}
-                                                iconColor={THEME.accent3}
-                                                placeholder="Role / Title"
-                                                value={basic.position}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, position: e.target.value });
-                                                    if (fieldErrors.position) setFieldErrors(prev => ({ ...prev, position: null }));
-                                                }}
-                                                error={!!fieldErrors.position}
-                                            />
-                                        </Field>
-
-                                        <Field label="LinkedIn Profile URL" required error={fieldErrors.linkedin || null}>
-                                            <Input
-                                                icon={LinkIcon}
-                                                iconColor={THEME.accent2}
-                                                placeholder="https://linkedin.com/in/..."
-                                                value={basic.linkedin}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, linkedin: e.target.value });
-                                                    if (fieldErrors.linkedin) setFieldErrors(prev => ({ ...prev, linkedin: null }));
-                                                }}
-                                                error={!!fieldErrors.linkedin}
-                                            />
-                                        </Field>
-
-                                        <Field label="Company / University Website" error={fieldErrors.website || null}>
-                                            <Input
-                                                icon={Globe2}
-                                                iconColor={THEME.accent4}
-                                                placeholder="https://..."
-                                                value={basic.website}
-                                                onChange={(e) => {
-                                                    setBasic({ ...basic, website: e.target.value });
-                                                    if (fieldErrors.website) setFieldErrors(prev => ({ ...prev, website: null }));
-                                                }}
-                                                error={!!fieldErrors.website}
-                                            />
-                                        </Field>
-                                    </div>
-                                </motion.div>
-                            ) : null}
-
-                            {/* STEP: PARTNERSHIP */}
-                            {steps[step].key === "partnership" ? (
-                                <motion.div
-                                    key="partnership"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                >
-                                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                                        <Field
-                                            label="Type of collaboration interested in"
-                                            required
-                                            hint="Multi-select"
-                                            className="sm:col-span-2"
-                                            error={fieldErrors.collab || null}
-                                        >
-                                            <MultiSelect
-                                                value={partnership.collab}
-                                                onChange={(v) => {
-                                                    setPartnership({ ...partnership, collab: v });
-                                                    if (fieldErrors.collab) setFieldErrors(prev => ({ ...prev, collab: null }));
-                                                }}
-                                                error={!!fieldErrors.collab}
-                                                options={[
-                                                    "Internship Programs (3–6 months)",
-                                                    "AI Training Programs",
-                                                    "Industrial Courses Integration",
-                                                    "Executive Workshops",
-                                                    "Tailored Corporate Programs",
-                                                    "Co-Hosted Programs",
-                                                    "Strategic Alliance",
-                                                    "Hiring Initiatives",
-                                                    "Research Collaboration",
-                                                ]}
-                                            />
-                                        </Field>
-
-                                        <Field label="Preferred delivery mode" required error={fieldErrors.deliveryMode || null}>
-                                            <Select
-                                                value={partnership.deliveryMode}
-                                                onChange={(v) => {
-                                                    setPartnership({ ...partnership, deliveryMode: v });
-                                                    if (fieldErrors.deliveryMode) setFieldErrors(prev => ({ ...prev, deliveryMode: null }));
-                                                }}
-                                                options={["Online", "Hybrid", "Onsite"]}
-                                                icon={Compass}
-                                                iconColor={THEME.accent}
-                                                error={!!fieldErrors.deliveryMode}
-                                            />
-                                        </Field>
-
-                                        <Field label="Estimated number of participants" required error={fieldErrors.participants || null}>
-                                            <Select
-                                                value={partnership.participants}
-                                                onChange={(v) => {
-                                                    setPartnership({ ...partnership, participants: v });
-                                                    if (fieldErrors.participants) setFieldErrors(prev => ({ ...prev, participants: null }));
-                                                }}
-                                                options={["10–25", "25–50", "50–100", "100+"]}
-                                                icon={Users}
-                                                iconColor={THEME.accent3}
-                                                error={!!fieldErrors.participants}
-                                            />
-                                        </Field>
-
-                                        <Field label="Expected start timeline" required error={fieldErrors.startTimeline || null}>
-                                            <Select
-                                                value={partnership.startTimeline}
-                                                onChange={(v) => {
-                                                    setPartnership({ ...partnership, startTimeline: v });
-                                                    if (fieldErrors.startTimeline) setFieldErrors(prev => ({ ...prev, startTimeline: null }));
-                                                }}
-                                                options={["Immediately", "Within 1 Month", "Within 3 Months", "Within 6 Months"]}
-                                                icon={Calendar}
-                                                iconColor={THEME.accent4}
-                                                error={!!fieldErrors.startTimeline}
-                                            />
-                                        </Field>
-
-                                        <Field label="Primary objectives (outcomes you aim to achieve)" className="sm:col-span-2">
-                                            <Textarea
-                                                value={partnership.objectives}
-                                                onChange={(e) => setPartnership({ ...partnership, objectives: e.target.value })}
-                                                placeholder="What outcomes are you aiming to achieve?"
-                                            />
-                                        </Field>
-                                    </div>
-                                </motion.div>
-                            ) : null}
-
-                            {/* STEP: EXPERT */}
-                            {steps[step].key === "expert" ? (
-                                <motion.div
-                                    key="expert"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                >
-                                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                                        <Field
-                                            label="Primary area of expertise"
-                                            required
-                                            hint="Multi-select"
-                                            className="sm:col-span-2"
-                                            error={fieldErrors.expertise || null}
-                                        >
-                                            <MultiSelect
-                                                value={expert.expertise}
-                                                onChange={(v) => {
-                                                    setExpert({
-                                                        ...expert,
-                                                        expertise: v,
-                                                        expertiseOther: v.includes("Other (Specify)") ? expert.expertiseOther : "",
-                                                    });
-                                                    if (fieldErrors.expertise) setFieldErrors(prev => ({ ...prev, expertise: null }));
-                                                }}
-                                                error={!!fieldErrors.expertise}
-                                                otherValue={expert.expertiseOther}
-                                                onOtherValueChange={(v) => setExpert({ ...expert, expertiseOther: v })}
-                                                options={[
-                                                    "Software Development", "AI & Machine Learning", "Data Science",
-                                                    "Cloud & DevOps", "Cybersecurity", "Digital Transformation",
-                                                    "Product Management", "UX/UI", "Business & Consulting",
-                                                    "Finance & FinTech", "Healthcare & Digital Health", "Marketing & Growth",
-                                                    "Entrepreneurship", "Supply Chain", "Project Management", "Other (Specify)",
-                                                ]}
-                                            />
-                                        </Field>
-
-                                        <Field label="Years of professional experience" required error={fieldErrors.years || null}>
-                                            <Select
-                                                value={expert.years}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, years: v });
-                                                    if (fieldErrors.years) setFieldErrors(prev => ({ ...prev, years: null }));
-                                                }}
-                                                options={["3–5", "5–10", "10–15", "15+"]}
-                                                icon={BadgeCheck}
-                                                iconColor={THEME.accent3}
-                                                error={!!fieldErrors.years}
-                                            />
-                                        </Field>
-
-                                        <Field label="Role type" required error={fieldErrors.roleType || null}>
-                                            <Select
-                                                value={expert.roleType}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, roleType: v });
-                                                    if (fieldErrors.roleType) setFieldErrors(prev => ({ ...prev, roleType: null }));
-                                                }}
-                                                options={["Industry Professional", "University Professor", "Consultant", "Executive", "Founder", "Other"]}
-                                                icon={Briefcase}
-                                                iconColor={THEME.accent4}
-                                                error={!!fieldErrors.roleType}
-                                            />
-                                        </Field>
-
-                                        <Field label="Weekly availability (hours)" required error={fieldErrors.availability || null}>
-                                            <Select
-                                                value={expert.availability}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, availability: v });
-                                                    if (fieldErrors.availability) setFieldErrors(prev => ({ ...prev, availability: null }));
-                                                }}
-                                                options={["2–4 Hours", "4–8 Hours", "8–12 Hours", "12+ Hours"]}
-                                                icon={Calendar}
-                                                iconColor={THEME.accent2}
-                                                error={!!fieldErrors.availability}
-                                            />
-                                        </Field>
-
-                                        <Field
-                                            label="Preferred engagement type"
-                                            required
-                                            hint="Multi-select"
-                                            className="sm:col-span-2"
-                                            error={fieldErrors.engagement || null}
-                                        >
-                                            <MultiSelect
-                                                value={expert.engagement}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, engagement: v });
-                                                    if (fieldErrors.engagement) setFieldErrors(prev => ({ ...prev, engagement: null }));
-                                                }}
-                                                error={!!fieldErrors.engagement}
-                                                options={[
-                                                    "Internship Supervision", "1-to-1 Mentorship",
-                                                    "Workshops & Masterclasses", "AI Training Programs",
-                                                    "Curriculum Co-Design", "Advisory Board", "Research Supervision",
-                                                ]}
-                                            />
-                                        </Field>
-
-                                        <Field label="Delivery preference" required error={fieldErrors.delivery || null}>
-                                            <Select
-                                                value={expert.delivery}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, delivery: v });
-                                                    if (fieldErrors.delivery) setFieldErrors(prev => ({ ...prev, delivery: null }));
-                                                }}
-                                                options={["Online", "Hybrid", "Onsite (Europe)", "Onsite (MENA)"]}
-                                                icon={Compass}
-                                                iconColor={THEME.accent}
-                                                error={!!fieldErrors.delivery}
-                                            />
-                                        </Field>
-
-                                        <Field label="Do you have existing training material?" required error={fieldErrors.hasMaterial || null}>
-                                            <Select
-                                                value={expert.hasMaterial}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, hasMaterial: v });
-                                                    if (fieldErrors.hasMaterial) setFieldErrors(prev => ({ ...prev, hasMaterial: null }));
-                                                }}
-                                                options={["Yes", "No", "Partially"]}
-                                                icon={FileCheck2}
-                                                iconColor={THEME.accent4}
-                                                error={!!fieldErrors.hasMaterial}
-                                            />
-                                        </Field>
-
-                                        <Field
-                                            label="Key projects (short description)"
-                                            className="sm:col-span-2"
-                                        >
-                                            <Textarea
-                                                value={expert.projectsDesc}
-                                                onChange={(e) => setExpert({ ...expert, projectsDesc: e.target.value })}
-                                                placeholder="Short description of key projects (optional)"
-                                            />
-                                        </Field>
-
-                                        <Field label="Portfolio / personal website URL" required error={fieldErrors.portfolio || null}>
-                                            <Input
-                                                icon={Globe2}
-                                                iconColor={THEME.accent3}
-                                                placeholder="https://..."
-                                                value={expert.portfolio}
-                                                onChange={(e) => {
-                                                    setExpert({ ...expert, portfolio: e.target.value });
-                                                    if (fieldErrors.portfolio) setFieldErrors(prev => ({ ...prev, portfolio: null }));
-                                                }}
-                                                error={!!fieldErrors.portfolio}
-                                            />
-                                        </Field>
-
-                                        <Field label="Preferred collaboration model" required error={fieldErrors.compensation || null}>
-                                            <Select
-                                                value={expert.compensation}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, compensation: v });
-                                                    if (fieldErrors.compensation) setFieldErrors(prev => ({ ...prev, compensation: null }));
-                                                }}
-                                                options={["Per Program", "Per Hour"]}
-                                                icon={Handshake}
-                                                iconColor={THEME.accent4}
-                                                error={!!fieldErrors.compensation}
-                                            />
-                                        </Field>
-
-                                        <Field
-                                            label="Uploads"
-                                            required
-                                            className="sm:col-span-2"
-                                        >
-                                            <FileRow
-                                                onProfileImageChange={(f) => {
-                                                    setProfileImageFile(f);
-                                                    if (fieldErrors.profile_image) setFieldErrors(prev => ({ ...prev, profile_image: null }));
-                                                }}
-                                                onCvFileChange={setCvFile}
-                                                profileImageError={fieldErrors.profile_image || null}
-                                            />
-                                        </Field>
-                                    </div>
-                                </motion.div>
-                            ) : null}
-
-                            {/* STEP: ALIGNMENT */}
-                            {steps[step].key === "alignment" ? (
-                                <motion.div
-                                    key="alignment"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                    className="grid grid-cols-1 gap-6"
-                                >
-                                    <div className="space-y-4">
-                                        <Field label="Why do you want to collaborate with Praktix?">
-                                            <Textarea
-                                                value={alignment.why}
-                                                onChange={(e) => setAlignment({ ...alignment, why: e.target.value })}
-                                                placeholder="Explain motivation and collaboration goals."
-                                            />
-                                        </Field>
-                                        <Field label="What impact do you want to create?">
-                                            <Textarea
-                                                value={alignment.impact}
-                                                onChange={(e) => setAlignment({ ...alignment, impact: e.target.value })}
-                                                placeholder="Describe the impact you want to achieve (outcomes)."
-                                            />
-                                        </Field>
-                                    </div>
-
-                                    <div className="space-y-2 rounded-3xl bg-white/60 p-4 ring-1 ring-[#0B1220]/10">
-                                        <Field label="Confirmation" required error={fieldErrors.confirm || null}>
-                                            <Checkbox
-                                                checked={alignment.confirm}
-                                                onChange={(v) => {
-                                                    setAlignment({ ...alignment, confirm: v });
-                                                    if (fieldErrors.confirm) setFieldErrors(prev => ({ ...prev, confirm: null }));
-                                                }}
-                                                label="I confirm the information provided is accurate."
-                                                error={!!fieldErrors.confirm}
-                                            />
-                                        </Field>
-
-                                        <Field label="Contact Agreement" required error={fieldErrors.contact || null}>
-                                            <Checkbox
-                                                checked={alignment.contact}
-                                                onChange={(v) => {
-                                                    setAlignment({ ...alignment, contact: v });
-                                                    if (fieldErrors.contact) setFieldErrors(prev => ({ ...prev, contact: null }));
-                                                }}
-                                                label="I agree to be contacted regarding partnership opportunities."
-                                                error={!!fieldErrors.contact}
-                                            />
-                                        </Field>
-
-                                        <Field label="Data Processing Consent" required error={fieldErrors.consent || null}>
-                                            <Checkbox
-                                                checked={alignment.consent}
-                                                onChange={(v) => {
-                                                    setAlignment({ ...alignment, consent: v });
-                                                    if (fieldErrors.consent) setFieldErrors(prev => ({ ...prev, consent: null }));
-                                                }}
-                                                label="I consent to data processing in accordance with the privacy policy."
-                                                error={!!fieldErrors.consent}
-                                            />
-                                        </Field>
-                                    </div>
-                                </motion.div>
-                            ) : null}
-
-                            {/* STEP: REVIEW */}
-                            {steps[step].key === "review" ? (
-                                <motion.div
-                                    key="review"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                    className="grid grid-cols-1 gap-6"
-                                >
-                                    <div>
-                                        <div className="rounded-[36px] bg-white/60 p-6 ring-1 ring-[#0B1220]/10">
-                                            <div className="text-xs font-semibold tracking-widest text-[#0B1220]/60">REVIEW</div>
-                                            <div className="mt-2 text-lg font-semibold text-[#0B1220]">Check details before submitting</div>
-                                            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                                <MiniKV k="Applicant type" v={applicantType} />
-                                                <MiniKV k="Name" v={basic.fullName || "—"} />
-                                                <MiniKV k="Email" v={basic.email || "—"} />
-                                                <MiniKV k="Country" v={basic.country || "—"} />
-                                                <MiniKV k="Organization" v={basic.orgName || "—"} />
-                                                <MiniKV k="LinkedIn" v={basic.linkedin || "—"} />
-                                            </div>
-                                            <div className="mt-5 rounded-3xl bg-white/60 p-5 ring-1 ring-[#0B1220]/10">
-                                                <div className="text-sm font-semibold text-[#0B1220]">
-                                                    {isExpert ? "Expert profile" : "Partnership details"}
-                                                </div>
-                                                <div className="mt-2 text-sm text-[#0B1220]/70">
-                                                    {isExpert ? (
-                                                        <>
-                                                            Expertise: <span className="font-semibold">{expert.expertise.join(", ") || "—"}</span>
-                                                            <br />
-                                                            Engagement: <span className="font-semibold">{expert.engagement.join(", ") || "—"}</span>
-                                                            <br />
-                                                            Availability: <span className="font-semibold">{expert.availability}</span>
-                                                            {(profileImageFile || cvFile) ? (
-                                                                <>
-                                                                    <br />
-                                                                    Uploads:{" "}
-                                                                    <span className="font-semibold">
-                                                                        {[
-                                                                            profileImageFile ? `Photo (${profileImageFile.name})` : null,
-                                                                            cvFile ? `CV (${cvFile.name})` : null,
-                                                                        ].filter(Boolean).join(", ")}
-                                                                    </span>
-                                                                </>
-                                                            ) : null}
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            Collaboration: <span className="font-semibold">{partnership.collab.join(", ") || "—"}</span>
-                                                            <br />
-                                                            Delivery: <span className="font-semibold">{partnership.deliveryMode}</span>
-                                                            <br />
-                                                            Objectives: <span className="font-semibold">{partnership.objectives || "—"}</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ) : null}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Navigation */}
-                    <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <button
-                            type="button"
-                            onClick={back}
-                            disabled={step === 0 || loading}
-                            className={cx(
-                                "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ring-1 transition",
-                                (step === 0 || loading) ? "opacity-40 cursor-not-allowed" : "hover:bg-[#0B1220]/5"
-                            )}
-                            style={{
-                                background: "rgba(11,18,32,0.04)",
-                                borderColor: "rgba(11,18,32,0.10)",
-                                color: "rgba(11,18,32,0.78)",
-                            }}
-                        >
-                            <ChevronLeft className="h-4 w-4" {...iconStrongProps} />
-                            Back
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={step === steps.length - 1 ? submit : next}
-                            disabled={loading}
-                            className={cx(
-                                "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm transition",
-                                loading ? "opacity-75 cursor-wait" : "hover:opacity-95"
-                            )}
-                            style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.78)} 80%)` }}
-                        >
-                            {loading ? (
-                                <>
-                                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Processing...
-                                </>
-                            ) : (
-                                <>
-                                    {step === steps.length - 1 ? "Submit" : "Continue"}
-                                    <ChevronRight className="h-4 w-4" {...iconStrongProps} />
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </div>
-            </div>
+          } catch {
+            onFileChange(null);
+          }
+        }}
+      />
+      <label
+        htmlFor={id}
+        className="group relative flex min-h-[132px] cursor-pointer flex-col items-start justify-between rounded-2xl bg-white/60 px-4 py-4 ring-1 ring-[#0B1220]/10 transition hover:ring-[#0B1220]/20"
+      >
+        <div className="flex items-start gap-3">
+          <span
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1"
+            style={{
+              background: "rgba(11,18,32,0.05)",
+              borderColor: "rgba(11,18,32,0.10)",
+            }}
+          >
+            <Upload className="h-4 w-4" style={{ color: THEME.accent3 }} {...iconStrongProps} />
+          </span>
+          <div>
+            <div className="text-sm font-semibold text-[#0B1220]">{label}</div>
+            <div className="text-xs text-[#0B1220]/55">{required ? "Required" : "Optional"}</div>
+            {file ? (
+              <div className="mt-1 text-xs font-semibold text-[#0B1220]/75">{file.name}</div>
+            ) : null}
+          </div>
         </div>
-    );
-}
 
-/** ---------------- HERO CHIP ---------------- */
-function HeroChip({ icon: Icon, title, desc, color }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            whileHover={{ y: -4 }}
-            className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur"
-            style={{ boxShadow: "0 18px 60px rgba(0,0,0,0.28)" }}
+        <span
+          className="self-end rounded-full px-3 py-1 text-xs font-semibold ring-1"
+          style={{
+            background: "rgba(11,18,32,0.06)",
+            borderColor: "rgba(11,18,32,0.10)",
+            color: "rgba(11,18,32,0.70)",
+          }}
         >
-            <div className="flex items-start gap-3">
-                <IconBadge color={color}>
-                    <Icon className="h-5 w-5" {...iconStrongProps} />
-                </IconBadge>
-                <div>
-                    <div className="text-sm font-semibold text-white">{title}</div>
-                    <div className="mt-1 text-xs text-white/65">{desc}</div>
-                </div>
-            </div>
-        </motion.div>
-    );
+          Choose
+        </span>
+
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <div className="shine" />
+        </div>
+      </label>
+    </div>
+  );
 }
 
 /** ---------------- MAIN PAGE ---------------- */
 export default function PartnershipsPage() {
-    const reduce = useReducedMotion();
+  const reduce = useReducedMotion();
 
-    return (
+  return (
+    <div
+      className="min-h-screen overflow-x-hidden"
+      style={{
+        background: THEME.deep,
+        color: "white",
+        fontFamily:
+          "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji",
+      }}
+    >
+     
+      <div className="pointer-events-none fixed inset-0">
         <div
-            className="min-h-screen overflow-x-hidden"
-            style={{
-                background: THEME.deep,
-                color: "white",
-                fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji",
-            }}
-        >
-            <meta name="csrf-token" content="{{ csrf_token() }}" />
-
-            <div className="pointer-events-none fixed inset-0">
-                <div
-                    className="absolute inset-0 opacity-70"
-                    style={{
-                        background:
-                            "radial-gradient(1200px circle at 10% 10%, rgba(255,255,255,0.08), transparent 55%), radial-gradient(1200px circle at 80% 20%, rgba(233,231,223,0.06), transparent 55%), radial-gradient(900px circle at 60% 90%, rgba(255,255,255,0.06), transparent 55%)",
-                    }}
-                />
-                <div className="absolute inset-0 opacity-55">
-                    <div className="light-streak" />
-                </div>
-            </div>
-
-            {/* HERO */}
-            <section className="relative" style={{ background: DARK_SECTION_BG }}>
-                <NetworkBackdrop />
-                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-                    <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center">
-                        <motion.div
-                            initial={{ opacity: 0, y: 18 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.65, ease: "easeOut" }}
-                            className="lg:col-span-6"
-                        >
-                            <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.05] sm:text-5xl lg:text-6xl">
-                                Strategic Partnerships <br /> Built on Outcomes.
-                            </h1>
-                            <p className="mt-5 max-w-xl text-balance text-base text-white/70 sm:text-lg">
-                                We collaborate with universities, corporations, public institutions, and industry leaders to deliver measurable professional impact — not theoretical engagement.
-                            </p>
-                            <p className="mt-4 max-w-xl text-balance text-sm leading-relaxed text-white/65">
-                                From co-hosted internships to executive AI programs and expert networks — our partnership model is structured, scalable, and results-driven.
-                            </p>
-                            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-                                <MagneticButton href="#apply">Become a Partner</MagneticButton>
-                                <MagneticButton href="#apply" variant="secondary">Become an Expert</MagneticButton>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 18 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut", delay: 0.05 }}
-                            className="relative lg:col-span-6"
-                        >
-                            <div
-                                className="relative overflow-hidden rounded-[44px] ring-1 ring-white/10 bg-white/5 backdrop-blur"
-                                style={{ boxShadow: "0 26px 90px rgba(0,0,0,0.35)" }}
-                            >
-                                <div className="absolute inset-0">
-                                    <div className="heroGrid" />
-                                </div>
-                                <div className="relative grid grid-cols-12 gap-3 p-5 sm:p-6">
-                                    <motion.div
-                                        className="col-span-12 sm:col-span-7 overflow-hidden rounded-[34px] ring-1 ring-white/10"
-                                        whileHover={{ scale: 1.01 }}
-                                        transition={{ duration: 0.25 }}
-                                    >
-                                        <img
-                                            src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1400&q=80"
-                                            alt="Partnership meeting"
-                                            className="h-[260px] w-full object-cover"
-                                        />
-                                    </motion.div>
-                                    <div className="col-span-12 sm:col-span-5 grid gap-3">
-                                        <motion.div className="overflow-hidden rounded-[34px] ring-1 ring-white/10" whileHover={{ y: -4 }}>
-                                            <img
-                                                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=80"
-                                                alt="Team collaboration"
-                                                className="h-[124px] w-full object-cover"
-                                            />
-                                        </motion.div>
-                                        <motion.div className="overflow-hidden rounded-[34px] ring-1 ring-white/10" whileHover={{ y: -4 }}>
-                                            <img
-                                                src="https://images.unsplash.com/photo-1526948128573-703ee1aeb6fa?auto=format&fit=crop&w=1400&q=80"
-                                                alt="Workshop"
-                                                className="h-[124px] w-full object-cover"
-                                            />
-                                        </motion.div>
-                                    </div>
-                                    <div className="col-span-12 mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                                        <HeroChip icon={GraduationCap} title="Universities" desc="Academic integration" color={THEME.accent2} />
-                                        <HeroChip icon={Building2} title="Corporations" desc="Workforce upskilling" color={THEME.accent} />
-                                        <HeroChip icon={Landmark} title="Governments" desc="Ecosystem impact" color={THEME.accent4} />
-                                    </div>
-                                </div>
-                                {!reduce ? (
-                                    <div className="pointer-events-none absolute inset-0">
-                                        <div className="nodesOverlay" />
-                                    </div>
-                                ) : null}
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ARCHITECTURE */}
-            <section id="architecture" className="relative" style={{ background: DARK_SECTION_BG }}>
-                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-                    <SectionTitle
-                        title="Structured collaboration models"
-                        accentText="aligned with outcomes"
-                        subtitle="We design partnerships aligned with institutional goals, workforce transformation, and long-term impact."
-                        dark
-                    />
-                    <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        {ARCHITECTURE.map((item, idx) => (
-                            <ArchitectureCard key={item.title} item={item} index={idx} />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* REACH */}
-            <section id="reach" className="relative" style={{ background: DARK_SECTION_BG }}>
-                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-                    <SectionTitle
-                        title="A European-Rooted, Global Network"
-                        subtitle="Our partnerships span universities, corporations, and ecosystems across Europe — with expansion in MENA and international markets."
-                        dark
-                    />
-                    <div className="mt-10">
-                        <ReachMap />
-                    </div>
-                </div>
-            </section>
-
-            {/* IMPACT */}
-            <section id="impact" className="relative" style={{ background: DARK_SECTION_BG }}>
-                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-                    <SectionTitle
-                        title="Measured outcomes"
-                        accentText="on outcomes"
-                        subtitle=""
-                        dark
-                    />
-                    <MetricsStrip />
-                </div>
-            </section>
-
-            {/* WHY */}
-            <section id="why" className="relative" style={{ background: THEME.sand, color: THEME.deep }}>
-                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-                    <WhyPartner />
-                </div>
-            </section>
-
-            {/* APPLICATION FORM */}
-            <section id="apply" className="relative" style={{ background: "rgba(233,231,223,1)", color: THEME.deep }}>
-                <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-                    <SectionTitle
-                        title="Let's Build Structured Impact Together."
-                        subtitle="Whether you represent a university, company, government entity, or expert network — we design partnerships that create measurable value."
-                    />
-                    <div id="application-form" className="mt-10 scroll-mt-24">
-                        <FormWizard />
-                    </div>
-                </div>
-            </section>
-
-            <a
-                href="#apply"
-                className="fixed bottom-6 right-6 z-50 hidden items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:inline-flex"
-                style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.74)} 90%)` }}
-            >
-                <Handshake className="h-4 w-4" {...iconStrongProps} />
-                Partner / Expert Apply
-            </a>
-
-            <style>{css}</style>
+          className="absolute inset-0 opacity-70"
+          style={{
+            background:
+              "radial-gradient(1200px circle at 10% 10%, rgba(255,255,255,0.08), transparent 55%), radial-gradient(1200px circle at 80% 20%, rgba(233,231,223,0.06), transparent 55%), radial-gradient(900px circle at 60% 90%, rgba(255,255,255,0.06), transparent 55%)",
+          }}
+        />
+        <div className="absolute inset-0 opacity-55">
+          <div className="light-streak" />
         </div>
-    );
+      </div>
+
+      {/* HERO (different layout: collage + animated network overlay) */}
+      <section className="relative" style={{ background: DARK_SECTION_BG }}>
+        <NetworkBackdrop />
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center">
+            {/* text */}
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="lg:col-span-6"
+            >
+              <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.05] sm:text-5xl lg:text-6xl">
+                Strategic Partnerships <br /> Built on Outcomes.
+              </h1>
+              
+
+              <p className="mt-5 max-w-xl text-balance text-base text-white/70 sm:text-lg">
+                We collaborate with universities, corporations, public institutions, and industry leaders to deliver measurable professional impact — not theoretical engagement.
+              </p>
+
+              <p className="mt-4 max-w-xl text-balance text-sm leading-relaxed text-white/65">
+                From co-hosted internships to executive AI programs and expert networks — our partnership model is structured, scalable, and results-driven.
+              </p>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <MagneticButton href="#apply">Become a Partner</MagneticButton>
+                <MagneticButton href="/experts/value-proposition" variant="secondary">Become an Expert</MagneticButton>
+              </div>
+
+            </motion.div>
+
+            {/* collage */}
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.05 }}
+              className="relative lg:col-span-6"
+            >
+              <div className="relative overflow-hidden rounded-[44px] ring-1 ring-white/10 bg-white/5 backdrop-blur"
+                   style={{ boxShadow: "0 26px 90px rgba(0,0,0,0.35)" }}>
+                <div className="absolute inset-0">
+                  <div className="heroGrid" />
+                </div>
+
+                <div className="relative grid grid-cols-12 gap-3 p-5 sm:p-6">
+                  {/* big image */}
+                  <motion.div
+                    className="col-span-12 sm:col-span-7 overflow-hidden rounded-[34px] ring-1 ring-white/10"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1400&q=80"
+                      alt="Partnership meeting"
+                      className="h-[260px] w-full object-cover"
+                    />
+                  </motion.div>
+
+                  {/* stack */}
+                  <div className="col-span-12 sm:col-span-5 grid gap-3">
+                    <motion.div
+                      className="overflow-hidden rounded-[34px] ring-1 ring-white/10"
+                      whileHover={{ y: -4 }}
+                    >
+                      <img
+                        src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=80"
+                        alt="Team collaboration"
+                        className="h-[124px] w-full object-cover"
+                      />
+                    </motion.div>
+                    <motion.div
+                      className="overflow-hidden rounded-[34px] ring-1 ring-white/10"
+                      whileHover={{ y: -4 }}
+                    >
+                      <img
+                        src="https://images.unsplash.com/photo-1526948128573-703ee1aeb6fa?auto=format&fit=crop&w=1400&q=80"
+                        alt="Workshop"
+                        className="h-[124px] w-full object-cover"
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* floating chips */}
+                  <div className="col-span-12 mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <HeroChip icon={GraduationCap} title="Universities" desc="Academic integration" color={THEME.accent2} />
+                    <HeroChip icon={Building2} title="Corporations" desc="Workforce upskilling" color={THEME.accent} />
+                    <HeroChip icon={Landmark} title="Governments" desc="Ecosystem impact" color={THEME.accent4} />
+                  </div>
+                </div>
+
+                {/* animated nodes overlay */}
+                {!reduce ? (
+                  <div className="pointer-events-none absolute inset-0">
+                    <div className="nodesOverlay" />
+                  </div>
+                ) : null}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ARCHITECTURE */}
+      <section id="architecture" className="relative" style={{ background: DARK_SECTION_BG }}>
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+          <SectionTitle
+            title="Structured collaboration models"
+            accentText="aligned with outcomes"
+            subtitle="We design partnerships aligned with institutional goals, workforce transformation, and long-term impact."
+            dark
+          />
+
+          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {ARCHITECTURE.map((item, idx) => (
+              <ArchitectureCard key={item.title} item={item} index={idx} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* REACH */}
+      <section id="reach" className="relative" style={{ background: DARK_SECTION_BG }}>
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+          <SectionTitle
+            title="A European-Rooted, Global Network"
+            subtitle="Our partnerships span universities, corporations, and ecosystems across Europe — with expansion in MENA and international markets."
+            dark
+          />
+          <div className="mt-10">
+            <ReachMap />
+          </div>
+        </div>
+      </section>
+
+      {/* IMPACT */}
+      <section id="impact" className="relative" style={{ background: DARK_SECTION_BG }}>
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+          <SectionTitle
+            accentText="on outcomes"
+            subtitle=""
+            dark
+          />
+          <MetricsStrip />
+        </div>
+      </section>
+
+      {/* WHY */}
+      <section id="why" className="relative" style={{ background: THEME.sand, color: THEME.deep }}>
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+          <WhyPartner />
+        </div>
+      </section>
+
+      {/* CLOSING CTA + FORM */}
+      <section id="apply" className="relative" style={{ background: "rgba(233,231,223,1)", color: THEME.deep }}>
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
+          <SectionTitle
+            title="Let's Build Structured Impact Together."
+            subtitle="Whether you represent a university, company, government entity, or expert network — we design partnerships that create measurable value."
+          />
+
+          <div id="application-form" className="mt-10 scroll-mt-24">
+            <FormWizard />
+          </div>
+        </div>
+      </section>
+
+      {/* floating action */}
+      <a
+        href="#apply"
+        className="fixed bottom-6 right-6 z-50 hidden items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:inline-flex"
+        style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.74)} 90%)` }}
+      >
+        <Handshake className="h-4 w-4" {...iconStrongProps} />
+        Partner / Expert Apply
+      </a>
+
+      <style>{css}</style>
+    </div>
+  );
+}
+
+/** ---------------- HERO CHIP ---------------- */
+function HeroChip({ icon: Icon, title, desc, color }) {
+  void Icon;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      whileHover={{ y: -4 }}
+      className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur"
+      style={{ boxShadow: "0 18px 60px rgba(0,0,0,0.28)" }}
+    >
+      <div className="flex items-start gap-3">
+        <IconBadge color={color}>
+          <Icon className="h-5 w-5" {...iconStrongProps} />
+        </IconBadge>
+        <div>
+          <div className="text-sm font-semibold text-white">{title}</div>
+          <div className="mt-1 text-xs text-white/65">{desc}</div>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 /** ---------------- CSS ---------------- */
@@ -2532,6 +2379,7 @@ const css = `
   100%{ transform: translateX(-35%) rotate(-10deg); }
 }
 
+/* global shine */
 .shine{
   position:absolute;
   inset:-30% -30%;
@@ -2547,6 +2395,7 @@ const css = `
   100%{ transform: translateX(-30%) rotate(-10deg); }
 }
 
+/* hero grid texture */
 .heroGrid{
   position:absolute;
   inset:0;
@@ -2561,6 +2410,7 @@ const css = `
   mask-image: radial-gradient(900px circle at 55% 30%, rgba(0,0,0,1), transparent 70%);
 }
 
+/* constellation */
 .constellation{
   position:absolute;
   inset:0;
@@ -2584,6 +2434,7 @@ const css = `
   100%{ transform: translateY(0px); opacity: 0.35; }
 }
 
+/* hero nodes overlay: animated "network" */
 .nodesOverlay{
   position:absolute;
   inset:0;
