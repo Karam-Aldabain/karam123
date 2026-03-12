@@ -1,25 +1,22 @@
 // src/api/apiClient.ts
 import axios from "axios";
 
-const BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || "https://praktix.hopn.eu/back/api";
-// const BASE_URL = "http://127.0.0.1:8000/api";
+// const BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || "https://praktix.hopn.eu/back/api";
+const BASE_URL = "http://localhost:8000/api";
 
 const apiClient = axios.create({
     baseURL: BASE_URL,
     headers: { "Content-Type": "application/json" },
+    withCredentials: true,
 });
 
-// Token helpers
+// Token helpers (no longer needed with cookies, but kept for interface compatibility if needed)
 export const setAuthToken = (token: string) => {
-    if (token) {
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    } else {
-        delete apiClient.defaults.headers.common["Authorization"];
-    }
+    // No-op: Token is in HttpOnly cookie
 };
 
 export const clearAuthToken = () => {
-    delete apiClient.defaults.headers.common["Authorization"];
+    // No-op: Cookie is cleared by backend on logout
 };
 
 apiClient.interceptors.response.use(
@@ -52,41 +49,32 @@ apiClient.interceptors.response.use(
 
 // Interceptors
 apiClient.interceptors.request.use((config) => {
-    const authData = localStorage.getItem("app_auth");
-    if (authData) {
-        try {
-            const parsed = JSON.parse(authData);
-            if (parsed?.token) {
-                config.headers.Authorization = `Bearer ${parsed.token}`;
-            }
-        } catch {
-            // ignore invalid JSON
-        }
+    // Skip auth if explicitly requested or for known public endpoints
+    const publicEndpoints = ["/experts/approved", "/roles", "/partnerships/submit", "/login", "/register"];
+    const isPublic = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
+
+    // @ts-ignore - custom property
+    if (config.skipAuth || isPublic) {
+        // Ensure no Authorization header is sent to public endpoints
+        delete config.headers.Authorization;
+        return config;
     }
+
+    // With cookies, we don't need to manually add the Authorization header from localStorage.
+    // The browser automatically sends the 'auth_token' cookie with withCredentials: true.
+    // The legacy header is removed here to prevent using stale localStorage tokens.
+    delete config.headers.Authorization;
+
     return config;
 });
 
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
-        const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                const refreshResponse = await axios.post(
-                    `${BASE_URL}/auth/refresh`,
-                    {},
-                    { withCredentials: true }
-                );
-                const newToken = refreshResponse.data.token;
-                setAuthToken(newToken);
-                originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-                return apiClient(originalRequest);
-            } catch (err) {
-                clearAuthToken();
-                window.location.href = "/login";
-                return Promise.reject(err);
-            }
+        if (error.response?.status === 401) {
+            // If we get a 401, the cookie is likely invalid/expired.
+            localStorage.removeItem("app_auth");
+            window.location.href = "/login";
         }
         return Promise.reject(error);
     }

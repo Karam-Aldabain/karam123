@@ -427,9 +427,24 @@ export default function Navbar({ dir = "ltr" }) {
           {/* RIGHT: Actions pinned to the far right */}
           <div className="px-right">
             <div className="px-actions">
-              <a className="px-cta" href="/portal" onClick={onNavLink}>
-                Login Portal
-              </a>
+              {(() => {
+                const auth = JSON.parse(localStorage.getItem("app_auth") || "null");
+                const user = auth?.user;
+                const isExpert = user?.role === "expert" || user?.roles?.some(r => r.name === "expert");
+
+                if (user) {
+                  return (
+                    <a className="px-cta" href={isExpert ? "/experts/dashboard" : "/portal"} onClick={onNavLink}>
+                      {isExpert ? "Dashboard" : "My Portal"}
+                    </a>
+                  );
+                }
+                return (
+                  <a className="px-cta" href="/portal" onClick={onNavLink}>
+                    Login Portal
+                  </a>
+                );
+              })()}
             </div>
 
             <button className="px-mobileBtn" type="button" aria-label="Toggle menu" onClick={toggleMobile}>
@@ -442,10 +457,25 @@ export default function Navbar({ dir = "ltr" }) {
         {mobileOpen && (
           <div className="px-mobilePanel">
             <div className="px-mobileInner">
-            <div className="px-mobileActions">
-              <a className="px-cta mobile" href="/portal" onClick={onNavLink}>
-                Login Portal
-              </a>
+              <div className="px-mobileActions">
+                {(() => {
+                  const auth = JSON.parse(localStorage.getItem("app_auth") || "null");
+                  const user = auth?.user;
+                  const isExpert = user?.role === "expert" || user?.roles?.some(r => r.name === "expert");
+
+                  if (user) {
+                    return (
+                      <a className="px-cta mobile" href={isExpert ? "/experts/dashboard" : "/portal"} onClick={onNavLink}>
+                        {isExpert ? "Dashboard" : "My Portal"}
+                      </a>
+                    );
+                  }
+                  return (
+                    <a className="px-cta mobile" href="/portal" onClick={onNavLink}>
+                      Login Portal
+                    </a>
+                  );
+                })()}
               </div>
 
               <div className="px-accordion">

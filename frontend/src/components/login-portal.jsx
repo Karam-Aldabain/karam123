@@ -1,18 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Lock, Mail } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import apiClient from "../api/api";
 
 const COLORS = {
   accent: "#C51F5D",
   primary: "#243447",
   deep: "#141D26",
   paper: "#E2E2D2",
+  error: "#EF4444"
 };
+
+/** ---------------- FIELD-LEVEL ERROR ---------------- */
+function FieldError({ error }) {
+  if (!error) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      className="mt-1.5 flex items-center gap-1.5 px-2 text-xs font-semibold"
+      style={{ color: COLORS.error }}
+    >
+      <div className="h-1 w-1 rounded-full bg-current" />
+      {error}
+    </motion.div>
+  );
+}
 
 export default function LoginPortalPage() {
   void motion;
   const reduce = useReducedMotion();
-  const [mode, setMode] = useState("login");
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const [mode, setMode] = useState(searchParams.get("mode") === "register" ? "register" : "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -22,27 +45,120 @@ export default function LoginPortalPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [roles, setRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState(searchParams.get("role") || "student");
 
-  function onLoginSubmit(e) {
+  // Fetch roles from API
+  useEffect(() => {
+    async function fetchRoles() {
+      try {
+        const response = await apiClient.get("/roles");
+        setRoles(response.data.data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    }
+    fetchRoles();
+  }, []);
+
+  // Update mode or selectedRole if URL parameters change
+  useEffect(() => {
+    const modeParam = searchParams.get("mode");
+    if (modeParam === "register" || modeParam === "login") {
+      setMode(modeParam);
+    }
+    const roleParam = searchParams.get("role");
+    if (roleParam) {
+      setSelectedRole(roleParam);
+    }
+  }, [searchParams]);
+
+  async function onLoginSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
     setStatusMessage("");
-    setStatusMessage("Login request submitted. We will contact you soon.");
-    setPassword("");
-    setSubmitting(false);
+    setFieldErrors({});
+
+    try {
+      const response = await apiClient.post("/login", {
+        email,
+        password,
+      });
+
+      if (response.data.user) {
+        // Store only the user object, the token is in the HttpOnly cookie
+        localStorage.setItem("app_auth", JSON.stringify({
+          user: response.data.user,
+        }));
+        setStatusMessage("Login successful! Redirecting...");
+
+        const redirect = searchParams.get("redirect");
+        setTimeout(() => navigate(redirect || "/"), 1000);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error.response?.status === 422 && error.response.data.errors) {
+        setFieldErrors(error.response.data.errors);
+        setStatusMessage("Please check the errors below.");
+      } else {
+        setStatusMessage(error.response?.data?.message || "Login failed. Please check your credentials.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  function onRegisterSubmit(e) {
+  async function onRegisterSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
     setStatusMessage("");
-    setStatusMessage("Registration request submitted. We will contact you soon.");
-    setFullName("");
-    setPhoneNumber("");
-    setRegisterEmail("");
-    setRegisterPassword("");
-    setConfirmPassword("");
-    setSubmitting(false);
+    setFieldErrors({});
+
+    if (registerPassword !== confirmPassword) {
+      setStatusMessage("Passwords do not match.");
+      setSubmitting(false);
+      return;
+    }
+
+    // Split full name into first and last name
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || firstName; // Fallback if only one name provided
+
+    try {
+      const response = await apiClient.post("/register", {
+        first_name: firstName,
+        last_name: lastName,
+        email: registerEmail,
+        password: registerPassword,
+        password_confirmation: confirmPassword,
+        phone: phoneNumber,
+        role: selectedRole,
+      });
+
+      if (response.data.user) {
+        // Store only the user object, the token is in the HttpOnly cookie
+        localStorage.setItem("app_auth", JSON.stringify({
+          user: response.data.user,
+        }));
+        setStatusMessage("Registration successful! Redirecting...");
+
+        const redirect = searchParams.get("redirect");
+        setTimeout(() => navigate(redirect || "/"), 1000);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      const errors = error.response?.data?.errors;
+      if (errors) {
+        setFieldErrors(errors);
+        setStatusMessage("Please check the validation errors below.");
+      } else {
+        setStatusMessage(error.response?.data?.message || "Registration failed. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -109,9 +225,11 @@ export default function LoginPortalPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="name@email.com"
-                      className="w-full rounded-2xl border border-[#243447]/14 bg-white/80 py-3 pl-11 pr-4 text-sm text-[#141D26] outline-none transition focus:border-[#C51F5D]/40 focus:ring-2 focus:ring-[#C51F5D]/20"
+                      className={`w-full rounded-2xl border bg-white/80 py-3 pl-11 pr-4 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 ${fieldErrors.email ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                        }`}
                     />
                   </div>
+                  <FieldError error={fieldErrors.email?.[0]} />
                 </div>
 
                 <div>
@@ -124,9 +242,11 @@ export default function LoginPortalPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full rounded-2xl border border-[#243447]/14 bg-white/80 py-3 pl-11 pr-4 text-sm text-[#141D26] outline-none transition focus:border-[#C51F5D]/40 focus:ring-2 focus:ring-[#C51F5D]/20"
+                      className={`w-full rounded-2xl border bg-white/80 py-3 pl-11 pr-4 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 ${fieldErrors.password ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                        }`}
                     />
                   </div>
+                  <FieldError error={fieldErrors.password?.[0]} />
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
@@ -165,46 +285,86 @@ export default function LoginPortalPage() {
             <>
               <div className="text-center text-sm font-semibold text-[#141D26]">Register</div>
               <form onSubmit={onRegisterSubmit} className="mt-4 space-y-3">
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Full name"
-                  className="w-full rounded-2xl border border-[#243447]/14 bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:border-[#C51F5D]/40 focus:ring-2 focus:ring-[#C51F5D]/20"
-                />
-                <input
-                  type="email"
-                  required
-                  value={registerEmail}
-                  onChange={(e) => setRegisterEmail(e.target.value)}
-                  placeholder="Email address"
-                  className="w-full rounded-2xl border border-[#243447]/14 bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:border-[#C51F5D]/40 focus:ring-2 focus:ring-[#C51F5D]/20"
-                />
-                <input
-                  type="tel"
-                  required
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Phone number"
-                  className="w-full rounded-2xl border border-[#243447]/14 bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:border-[#C51F5D]/40 focus:ring-2 focus:ring-[#C51F5D]/20"
-                />
-                <input
-                  type="password"
-                  required
-                  value={registerPassword}
-                  onChange={(e) => setRegisterPassword(e.target.value)}
-                  placeholder="Password"
-                  className="w-full rounded-2xl border border-[#243447]/14 bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:border-[#C51F5D]/40 focus:ring-2 focus:ring-[#C51F5D]/20"
-                />
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm password"
-                  className="w-full rounded-2xl border border-[#243447]/14 bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:border-[#C51F5D]/40 focus:ring-2 focus:ring-[#C51F5D]/20"
-                />
+                <div>
+                  <input
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Full name"
+                    className={`w-full rounded-2xl border bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 ${fieldErrors.first_name || fieldErrors.last_name ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                      }`}
+                  />
+                  <FieldError error={fieldErrors.first_name?.[0] || fieldErrors.last_name?.[0]} />
+                </div>
+                <div>
+                  <input
+                    type="email"
+                    required
+                    value={registerEmail}
+                    onChange={(e) => setRegisterEmail(e.target.value)}
+                    placeholder="Email address"
+                    className={`w-full rounded-2xl border bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 ${fieldErrors.email ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                      }`}
+                  />
+                  <FieldError error={fieldErrors.email?.[0]} />
+                </div>
+                <div>
+                  <input
+                    type="tel"
+                    required
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Phone number"
+                    className={`w-full rounded-2xl border bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 ${fieldErrors.phone ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                      }`}
+                  />
+                  <FieldError error={fieldErrors.phone?.[0]} />
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    required
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                    placeholder="Password"
+                    className={`w-full rounded-2xl border bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 ${fieldErrors.password ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                      }`}
+                  />
+                  <FieldError error={fieldErrors.password?.[0]} />
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm password"
+                    className={`w-full rounded-2xl border bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 ${fieldErrors.password_confirmation ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                      }`}
+                  />
+                  <FieldError error={fieldErrors.password_confirmation?.[0]} />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#141D26]/60 ml-2">Select your role</label>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className={`w-full rounded-2xl border bg-white/80 px-4 py-3 text-sm text-[#141D26] outline-none transition focus:ring-2 focus:ring-[#C51F5D]/20 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207L10%2012L15%207%22%20stroke%3D%22%23243447%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px_20px] bg-[right_1rem_center] bg-no-repeat ${fieldErrors.role ? "border-[#EF4444]" : "border-[#243447]/14 focus:border-[#C51F5D]/40"
+                      }`}
+                  >
+                    {roles.map((r) => (
+                      <option key={r.id} value={r.name}>
+                        {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
+                      </option>
+                    ))}
+                    {roles.length === 0 && (
+                      <option value="student">Student</option>
+                    )}
+                  </select>
+                  <FieldError error={fieldErrors.role?.[0]} />
+                </div>
                 <motion.button
                   whileHover={reduce ? undefined : { y: -1 }}
                   whileTap={reduce ? undefined : { scale: 0.99 }}

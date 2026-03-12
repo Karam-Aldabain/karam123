@@ -455,7 +455,7 @@ function SplitImperative() {
                   )}
                 </IconBadge>
                 <div>
-              
+
                   <div className="mt-1 text-xl font-semibold text-[#0B1220]">
                     {mode === "unstructured"
                       ? "Adoption without direction creates risk."
@@ -494,7 +494,7 @@ function SplitImperative() {
               <ClipboardCheck className="h-5 w-5" {...iconStrongProps} />
             </IconBadge>
             <div>
-             
+
               <div className="mt-1 text-xl font-semibold text-[#0B1220]">
                 AI is not the future. It’s the standard.
               </div>
@@ -826,7 +826,7 @@ function OutcomesDeliverablesGrid({ inView, reduce }) {
                 <I className="h-5 w-5" {...iconStrongProps} />
               </IconBadge>
               <div>
-              
+
                 <div className="mt-1 text-lg font-semibold text-[#0B1220]">{x.t}</div>
                 <p className="mt-2 text-sm text-[#0B1220]/70">
                   Executive-ready output designed for action, governance, and adoption.
@@ -1049,7 +1049,7 @@ export default function AIForOrganizationsLanding() {
       {/* PROGRAM CATEGORIES */}
       <section id="programs" className="relative" style={{ background: DARK_SECTION_BG }}>
         <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
-      
+
 
           {/* tabs */}
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -1248,7 +1248,7 @@ export default function AIForOrganizationsLanding() {
           </div>
 
           <div className="mt-8 rounded-[36px] bg-white/70 p-7 ring-1 ring-[#0B1220]/10">
-            
+
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 "Industry sector",
@@ -1268,7 +1268,7 @@ export default function AIForOrganizationsLanding() {
             </div>
 
             <div className="mt-6 rounded-[32px] p-6 ring-1 ring-[#0B1220]/10" style={{ background: "rgba(11,18,32,0.04)" }}>
-              
+
             </div>
           </div>
         </div>
@@ -1364,7 +1364,7 @@ export default function AIForOrganizationsLanding() {
                 <BadgeCheck className="h-5 w-5" {...iconStrongProps} />
               </IconBadge>
               <div>
-             
+
                 <div className="mt-1 text-xl font-semibold text-[#0B1220]">
                   Ongoing AI advisory partnership
                 </div>
@@ -1376,7 +1376,7 @@ export default function AIForOrganizationsLanding() {
           </div>
 
           <div className="mt-8 rounded-[36px] bg-white/70 p-7 ring-1 ring-[#0B1220]/10">
-           
+
             <div className="mt-4 flex flex-wrap gap-2">
               {[
                 "Corporations & Enterprises",

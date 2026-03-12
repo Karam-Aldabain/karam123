@@ -30,6 +30,7 @@ import PartnershipsPage from "./components/partnerships";
 import EcosystemPage from "./components/ecosystem";
 import ExpertsValuePropositionPage from "./components/experts-value-proposition";
 import ExpertsRegisterPage from "./components/experts-register";
+import ExpertDashboardPage from "./components/expert-dashboard";
 import SiteFooter from "./components/SiteFooter";
 import ImpressumPage from "./components/legal/ImpressumPage";
 import TermsOfUsePage from "./components/legal/TermsOfUsePage";
@@ -139,6 +140,7 @@ export default function App() {
           <Route path="/about/ecosystem/become-an-expert" element={<ExpertsValuePropositionPage />} />
           <Route path="/experts/value-proposition" element={<ExpertsValuePropositionPage />} />
           <Route path="/experts/register" element={<ExpertsRegisterPage />} />
+          <Route path="/experts/dashboard" element={<ExpertDashboardPage />} />
           <Route path="/about" element={<MissionVisionPage />} />
         </Routes>
       </main>
