@@ -1312,30 +1312,6 @@ function FormWizard() {
         objectives: "",
     });
 
-    const [expert, setExpert] = useState({
-        expertise: [],
-        expertiseOther: "",
-        years: "",
-        organization: "",
-        roleType: "",
-        availability: "",
-        engagement: [],
-        engagementOther: "",
-        delivery: "",
-        travel: false,
-        hasMaterial: "",
-        contentTypes: [],
-        contentTypesOther: "",
-        coDesign: true,
-        ledProjects: true,
-        projectsDesc: "",
-        references: true,
-        portfolio: "",
-        scholar: "",
-        compensation: "",
-        longTerm: true,
-    });
-
     const [alignment, setAlignment] = useState({
         why: "",
         impact: "",
@@ -1344,17 +1320,15 @@ function FormWizard() {
         consent: false,
     });
 
-    const isExpert = applicantType === "Industry Expert / University Professor";
-
     const steps = useMemo(() => {
         return [
             { key: "type", label: "Applicant Type" },
             { key: "basic", label: "Basic Info" },
-            { key: isExpert ? "expert" : "partnership", label: isExpert ? "Expert Profile" : "Partnership Details" },
+            { key: "partnership", label: "Partnership Details" },
             { key: "alignment", label: "Alignment & Compliance" },
             { key: "review", label: "Review & Submit" },
         ];
-    }, [isExpert]);
+    }, []);
 
     const pct = Math.round(((step + 1) / steps.length) * 100);
 
@@ -1362,7 +1336,6 @@ function FormWizard() {
         "University / Educational Institution": "University / Faculty / Institution",
         "Company / Organization": "Company / Organization",
         "Government / Public Sector": "Ministry / Agency / Public Entity",
-        "Industry Expert / University Professor": "University / Company / Lab",
     };
     const orgNamePlaceholder = orgPlaceholderByType[applicantType] || "Organization / Institution";
 
@@ -1407,41 +1380,6 @@ function FormWizard() {
         return errs;
     };
 
-    const validateExpert = () => {
-        const errs = {};
-        if (!expert.expertise?.length)
-            errs.expertise = "Select at least one area of expertise";
-        if (expert.expertise.includes("Other (Specify)") && !expert.expertiseOther?.trim())
-            errs.expertiseOther = "Please specify your expertise";
-        if (!expert.engagement?.length)
-            errs.engagement = "Select at least one engagement type";
-        if (expert.engagement.includes("Other (Specify)") && !expert.engagementOther?.trim())
-            errs.engagementOther = "Please specify the engagement type";
-        if (expert.contentTypes?.includes("Other (Specify)") && !expert.contentTypesOther?.trim())
-            errs.contentTypesOther = "Please specify the content type";
-        if (!expert.years)
-            errs.years = "Select your years of experience";
-        if (!expert.roleType)
-            errs.roleType = "Select your role type";
-        if (!expert.availability)
-            errs.availability = "Select your weekly availability";
-        if (!expert.delivery)
-            errs.delivery = "Select a delivery preference";
-        if (!expert.hasMaterial)
-            errs.hasMaterial = "Indicate whether you have training material";
-        if (!expert.projectsDesc?.trim())
-            errs.projectsDesc = "Key projects description is required";
-        if (!expert.portfolio?.trim())
-            errs.portfolio = "Portfolio or personal website URL is required";
-        else if (!/^https?:\/\/.*\..*$/.test(expert.portfolio))
-            errs.portfolio = "Must be a valid URL — e.g. https://yoursite.com";
-        if (!expert.compensation)
-            errs.compensation = "Select a preferred collaboration model";
-        if (!profileImageFile)
-            errs.profile_image = "A professional photo is required";
-        return errs;
-    };
-
     const validateAlignment = () => {
         const errs = {};
         if (!alignment.confirm)
@@ -1459,7 +1397,6 @@ function FormWizard() {
         let errs = {};
         if (key === "basic") errs = validateBasic();
         else if (key === "partnership") errs = validatePartnership();
-        else if (key === "expert") errs = validateExpert();
         else if (key === "alignment") errs = validateAlignment();
 
         if (Object.keys(errs).length > 0) {
@@ -1485,12 +1422,6 @@ function FormWizard() {
         setApplicantType("University / Educational Institution");
         setBasic({ fullName: "", email: "", phone: "", country: "", orgName: "", position: "", linkedin: "", website: "" });
         setPartnership({ collab: [], collabOther: "", deliveryMode: "", participants: "", startTimeline: "", objectives: "" });
-        setExpert({
-            expertise: [], expertiseOther: "", years: "", organization: "", roleType: "", availability: "",
-            engagement: [], engagementOther: "", delivery: "", travel: false, hasMaterial: "", contentTypes: [],
-            contentTypesOther: "", coDesign: true, ledProjects: true, projectsDesc: "", references: true,
-            portfolio: "", scholar: "", compensation: "", longTerm: true,
-        });
         setAlignment({ why: "", impact: "", confirm: false, contact: false, consent: false });
         setFieldErrors({});
         setApplicationId(null);
@@ -1500,11 +1431,10 @@ function FormWizard() {
 
     async function submit() {
         const basicErrors = validateBasic();
-        const partnershipErrors = isExpert ? {} : validatePartnership();
-        const expertErrors = isExpert ? validateExpert() : {};
+        const partnershipErrors = validatePartnership();
         const alignmentErrors = validateAlignment();
 
-        const allErrors = { ...basicErrors, ...partnershipErrors, ...expertErrors, ...alignmentErrors };
+        const allErrors = { ...basicErrors, ...partnershipErrors, ...alignmentErrors };
 
         if (Object.keys(allErrors).length > 0) {
             setFieldErrors(allErrors);
@@ -1529,49 +1459,14 @@ function FormWizard() {
         formData.append('alignment[contact]', alignment.contact ? '1' : '0');
         formData.append('alignment[consent]', alignment.consent ? '1' : '0');
 
-        if (isExpert) {
-            if (expert.expertise?.length) {
-                expert.expertise.forEach((item, index) => formData.append(`expert[expertise][${index}]`, item));
-            }
-            if (expert.expertiseOther) formData.append('expert[expertiseOther]', expert.expertiseOther);
-
-            if (expert.engagement?.length) {
-                expert.engagement.forEach((item, index) => formData.append(`expert[engagement][${index}]`, item));
-            }
-            if (expert.engagementOther) formData.append('expert[engagementOther]', expert.engagementOther);
-
-            if (expert.contentTypes?.length) {
-                expert.contentTypes.forEach((item, index) => formData.append(`expert[contentTypes][${index}]`, item));
-            }
-            if (expert.contentTypesOther) formData.append('expert[contentTypesOther]', expert.contentTypesOther);
-
-            formData.append('expert[years]', expert.years);
-            formData.append('expert[roleType]', expert.roleType);
-            formData.append('expert[availability]', expert.availability);
-            formData.append('expert[delivery]', expert.delivery);
-            formData.append('expert[travel]', expert.travel ? '1' : '0');
-            formData.append('expert[hasMaterial]', expert.hasMaterial || '');
-            formData.append('expert[coDesign]', expert.coDesign ? '1' : '0');
-            formData.append('expert[ledProjects]', expert.ledProjects ? '1' : '0');
-            formData.append('expert[projectsDesc]', expert.projectsDesc || '');
-            formData.append('expert[references]', expert.references ? '1' : '0');
-            formData.append('expert[portfolio]', expert.portfolio || '');
-            formData.append('expert[scholar]', expert.scholar || '');
-            formData.append('expert[compensation]', expert.compensation || '');
-            formData.append('expert[longTerm]', expert.longTerm ? '1' : '0');
-
-            if (profileImageFile) formData.append('profile_image', profileImageFile);
-            if (cvFile) formData.append('cv_file', cvFile);
-        } else {
-            if (partnership.collab?.length) {
-                partnership.collab.forEach((item, index) => formData.append(`partnership[collab][${index}]`, item));
-            }
-            if (partnership.collabOther) formData.append('partnership[collabOther]', partnership.collabOther);
-            formData.append('partnership[deliveryMode]', partnership.deliveryMode);
-            formData.append('partnership[participants]', partnership.participants);
-            formData.append('partnership[startTimeline]', partnership.startTimeline);
-            formData.append('partnership[objectives]', partnership.objectives || '');
+        if (partnership.collab?.length) {
+            partnership.collab.forEach((item, index) => formData.append(`partnership[collab][${index}]`, item));
         }
+        if (partnership.collabOther) formData.append('partnership[collabOther]', partnership.collabOther);
+        formData.append('partnership[deliveryMode]', partnership.deliveryMode);
+        formData.append('partnership[participants]', partnership.participants);
+        formData.append('partnership[startTimeline]', partnership.startTimeline);
+        formData.append('partnership[objectives]', partnership.objectives || '');
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -1623,12 +1518,12 @@ function FormWizard() {
                     {/* Header */}
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <div className="mt-1 text-2xl font-semibold text-[#0B1220]">Partnership & Expert Application Form</div>
+                            <div className="mt-1 text-2xl font-semibold text-[#0B1220]">Partnership Application Form</div>
                             <p className="mt-2 max-w-3xl text-sm text-[#0B1220]/70">
-                                We collaborate with universities, corporations, public institutions, and industry experts to deliver structured, measurable professional impact.
+                                We collaborate with universities, corporations, and public institutions to deliver structured, measurable professional impact.
                             </p>
                             <p className="mt-2 max-w-3xl text-sm text-[#0B1220]/70">
-                                Please complete the form below to initiate a partnership or apply to join our expert network.
+                                Please complete the form below to initiate a partnership.
                             </p>
                         </div>
                         <div className="w-full sm:w-[280px]">
@@ -1666,7 +1561,6 @@ function FormWizard() {
                                         let errs = {};
                                         if (key === "basic") errs = validateBasic();
                                         else if (key === "partnership") errs = validatePartnership();
-                                        else if (key === "expert") errs = validateExpert();
                                         else if (key === "alignment") errs = validateAlignment();
 
                                         if (Object.keys(errs).length > 0) {
@@ -1722,7 +1616,6 @@ function FormWizard() {
                                                 "University / Educational Institution",
                                                 "Company / Organization",
                                                 "Government / Public Sector",
-                                                "Industry Expert / University Professor",
                                             ]}
                                         />
                                     </FormCard>
@@ -1957,238 +1850,6 @@ function FormWizard() {
                                 </motion.div>
                             ) : null}
 
-                            {/* STEP: EXPERT */}
-                            {steps[step].key === "expert" ? (
-                                <motion.div
-                                    key="expert"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    transition={{ duration: 0.35, ease: "easeOut" }}
-                                >
-                                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                                        <Field
-                                            label="Primary area of expertise"
-                                            required
-                                            hint="Multi-select"
-                                            className="sm:col-span-2"
-                                            error={fieldErrors.expertise || null}
-                                        >
-                                            <MultiSelect
-                                                value={expert.expertise}
-                                                onChange={(v) => {
-                                                    setExpert({
-                                                        ...expert,
-                                                        expertise: v,
-                                                        expertiseOther: v.includes("Other (Specify)") ? expert.expertiseOther : "",
-                                                    });
-                                                    if (fieldErrors.expertise) setFieldErrors(prev => ({ ...prev, expertise: null }));
-                                                }}
-                                                error={!!fieldErrors.expertise}
-                                                otherValue={expert.expertiseOther}
-                                                onOtherValueChange={(v) => setExpert({ ...expert, expertiseOther: v })}
-                                                options={[
-                                                    "Software Development", "AI & Machine Learning", "Data Science",
-                                                    "Cloud & DevOps", "Cybersecurity", "Digital Transformation",
-                                                    "Product Management", "UX/UI", "Business & Consulting",
-                                                    "Finance & FinTech", "Healthcare & Digital Health", "Marketing & Growth",
-                                                    "Entrepreneurship", "Supply Chain", "Project Management", "Other (Specify)",
-                                                ]}
-                                            />
-                                            {fieldErrors.expertiseOther && (
-                                                <FieldError error={fieldErrors.expertiseOther} />
-                                            )}
-                                        </Field>
-
-                                        <Field label="Years of professional experience" required error={fieldErrors.years || null}>
-                                            <Select
-                                                value={expert.years}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, years: v });
-                                                    if (fieldErrors.years) setFieldErrors(prev => ({ ...prev, years: null }));
-                                                }}
-                                                options={["3–5", "5–10", "10–15", "15+"]}
-                                                icon={BadgeCheck}
-                                                iconColor={THEME.accent3}
-                                                error={!!fieldErrors.years}
-                                            />
-                                        </Field>
-
-                                        <Field label="Role type" required error={fieldErrors.roleType || null}>
-                                            <Select
-                                                value={expert.roleType}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, roleType: v });
-                                                    if (fieldErrors.roleType) setFieldErrors(prev => ({ ...prev, roleType: null }));
-                                                }}
-                                                options={["Industry Professional", "University Professor", "Consultant", "Executive", "Founder", "Other"]}
-                                                icon={Briefcase}
-                                                iconColor={THEME.accent4}
-                                                error={!!fieldErrors.roleType}
-                                            />
-                                        </Field>
-
-                                        <Field label="Weekly availability (hours)" required error={fieldErrors.availability || null}>
-                                            <Select
-                                                value={expert.availability}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, availability: v });
-                                                    if (fieldErrors.availability) setFieldErrors(prev => ({ ...prev, availability: null }));
-                                                }}
-                                                options={["2–4 Hours", "4–8 Hours", "8–12 Hours", "12+ Hours"]}
-                                                icon={Calendar}
-                                                iconColor={THEME.accent2}
-                                                error={!!fieldErrors.availability}
-                                            />
-                                        </Field>
-
-                                        <Field
-                                            label="Preferred engagement type"
-                                            required
-                                            hint="Multi-select"
-                                            className="sm:col-span-2"
-                                            error={fieldErrors.engagement || null}
-                                        >
-                                            <MultiSelect
-                                                value={expert.engagement}
-                                                onChange={(v) => {
-                                                    setExpert({
-                                                        ...expert,
-                                                        engagement: v,
-                                                        engagementOther: v.includes("Other (Specify)") ? expert.engagementOther : "",
-                                                    });
-                                                    if (fieldErrors.engagement) setFieldErrors(prev => ({ ...prev, engagement: null }));
-                                                }}
-                                                error={!!fieldErrors.engagement}
-                                                otherValue={expert.engagementOther}
-                                                onOtherValueChange={(v) => setExpert({ ...expert, engagementOther: v })}
-                                                options={[
-                                                    "Internship Supervision", "1-to-1 Mentorship",
-                                                    "Workshops & Masterclasses", "AI Training Programs",
-                                                    "Curriculum Co-Design", "Advisory Board", "Research Supervision",
-                                                    "Other (Specify)",
-                                                ]}
-                                            />
-                                            {fieldErrors.engagementOther && (
-                                                <FieldError error={fieldErrors.engagementOther} />
-                                            )}
-                                        </Field>
-
-                                        <Field label="Delivery preference" required error={fieldErrors.delivery || null}>
-                                            <Select
-                                                value={expert.delivery}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, delivery: v });
-                                                    if (fieldErrors.delivery) setFieldErrors(prev => ({ ...prev, delivery: null }));
-                                                }}
-                                                options={["Online", "Hybrid", "Onsite (Europe)", "Onsite (MENA)"]}
-                                                icon={Compass}
-                                                iconColor={THEME.accent}
-                                                error={!!fieldErrors.delivery}
-                                            />
-                                        </Field>
-
-                                        <Field label="Type of content available" hint="Optional" className="sm:col-span-2">
-                                            <MultiSelect
-                                                value={expert.contentTypes}
-                                                onChange={(v) =>
-                                                    setExpert({
-                                                        ...expert,
-                                                        contentTypes: v,
-                                                        contentTypesOther: v.includes("Other (Specify)") ? expert.contentTypesOther : "",
-                                                    })
-                                                }
-                                                otherValue={expert.contentTypesOther}
-                                                onOtherValueChange={(v) => setExpert({ ...expert, contentTypesOther: v })}
-                                                options={[
-                                                    "Course Curriculum",
-                                                    "Slides & Workshops",
-                                                    "Case Studies",
-                                                    "Real Industry Projects",
-                                                    "Recorded Sessions",
-                                                    "AI Labs / Technical Modules",
-                                                    "Other (Specify)",
-                                                ]}
-                                            />
-                                        </Field>
-
-                                        <Field label="Do you have existing training material?" required error={fieldErrors.hasMaterial || null}>
-                                            <Select
-                                                value={expert.hasMaterial}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, hasMaterial: v });
-                                                    if (fieldErrors.hasMaterial) setFieldErrors(prev => ({ ...prev, hasMaterial: null }));
-                                                }}
-                                                options={["Yes", "No", "Partially"]}
-                                                icon={FileCheck2}
-                                                iconColor={THEME.accent4}
-                                                error={!!fieldErrors.hasMaterial}
-                                            />
-                                        </Field>
-
-                                        <Field
-                                            label="Key projects (short description)"
-                                            required
-                                            className="sm:col-span-2"
-                                            error={fieldErrors.projectsDesc || null}
-                                        >
-                                            <Textarea
-                                                value={expert.projectsDesc}
-                                                onChange={(e) => {
-                                                    setExpert({ ...expert, projectsDesc: e.target.value });
-                                                    if (fieldErrors.projectsDesc) setFieldErrors(prev => ({ ...prev, projectsDesc: null }));
-                                                }}
-                                                placeholder="Short description of key projects"
-                                                error={!!fieldErrors.projectsDesc}
-                                            />
-                                        </Field>
-
-                                        <Field label="Portfolio / personal website URL" required error={fieldErrors.portfolio || null}>
-                                            <Input
-                                                icon={Globe2}
-                                                iconColor={THEME.accent3}
-                                                placeholder="https://..."
-                                                value={expert.portfolio}
-                                                onChange={(e) => {
-                                                    setExpert({ ...expert, portfolio: e.target.value });
-                                                    if (fieldErrors.portfolio) setFieldErrors(prev => ({ ...prev, portfolio: null }));
-                                                }}
-                                                error={!!fieldErrors.portfolio}
-                                            />
-                                        </Field>
-
-                                        <Field label="Preferred collaboration model" required error={fieldErrors.compensation || null}>
-                                            <Select
-                                                value={expert.compensation}
-                                                onChange={(v) => {
-                                                    setExpert({ ...expert, compensation: v });
-                                                    if (fieldErrors.compensation) setFieldErrors(prev => ({ ...prev, compensation: null }));
-                                                }}
-                                                options={["Per Program", "Per Hour"]}
-                                                icon={Handshake}
-                                                iconColor={THEME.accent4}
-                                                error={!!fieldErrors.compensation}
-                                            />
-                                        </Field>
-
-                                        <Field
-                                            label="Uploads"
-                                            required
-                                            className="sm:col-span-2"
-                                        >
-                                            <FileRow
-                                                onProfileImageChange={(f) => {
-                                                    setProfileImageFile(f);
-                                                    if (fieldErrors.profile_image) setFieldErrors(prev => ({ ...prev, profile_image: null }));
-                                                }}
-                                                onCvFileChange={setCvFile}
-                                                profileImageError={fieldErrors.profile_image || null}
-                                            />
-                                        </Field>
-                                    </div>
-                                </motion.div>
-                            ) : null}
-
                             {/* STEP: ALIGNMENT */}
                             {steps[step].key === "alignment" ? (
                                 <motion.div
@@ -2280,44 +1941,22 @@ function FormWizard() {
                                             </div>
                                             <div className="mt-5 rounded-3xl bg-white/60 p-5 ring-1 ring-[#0B1220]/10">
                                                 <div className="text-sm font-semibold text-[#0B1220]">
-                                                    {isExpert ? "Expert profile" : "Partnership details"}
+                                                    Partnership details
                                                 </div>
                                                 <div className="mt-2 text-sm text-[#0B1220]/70">
-                                                    {isExpert ? (
-                                                        <>
-                                                            Expertise: <span className="font-semibold">{expert.expertise.join(", ") || "—"}</span>
-                                                            <br />
-                                                            Engagement: <span className="font-semibold">{expert.engagement.join(", ") || "—"}</span>
-                                                            <br />
-                                                            Availability: <span className="font-semibold">{expert.availability}</span>
-                                                            {(profileImageFile || cvFile) ? (
-                                                                <>
-                                                                    <br />
-                                                                    Uploads:{" "}
-                                                                    <span className="font-semibold">
-                                                                        {[
-                                                                            profileImageFile ? `Photo (${profileImageFile.name})` : null,
-                                                                            cvFile ? `CV (${cvFile.name})` : null,
-                                                                        ].filter(Boolean).join(", ")}
-                                                                    </span>
-                                                                </>
-                                                            ) : null}
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            Collaboration: <span className="font-semibold">
-                                                                {partnership.collab.map(item =>
-                                                                    item === "Other (Specify)" && partnership.collabOther
-                                                                        ? `Other: ${partnership.collabOther}`
-                                                                        : item
-                                                                ).join(", ") || "—"}
-                                                            </span>
-                                                            <br />
-                                                            Delivery: <span className="font-semibold">{partnership.deliveryMode}</span>
-                                                            <br />
-                                                            Objectives: <span className="font-semibold">{partnership.objectives || "—"}</span>
-                                                        </>
-                                                    )}
+                                                    <>
+                                                        Collaboration: <span className="font-semibold">
+                                                            {partnership.collab.map(item =>
+                                                                item === "Other (Specify)" && partnership.collabOther
+                                                                    ? `Other: ${partnership.collabOther}`
+                                                                    : item
+                                                            ).join(", ") || "—"}
+                                                        </span>
+                                                        <br />
+                                                        Delivery: <span className="font-semibold">{partnership.deliveryMode}</span>
+                                                        <br />
+                                                        Objectives: <span className="font-semibold">{partnership.objectives || "—"}</span>
+                                                    </>
                                                 </div>
                                             </div>
                                         </div>
@@ -2446,14 +2085,13 @@ export default function PartnershipsPage() {
                                 Strategic Partnerships <br /> Built on Outcomes.
                             </h1>
                             <p className="mt-5 max-w-xl text-balance text-base text-white/70 sm:text-lg">
-                                We collaborate with universities, corporations, public institutions, and industry leaders to deliver measurable professional impact — not theoretical engagement.
+                                We collaborate with universities, corporations, and public institutions to deliver measurable professional impact — not theoretical engagement.
                             </p>
                             <p className="mt-4 max-w-xl text-balance text-sm leading-relaxed text-white/65">
-                                From co-hosted internships to executive AI programs and expert networks — our partnership model is structured, scalable, and results-driven.
+                                From co-hosted internships to executive AI programs — our partnership model is structured, scalable, and results-driven.
                             </p>
                             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                                 <MagneticButton href="#apply">Become a Partner</MagneticButton>
-                                <MagneticButton href="#apply" variant="secondary">Become an Expert</MagneticButton>
                             </div>
                         </motion.div>
 
@@ -2570,7 +2208,7 @@ export default function PartnershipsPage() {
                 <div className="mx-auto max-w-7xl px-5 py-14 sm:py-18">
                     <SectionTitle
                         title="Let's Build Structured Impact Together."
-                        subtitle="Whether you represent a university, company, government entity, or expert network — we design partnerships that create measurable value."
+                        subtitle="Whether you represent a university, company, or government entity — we design partnerships that create measurable value."
                     />
                     <div id="application-form" className="mt-10 scroll-mt-24">
                         <FormWizard />
@@ -2584,7 +2222,7 @@ export default function PartnershipsPage() {
                 style={{ background: `linear-gradient(135deg, ${THEME.pink} 0%, ${accent(0.74)} 90%)` }}
             >
                 <Handshake className="h-4 w-4" {...iconStrongProps} />
-                Partner / Expert Apply
+                Partner Apply
             </a>
 
             <style>{css}</style>
